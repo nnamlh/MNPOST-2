@@ -1,0 +1,333 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_content">
+
+            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Danh mục</a>
+                    </li>
+                    <li role="presentation" class="">
+                        <a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Thao tác</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                        <div class="x_panel">
+                            <!-- end x_title-->
+                            <div class="x_content">
+                                <div class="row">
+                                    <!-- search-->
+                                    <div class="col-sm-6">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon" id="sizing-addon3">Từ ngày</span>
+                                            <div class="col-xs-6">
+                                                <input type="text" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon" id="sizing-addon3">Tìm nhanh</span>
+                                            <input type="text" class="form-control" ng-model="searchText" my-enter="GetData(1,searchText)" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon" id="sizing-addon3">Đến ngày</span>
+                                            <div class="col-xs-6">
+                                                <input type="text" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- search-->
+                                </div>
+
+                                <!-- table data-->
+                                <div class="table-responsive">
+                                    <table class="table table-striped jambo_table bulk_action">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th>STT</th>
+                                                <th>Mã bảng kê</th>
+                                                <th>Ngày lập</th>
+                                                <th>Nhân viên</th>
+                                                <th>Biển số</th>
+                                                <th>Tuyến phát</th>
+                                                <th>Số lượng</th>
+                                                <th>Trọng lượng</th>
+                                                <th>Ghi chú</th>
+                                                <th>#</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr ng-repeat="item in allMailerDelivery">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{item.DocumentID}}</td>
+                                                <td>{{item.DocumentDate}}</td>
+                                                <td>{{item.EmployeeID}}</td>
+                                                <td>{{item.NumberPlate}}</td>
+                                                <td>{{item.RouteID}}</td>
+                                                <td>{{item.Quantity}}</td>
+                                                <td>{{item.Weight}}</td>
+                                                <td>{{item.Notes}}</td>
+                                                <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- end table data-->
+                                <!--phan trang-->
+                                <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                                <!-- end phan trang-->
+
+                            </div>
+                        </div>
+                        <!-- end x_content-->
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+                        <div id="insertmodal">
+                            <!-- begin form-->
+                            <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                                <!-- body-->
+                                <div class="modal-body">
+                                    <div class="row">
+                                                                             
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Ngày phát</label>
+                                                <input type="text" class="form-control" ng-model="MailerInfo.Quantity" />
+                                            </div>                                           
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Bưu cục phát</label>
+                                                <input type="text" class="form-control" ng-model="MailerInfo.NumberPlate" />
+                                            </div>                                          
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Số phiếu</label>
+                                                <input type="text" class="form-control" ng-model="MailerInfo.NumberPlate" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end body-->
+                                <!-- begin footer-->
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-default">Hoàn thành</button>
+                                </div>
+                                <!-- end footer-->
+                            </form>
+                            <!-- end form-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end content-->
+@section scripts {
+    <script src="~/Content/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+
+    <script>
+
+
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress']);
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.allEmployee = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllEmployee))');
+            $scope.allRoute = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllRoute))');
+            //console.log($scope.allProvince);
+            // phan trang
+            $scope.numPages;
+            $scope.itemPerPage;
+            $scope.totalItems;
+            $scope.currentPage = 1;
+            $scope.maxSize = 5;
+            $scope.pageChanged = function () {
+                $scope.GetData($scope.currentPage);
+            };
+
+
+            // lay du lieu
+            $scope.allMailerDelivery = [];
+            $scope.GetData = function (page, search) {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/mailerdelivery/getmailerdelivery?page=" + page + "&search=" + search
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allMailerDelivery = response.data.data;
+                        $scope.itemPerPage = response.data.pageSize;
+                        $scope.totalItems = response.data.toltalSize;
+                        $scope.numPages = Math.round($scope.totalItems / $scope.itemPerPage);
+
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            // goi lay du liẹu
+
+            $scope.GetData(1, "");
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.MailerInfo = {};
+            $scope.DocumentIDDisable = false;
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+
+                $scope.MailerInfo = {
+                    "DocumentID": "",
+                    "DocumentDate": "",
+                    "EmployeeID": "",
+                    "RouteID": "",
+                    "NumberPlate": "",
+                    "Notes": "",
+                    "Quantity": "",
+                    "Weight": "",
+                    "StatusID":"0"
+                };
+
+                $scope.modaltitle = "Thêm bảng kê";
+                $scope.DocumentIDDisable = false;
+                $scope.IsAction = 'add';
+                showModel("insertmodal")
+
+            };
+
+            $scope.edit = function (index) {
+                var info = $scope.allMailerDelivery[index];
+
+                $scope.MailerInfo = angular.copy(info);
+
+                $scope.modaltitle = "Chỉnh sửa bảng kê";
+                $scope.DocumentIDDisable = true;
+                $scope.IsAction = 'edit';
+                showModel("insertmodal")
+            };
+
+
+            // tim index theo ma tinh
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.allMailerDelivery.length; i++)
+                    if ($scope.allMailerDelivery[i].DocumentID == id)
+                        return i;
+                return -1;
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        $scope.sendCreate();
+                    } else if ($scope.IsAction === 'edit') {
+                        $scope.sendEdit();
+                    }
+
+                } else {
+                    showNotify('our form is missing');
+                }
+            }
+
+
+            // them tinh
+            $scope.sendCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/mailerdelivery/create",
+                    data: $scope.MailerInfo
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.alMailerDelivery.unshift(result.data);
+
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm bảng kê");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/mailerdelivery/edit",
+                    data: $scope.MailerInfo
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+
+                            var findIndex = getSelectedIndex(result.data.DocumentID);
+
+                            if (findIndex !== -1) {
+                                $scope.allMailerDelivery[findIndex] = angular.copy(result.data);
+                            }
+
+                            showNotify("Đã cập nhật");
+                            hideModel("insertmodal");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                );
+            }
+
+        });
+        //-- end controller
+        $(":input").inputmask();
+    </script>
+}

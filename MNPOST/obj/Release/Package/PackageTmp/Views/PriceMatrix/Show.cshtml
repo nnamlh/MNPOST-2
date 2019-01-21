@@ -1,0 +1,309 @@
+﻿
+@{
+    ViewBag.Title = "Bảng giá khách hàng";
+}
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>QUẢN LÝ COD {{postHandle}}</h2>
+                <div class="nav navbar-right">
+                    <button type="button" class="btn btn-primary" ng-click="addnew()">Tạo bảng giá</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_danhmuc" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=false">Danh mục</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=true">Chi tiết</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_danhmuc" aria-labelledby="home-tab">
+                            <!-- begin tab-->
+                            <div class="row">
+                                <form name="formSearch">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Thời gian</label>
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <input type="text" id="fromDate" my-tool-tip="Từ ngày" required class="form-control" data-inputmask="'mask': '99/99/9999'" ng-model="searchInfo.FromDate" value="@ViewBag.FromDate">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <input type="text" id="toDate" my-tool-tip="Đến ngày" required class="form-control" data-inputmask="'mask': '99/99/9999'" ng-model="searchInfo.ToDate" value="@ViewBag.ToDate">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-primary" type="button" ng-click="GetData()">Xem thông tin</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <!-- thong tin-->
+                                <div class="col-md-12">
+                                    <!-- table data-->
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Mã bảng giá</th>
+                                                    <th>Ngày lập</th>
+                                                    <th>Ngày bắt đầu</th>
+                                                    <th>Ngày kết thúc</th>
+                                                    <th>Loại bảng giá</th>
+                                                    <th>Nhóm </th>
+                                                    <th>Diễn giải</th>
+                                                    <th>Bưu cục</th>
+                                                    <th>#</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr ng-repeat="item in allMaster">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>{{item.PriceMaTrixID}}</td>
+                                                    <td>{{convertDate(item.CreateDate) | date:'dd/MM/yyyy' }}</td>
+                                                    <td>{{convertDate(item.StartDate) | date:'dd/MM/yyyy'}}</td>
+                                                    <td>{{convertDate(item.EndDate) | date:'dd/MM/yyyy'}}</td>
+                                                    <td>{{item.PriceType}}</td>
+                                                    <td>{{item.GroupID}}</td>
+                                                    <td>{{item.Description}}</td>
+                                                    <td>{{item.PostOfficeID}}</td>
+                                                    <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--phan trang-->
+                                    <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                                    <!-- end phan trang-->
+
+                                </div>
+
+                            </div>
+                            <!-- end tab-->
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Mã bảng kê</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.DocumentID" required ng-disabled="DocumentIDDisable" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ngày lập bảng</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.DocumentDate" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Phiếu thu</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.DocumentNumber" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bưu cục</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.PostOfficeID" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Người thu</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.MoneyColector" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Người nộp</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.EmployeeID" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Số đơn hàng</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.MailerAccount" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số tiền</label>
+                                        <input type="text" maxlength="10" class="form-control" ng-model="CODInfo.TotalMoney" />
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>COD</th>
+                                                    <th>Thực thu</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in mailers">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>{{item.MailerID}}</td>
+                                                    <td>{{item.COD}}</td>
+                                                    <td><input type="number" class="form-control" ng-init="item.ReciveCOD = item.COD" ng-model="item.ReciveCOD" ng-change="totalMoney()" /> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--foter-->
+                            <div class="nav navbar-right">
+                                <button type="button" class="btn btn-primary" ng-click="updateDetail()">Lưu thông tin</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- end content-->
+@section scripts {
+    <script src="~/Content/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+
+    <script>
+        $(":input").inputmask();
+
+        // tao controller
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+        var fromDate = '@Html.Raw(ViewBag.FromDate)';
+        var toDate = '@Html.Raw(ViewBag.ToDate)';
+
+        showModelFix('choosePostOfficeModal');
+
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress', 'ui.mask']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+            //mo tab moi khi bam nut tao bang ke
+            $scope.addnew = function () {
+                console.log('mo tab chi tiet');
+                $scope.mailers = [];
+                $scope.CODInfo = [];
+                $('.nav-tabs a[href="#tab_chitiet"]').tab('show');
+            };
+
+            // lay du lieu
+            $scope.allMaster = [];
+            $scope.GetData = function (page, search) {
+
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                console.log(fromDate + '  ' + toDate);
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/PriceMatrix/getPriceMatrix?page=" + page + "&search=" + search + "&fromDate=" + fromDate + "&toDate=" + toDate
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allMaster = response.data.data;
+                        $scope.itemPerPage = response.data.pageSize;
+                        $scope.totalItems = response.data.toltalSize;
+                        $scope.numPages = Math.round($scope.totalItems / $scope.itemPerPage);
+
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            };
+            // goi lay du liẹu
+
+            $scope.convertDate = function (jsonDate) {
+                var date = new Date(parseInt(jsonDate.substr(6)));
+                return date;
+            };
+
+            //get chi tiet
+            $scope.edit = function (index) {
+                var info = $scope.allCODMaster[index];
+                $scope.CODInfo = angular.copy(info);
+                //load danh sach cg chi tiet
+
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/EmployeeDebit/getDebitdetail?DocumentID=" + $scope.CODInfo.DocumentID
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+                    console.log(response.data);
+                   // if (response.error === 0) {
+
+                    console.log(response.data.data);
+                        $scope.mailers = response.data.data;
+                        console.log(response.data);
+                    //}
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+                //ket thuc load chi tiet
+                $scope.CountryIDDisable = true;
+                $scope.IsAction = 'edit';
+                $('.nav-tabs a[href="#tab_chitiet"]').tab('show');
+            };
+
+
+            //
+            $scope.totalMoney = function () {
+                var total = 0;
+                for (var i = 0; i < $scope.mailers.length; i++) {
+                    total += $scope.mailers[i].ReciveCOD;
+                }
+                $scope.CODInfo.TotalMoney = total;
+            };
+
+            $scope.updateDetail = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/employeedebit/UpdateDebitDetail",
+                    data: {
+                        detail: $scope.mailers,
+                        documentID: $scope.CODInfo.DocumentID
+                    }
+                }).then(
+                    function sucess(response) {
+                        showLoader(false);
+
+                        alert('Da cap nhat');
+
+                    }, function error(response) {
+                        showLoader(false);
+                        alert('disconnect internet');
+                    });
+            };
+
+        });
+
+
+
+    </script>
+
+}
+

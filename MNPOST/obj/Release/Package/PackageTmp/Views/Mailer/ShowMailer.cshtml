@@ -1,0 +1,489 @@
+﻿
+@{
+    ViewBag.Title = "ShowMailer";
+}
+
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>QUẢN LÝ VẬN ĐƠN <strong>{{postHandle}}</strong></h2>
+                <div class="nav navbar-right">
+                    <a class="btn btn-primary" href="/mailerinit/init" target="_blank" ng-hide="showEdit">Tạo vận đơn</a>
+                    <a class="btn btn-warning" ng-hide="showEdit" ng-click="printMailers()">Print</a>
+                    <a class="btn btn-primary" ng-click="updateMailer()" ng-show="showEdit">Cập nhật</a>
+                    <a class="btn btn-warning" ng-show="showEdit" ng-click="getTracking()">Xem lịch sử</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_vandon" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=false">Danh sách</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=true">Chi tiết</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_vandon" aria-labelledby="home-tab">
+                            <!-- begin tab-->
+                            <div class="row">
+                                <form name="formSearch" ng-submit="GetData()">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Lọc theo khách hàng</label>
+                                            <select ui-select2="select2Options" ng-model="searchInfo.customerId" class="form-control">
+                                                <option value="">Tất cả</option>
+                                                <option ng-repeat="item in customers" value="{{item.code}}">{{item.name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Nhập mã vận đơn</label>
+                                            <div class="row">
+                                                <div class="col-sm-7">
+                                                    <input type="text" class="form-control" ng-model="searchInfo.search" my-enter="GetData()">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <select class="form-control" ng-model="searchInfo.status" convert-to-number>
+                                                        <option ng-repeat="item in status" value="{{item.code}}">{{item.name | uppercase}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Thời gian</label>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.fromDate">
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.toDate">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-primary" type="submit">Xem thông tin</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <!-- thong tin-->
+                                <div class="col-md-12">
+                                    <!-- table data-->
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action ">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th><input type="checkbox" ng-model="checkMailers" ng-change="checkAll()" /></th>
+                                                    <th>STT</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>TT gửi</th>
+                                                    <th>TT nhận</th>
+                                                    <th>TT hàng</th>
+                                                    <th>TT cước</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr ng-repeat="item in mailers">
+                                                    <td><input type="checkbox" ng-model="item.isCheck" /></td>
+                                                    <td>
+                                                        {{$index + 1}}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Mã VĐ: </strong>{{item.MailerID}} <br />
+                                                        <strong>Ngày lập: </strong>{{item.AcceptDate}} <br />
+                                                        <strong>BC nhận: </strong>{{item.PostOfficeAcceptID}} <br />
+                                                        <strong>BC H/tại: </strong>{{item.CurrentPostOfficeID}}<br />
+                                                        <span class="label label-info">{{findStatus(item.CurrentStatusID)}}</span><br />
+                                                        <span ng-show="item.IsReturn" class="label label-warning">ĐƠN CHUYỂN HOÀN</span><br /><a href="#" ng-show="item.CurrentStatusID != 11 && item.IsReturn" ng-click="cancelReturn(item.MailerID)">Hủy hoàn</a><br /><br />
+                                                        <a href="#" class="label label-primary" ng-click="showMailerDetail($index)">Chi tiết</a> &nbsp;&nbsp;
+                                                        <a href="#" ng-click="showPDF('/report/PhieuGui?mailerId=' + item.MailerID)">In phiếu</a>
+                                                    </td>
+                                                    <td>
+                                                        <strong>Tên NgGửi: </strong> {{item.SenderName}} <br />
+                                                        <strong>ĐT NgGửi: </strong> {{item.SenderPhone}} <br />
+                                                        <strong>Đ/Chỉ NgGửi: </strong> {{item.SenderAddress}} <br />
+                                                        <strong>T/Thành NgGửi: </strong> {{item.SendProvinceName}} <br />
+                                                        <strong>Q/Huyện NgGửi: </strong> {{item.SendDistrictName}}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Tên NgNhận: </strong> {{item.RecieverName}} <br />
+                                                        <strong>ĐT NgNhận: </strong> {{item.RecieverPhone}} <br />
+                                                        <strong>Đ/Chỉ NgNhận: </strong> {{item.RecieverAddress}} <br />
+                                                        <strong>T/Thành NgNhận: </strong> {{item.RecieProvinceName}} <br />
+                                                        <strong>Q/Huyện NgNhận: </strong> {{item.ReceiDistrictName}} <br />
+                                                        <strong>P/xã NgNhận: </strong> {{item.RecieWardName}} <br />
+                                                    </td>
+                                                    <td>
+                                                        <strong>Dịch vụ: </strong>{{item.MailerTypeID}}<br />
+                                                        <strong>HT Thanh toán: </strong>{{item.PaymentMethodID}}<br />
+                                                        <strong>Trọng lượng: </strong>{{item.Weight}} Gram<br />
+                                                        <strong>Số lượng: </strong>{{item.Quantity}}<br />
+                                                        <strong>Tiền thu: </strong>{{item.COD |  currency: 'VND ':0}}<br />
+                                                        <strong>Loại hàng: </strong>{{item.MerchandiseID}}<br />
+                                                        <strong>Nội dung hàng: </strong>{{item.MailerDescription}}<br />
+                                                        <strong>Ghi chú: </strong>{{item.Notes}}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Phụ phí: </strong> {{item.PriceService |  currency: 'VND ':0}} <br />
+                                                        <strong>Cước CoD: </strong> {{item.PriceCoD |  currency: 'VND ':0}} <br />
+                                                        <strong>Cước chính: </strong> {{item.PriceDefault |  currency: 'VND ':0}} <br />
+                                                        <strong>Tổng cước: </strong> {{item.Amount |  currency: 'VND ':0}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--phan trang-->
+                                    <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                                    <!-- end phan trang-->
+
+                                </div>
+
+                            </div>
+                            <!-- end tab-->
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <div class="x_title">
+                                        <h2>Vận đơn : <strong>{{mailer.MailerID}}</strong> -- Tình trạng : <strong>{{findStatus(mailer.CurrentStatusID)}}</strong></h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Mã người gửi</label>
+                                        <input type="text" disabled class="form-control" value="{{mailer.SenderID}}" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tên người gửi</label>
+                                        <input type="text" class="form-control" ng-model="mailer.SenderName" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Điện thoại gửi</label>
+                                        <input type="tel" class="form-control" ng-model="mailer.SenderPhone" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Địa chỉ gửi</label>
+                                        <input type="text" class="form-control" ng-model="mailer.SenderAddress" required id="autocompleteSend" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tỉnh thành gửi</label>
+                                        <select class="form-control" ng-model="mailer.SenderProvinceID" ng-change="provinceChange('district', 'send')" required>
+                                            <option ng-repeat="item in provinceSend" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quận huyện gửi</label>
+                                        <select class="form-control" ng-model="mailer.SenderDistrictID" ng-change="provinceChange('ward', 'send')" required>
+                                            <option ng-repeat="item in districtSend" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Tên người nhận</label>
+                                        <input type="text" class="form-control" ng-model="mailer.RecieverName" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Điện thoại nhận</label>
+                                        <input type="tel" class="form-control" ng-model="mailer.RecieverPhone" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Địa chỉ nhận</label>
+                                        <input type="text" class="form-control" ng-model="mailer.RecieverAddress" id="autocompleteRecei" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tỉnh thành nhận</label>
+                                        <select class="form-control" ng-model="mailer.RecieverProvinceID" ng-change="provinceChange('district', 'recei')" required>
+                                            <option ng-repeat="item in provinceRecei" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quận huyện nhận</label>
+                                        <select class="form-control" ng-model="mailer.RecieverDistrictID" ng-change="provinceChange('ward', 'recei')" required>
+                                            <option ng-repeat="item in districtRecei" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phường xã nhận</label>
+                                        <select class="form-control" ng-model="mailer.RecieverWardID" required>
+                                            <option ng-repeat="item in wardRecei" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="x_title">
+                                        <h2><i class="fa fa-align-left"></i> Thông tin hàng gửi</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Dịch vụ</label>
+                                        <select ng-model="mailer.MailerTypeID" class="form-control" required>
+                                            <option ng-repeat="item in mailerTypes" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hình thức thanh toán</label>
+                                        <select ng-model="mailer.PaymentMethodID" class="form-control" required>
+                                            <option ng-repeat="item in payments" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label>Nội dung hàng</label>
+                                        <input type="text" class="form-control" ng-model="mailer.MailerDescription" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ghi chú</label>
+                                        <input type="text" class="form-control" ng-model="mailer.Notes" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Tiền thu (CoD) {{mailer.COD |  currency: 'VND ':0}}</label>
+                                        <input type="number" class="form-control" ng-model="mailer.COD" step="any" ng-change="setMerchandiseValue()" />
+                                     
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Giá trị hàng hóa {{mailer.MerchandiseValue |  currency: 'VND ':0}}</label>
+                                        <input type="number" class="form-control" ng-model="mailer.MerchandiseValue" step="any" />
+                                      
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label>Kích thước (cm)</label>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="number" class="form-control" placeholder="Dài" ng-model="mailer.LengthSize" step="any" />
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="number" class="form-control" placeholder="Rộng" ng-model="mailer.WidthSize" step="any" />
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="number" class="form-control" placeholder="Cao" ng-model="mailer.HeightSize" step="any" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <label>Hàng hóa</label>
+                                                    <select ng-model="mailer.MerchandiseID" class="form-control">
+                                                        <option ng-repeat="merchandise in merchandises" value="{{merchandise.code}}">{{merchandise.name}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <label>Số lượng</label>
+                                                    <input type="number" ng-model="mailer.Quantity" class="form-control" placeholder="Số lượng" required step="any" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <label>Trọng lượng (Gram)</label>
+                                                    <input type="number" class="form-control" ng-model="mailer.Weight" placeholder="Trọng lượng" required step="any" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Dịch vụ cộng thêm</label>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" ng-model="mailer.PriceService" step="any" ng-change="changePrice()">
+                                                    <span class="input-group-addon">
+                                                        <input type="checkbox" ng-model="showChoose">
+                                                    </span>
+                                                </div>
+                                                {{mailer.PriceService |  currency: 'VND ':0}}
+                                            </div>
+                                            <div class="col-sm-8" ng-show="showChoose">
+                                                <div class="serviceMorePrice">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <tr ng-repeat="opt in otherServices">
+                                                                <td><input type="checkbox" ng-model="opt.choose" ng-change="addSeviceMorePrice()"></td>
+                                                                <td>{{opt.name}}</td>
+                                                                <td><input type="number" step="any" ng-model="opt.price" ng-change="addSeviceMorePrice()" />&nbsp;&nbsp;{{opt.price | currency:"VND"}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="x_title">
+                                        <h2><i class="fa fa-align-left"></i>Thành tiền</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Cước chính</label>
+                                        <input type="number" class="form-control" step="any" ng-model="mailer.PriceDefault" ng-change="changePrice()" />
+                                        {{mailer.PriceDefault |  currency: 'VND ':0}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Cước CoD</label>
+                                        <input type="number" class="form-control" step="any" ng-model="mailer.PriceCoD" ng-change="changePrice()" />
+                                        {{mailer.PriceCoD |  currency: 'VND ':0}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Tổng cước</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" step="any" ng-model="mailer.Amount" />
+                                            <span class="input-group-addon"><a href="#" ng-click="calPrice()">Tính giá</a></span>
+                                        </div>
+                                        {{mailer.PriceDefault |  currency: 'VND ':0}}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end chon buu cuc-->
+    <!-- show tracking-->
+    <div id="showtracking" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped jambo_table bulk_action">
+                            <thead>
+                                <tr class="headings">
+                                    <th>STT</th>
+                                    <th>Tình trạng</th>
+                                    <th>Ngày giờ</th>
+                                    <th>Bưu cục hiện tại</th>
+                                    <th>Diễn dãi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="item in tracks">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{findStatus(item.StatusID)}}</td>
+                                    <td>{{item.CreateDate}}</td>
+                                    <td>{{item.PostOffice}}</td>
+                                    <td>{{item.Describe}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- end show tracking -->
+
+</div>
+
+<!-- end content-->
+@section scripts {
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMESJTjSQnZU8Q7J5AFDE2wP2wOm3hy1o&libraries=places&callback=initAutocomplete&language=vi"
+            async defer></script>
+
+    <script>
+        // tao controller
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+        var servicesGet = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Services)));
+        var customerDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.AllCustomer)));
+        var mailerTypesGet = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.MailerTypes)));
+
+        var paymentsGet = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Payments)));
+
+        var provinceSendGet = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Provinces)));
+        var currentDate = '@DateTime.Now.ToString("dd/MM/yyyy")';
+        var fromDate = '@DateTime.Now.AddDays(-7).ToString("dd/MM/yyyy")';
+        var toDate = '@DateTime.Now.AddDays(1).ToString("dd/MM/yyyy")';
+
+    </script>
+    <script src="~/Scripts/order/mailershow.js"></script>
+}
+
+
+

@@ -1,0 +1,264 @@
+﻿@{
+    ViewBag.Title = "Show";
+}
+<div ng-app="myApp" ng-controller="myCtrl">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Danh sách Menu</h2>
+                    <div class="navbar-right">
+                        <button class="btn btn-primary" type="button" ng-click="createMenu()">Thêm menu</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content">
+                    <form class="form-horizontal form-label-left" name="findmenu" ng-submit="getMenus(findmenu.$valid)">
+                        <div class="row">
+
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Tìm kiếm theo tên menu" type="text">
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <select class="form-control" ng-model="group" required>
+                                        <option ng-repeat="item in groups" value="{{item.Id}}">{{item.Name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="submit" class="btn btn-primary">Tìm</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã</th>
+                                <th>Tên menu</th>
+                                <th>Đường dẫn</th>
+                                <th>Vị trí</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in menus">
+                                <td>
+                                    {{$index + 1}}&nbsp;&nbsp;
+                                    <a href="#" ng-click="editMenu($index)"><i my-tool-tip="Chỉnh sửa" class="fa fa-pencil-square"></i></a>
+                                </td>
+                                <td>{{item.Code}}</td>
+                                <td>{{item.Name}}</td>
+                                <td>{{item.Link}}</td>
+                                <td>{{item.Position}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="menumodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{title}}</h4>
+                </div>
+                <form name="menuform" ng-submit="finishForm(menuform.$valid)">
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label>Mã menu</label>
+                            <input type="text" class="form-control" required ng-model="menu.Code" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tên menu</label>
+                            <input type="text" class="form-control" required ng-model="menu.Name" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nhóm</label>
+                            <select class="form-control" required ng-model="menu.GroupMenuId">
+                                <option ng-repeat="item in groups" value="{{item.Id}}">{{item.Name}}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Đường dẫn</label>
+                            <input type="text" class="form-control" name="link" required ng-model="menu.Link" />
+                        </div>
+                        <div class="form-group">
+                            <label>Vị trí</label>
+                            <input type="number" class="form-control" name="position" required ng-model="menu.Position" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Hoàn thành</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <!-- validator -->
+    <script>
+
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.groups = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.GroupMenu))');
+            $scope.group = '';
+
+            $scope.menus = [];
+
+            $scope.menu = {};
+
+            $scope.action = '';
+            $scope.title = '';
+
+
+            $scope.getMenus = function (isValid) {
+                if (isValid) {
+                    showLoader(true);
+                    $http.get('/menu/getmenus?groupId=' + $scope.group).then(function (response) {
+
+                        showLoader(false);
+                        console.log(response.data.data);
+                        $scope.menus = angular.copy(response.data.data);
+
+                    });
+
+                }
+
+            };
+
+
+            $scope.createMenu = function () {
+
+                $scope.menu = {
+                    'Id': '',
+                    'Name': '',
+                    'Link': '',
+                    'GroupMenuId': '',
+                    'Code': '',
+                    'Link': ''
+                };
+                $scope.menu.GroupMenuId = $scope.group;
+                $scope.action = 'create';
+                $scope.title = 'Thêm menu';
+                showModel('menumodal');
+            };
+
+            $scope.editMenu = function (idx) {
+
+                var data = $scope.menus[idx];
+
+                $scope.menu = angular.copy(data);
+
+                $scope.action = 'edit';
+                $scope.title = 'Sửa menu';
+                showModel('menumodal');
+
+            };
+
+            $scope.findMenuIdx = function (id) {
+                for (var i = 0; i < $scope.menus.length; i++) {
+                    if ($scope.menus[i].Id === id)
+                        return i;
+                }
+
+                return -1;
+            }
+
+            $scope.finishForm = function (isValid) {
+
+                if (isValid) {
+
+                    if ($scope.action === 'create') {
+                        $scope.finishCreate();
+                    } else if ($scope.action === 'edit') {
+                        $scope.finishEdit();
+                    }
+
+
+                } else {
+                    alert('Missing field');
+                }
+
+            };
+
+            $scope.finishCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/menu/addmenu",
+                    data: $scope.menu
+                }).then(
+                    function success(response) {
+                        showLoader(false);
+                        if (response.data.error === 0) {
+                            $scope.menus.unshift(response.data.data);
+                            hideModel('menumodal');
+                        } else {
+                            alert(response.data.msg);
+                        }
+                    },
+                    function error(response) {
+                        showLoader(false);
+                    });
+
+            };
+
+            $scope.finishEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/menu/EditMenu",
+                    data:  $scope.menu
+
+                }).then(function mySuccess(response)  {
+                        showLoader(false);
+                        if (response.data.error === 0) {
+                            var idx = $scope.findMenuIdx($scope.menu.Id);
+
+                            $scope.menus[idx] = angular.copy($scope.menu);
+                            hideModel('menumodal');
+                        } else {
+                            alert(response.data.msg);
+                        }
+
+                    }, function myError(response) {
+                        showLoader(false);
+                    });
+
+            };
+
+
+        });
+
+    </script>
+}

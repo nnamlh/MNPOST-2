@@ -1,0 +1,323 @@
+﻿@{
+    ViewBag.Title = "Quản lý thu tiền";
+}
+<div ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="row">
+
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>THU TIỀN COD CỦA NHÂN VIÊN PHÁT - <strong>{{postHandle}}</strong></h2>
+                    <div class="nav navbar-right">
+                        <button type="button" class="btn btn-primary" ng-click="createDocument()" ng-show="tabcreate">Tạo bảng kê</button>
+                        <button type="button" class="btn btn-warning" ng-click="refeshData()" ng-hide="tabcreate">TẢI LẠI</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                        <ul class="nav nav-tabs bar_tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#tab_report" role="tab" data-toggle="tab" aria-expanded="false" ng-click="tabcreate = false">Thống kê</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#tab_phieuthu" role="tab" data-toggle="tab" aria-expanded="false" ng-click="tabcreate = false">Phiếu thu</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="tabcreate = false">Chi tiết</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#tab_taodon" role="tab" data-toggle="tab" aria-expanded="false" ng-click="prepareCreate()">Tạo phiếu thu</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active in" id="tab_report" aria-labelledby="home-tab">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Lọc theo nhân viên</label>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <select ui-select2 class="form-control" ng-model="reportFilter.EmployeeID">
+                                                        <option value="">Tất cả</option>
+                                                        <option ng-repeat="x in employees" value="{{x.code}}">{{x.name + ' - ' + x.code}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <!-- table data-->
+                                        <div class="table-responsive">
+                                            <table class="table table-striped jambo_table bulk_action">
+                                                <thead>
+                                                    <tr class="headings">
+                                                        <th>STT</th>
+                                                        <th>Mã NV</th>
+                                                        <th>Tên NV</th>
+                                                        <th>SDT</th>
+                                                        <th>Email</th>
+                                                        <th>Tiền đang nợ</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="item in debitReports | filter : reportFilter">
+                                                        <td>
+                                                            {{$index + 1}}
+                                                        </td>
+                                                        <td>{{item.EmployeeID}}</td>
+                                                        <td>{{item.EmployeeName}}</td>
+                                                        <td>{{item.Phone}}</td>
+                                                        <td>{{item.Email}}</td>
+                                                        <td>{{item.MoneyDebit | currency: 'VND'}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_phieuthu" aria-labelledby="profile-tab">
+                                <div class="row">
+                                    <form name="formSearch" ng-submit="GetData()">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label>Lọc theo nhân viên</label>
+                                                <select class="form-control" ng-model="searchInfo.employeeId" ui-select2="select2Options">
+                                                    <option value="">Tất cả</option>
+                                                    <option ng-repeat="x in employees" value="{{x.code}}">{{x.name + ' - ' + x.code}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label>Thời gian (từ ngày --> đến ngày)</label>
+                                                <div class="row">
+                                                    <div class="col-sm-5">
+                                                        <input type="text" required class="form-control" ui-mask='99/99/9999' model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.fromDate">
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <input type="text" required class="form-control" ui-mask='99/99/9999' model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.toDate">
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <button class="btn btn-primary" type="submit">Xem thông tin</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped jambo_table bulk_action">
+                                                <thead>
+                                                    <tr class="headings">
+                                                        <th>STT</th>
+                                                        <th>Ng thu</th>
+                                                        <th>Ng nộp</th>
+                                                        <th>Tgian nộp</th>
+                                                        <th>Số tiền</th>
+                                                        <th>Số đơn</th>
+                                                        <th>Ghi chú</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="item in documents">
+                                                        <td>
+                                                            <strong>{{$index + 1}}</strong>.<a href="#" ng-click="showDocumentDetail($index)">chi tiết</a>
+                                                        </td>
+                                                        <td>
+                                                            {{item.ColectorName}}<br />
+                                                            {{item.ColectorID}}
+                                                        </td>
+                                                        <td>
+                                                            {{item.EmployeeName}} <br />
+                                                            {{item.EmployeeID}}
+                                                        </td>
+                                                        <td>{{item.DocumentDate}} <br />
+                                                            {{item.DocumentTime}}</td>
+                                                        <td>{{item.AllMoneyCollect | currency: 'VND'}}</td>
+                                                        <td>{{item.AllMailer}}</td>
+                                                        <td>{{item.Notes}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!--phan trang-->
+                                        <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                                        <!-- end phan trang-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h4><strong>Tổng tiền: </strong> {{document.AllMoneyCollect | currency:'VND'}}</h4>
+                                        
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h4><strong>Tổng đơn: </strong> {{document.AllMailer}}</h4>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped jambo_table bulk_action">
+                                                <thead>
+                                                    <tr class="headings">
+                                                        <th>STT</th>
+                                                        <th>Mã đơn</th>
+                                                        <th>Tiền thu</th>
+                                                        <th>Khách hàng</th>
+                                                        <th>Thông tin phát</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="item in details">
+                                                        <td>{{$index + 1}}</td>
+                                                        <td>{{item.MailerID}}</td>
+                                                        <td>{{item.COD | currency: 'VND'}}</td>
+                                                        <td><strong>Tên: </strong> {{item.SenderName}}<br />
+                                                            <strong>Mã: </strong> {{item.SenderID}} <br />
+                                                            <strong>Phone: </strong> {{item.SenderPhone}}
+                                                         </td>
+                                                        <td>
+                                                            <strong>Ngày phát: </strong> {{item.DeliveryDate}} <br />
+                                                            <strong>Giờ phát: </strong> {{item.DeliveryTime}} <br />
+                                                            <strong>Ký nhận: </strong> {{item.DeliveryTo}} 
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_taodon" aria-labelledby="profile-tab">
+                                <div class="row">
+                                     <form name="formSearch" ng-submit="GetData()">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label>Nhân viên</label>
+                                                <select class="form-control" ng-model="createDocumentInfo.EmployeeID" ui-select2="select2Options">
+                                                    <option ng-repeat="x in employees" value="{{x.code}}">{{x.name + ' - ' + x.code}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Tổng tiền</label>
+                                                <input type="text" class="form-control" value="{{createDocumentInfo.AllMoney | currency:'VND'}}" />
+                                            </div>
+                                           
+                                        </div>
+                                         <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label>Ghi chú</label>
+                                                <input type="text" class="form-control" ng-model="createDocumentInfo.Notes" />
+                                            </div>
+                                             <div class="form-group">
+                                                 <label>Tổng đơn</label>
+                                                 <input type="text" class="form-control" value="{{createDocumentInfo.AllMailer}}" />
+                                             </div>
+                                         </div>
+                                    </form>
+                                    <div class="col-sm-12">
+                                        <span>Tìm kiếm - <input type="checkbox" ng-model="autoChek" /> tự động check nếu tìm thấy</span>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" ng-model="filerPaidList.MailerID" ng-change="findMailerPaid()"/>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <a href="#" class="btn btn-danger" ng-click="getMailerNotPaid()">Tải danh sách</a>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped jambo_table bulk_action">
+                                                <thead>
+                                                    <tr class="headings">
+                                                        <th><input type="checkbox" ng-model="isChkPaid" ng-checked="isChkPaid" ng-change="chkAllPaid()"/> STT</th>
+                                                        <th>Mã đơn</th>
+                                                        <th>Khách hàng</th>
+                                                        <th>Tiền thu</th>
+                                                        <th>Thông tin phát</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr ng-repeat="item in mailerNotPaids | filter: filerPaidList">
+                                                        <td><input type="checkbox" ng-model="item.isCheck" ng-checked="item.isCheck" ng-change="checkPaidItem()"/> {{$index + 1}}</td>
+                                                        <td>{{item.MailerID}}</td>
+                                                        <td>
+                                                            <strong>Tên: </strong> {{item.SenderName}}<br />
+                                                            <strong>Mã: </strong> {{item.SenderID}} <br />
+                                                            <strong>Phone: </strong> {{item.SenderPhone}}
+                                                        </td>
+                                                        <td>{{item.COD | currency: 'VND'}}</td>
+                                                        <td>
+                                                            <strong>Ngày phát: </strong> {{item.DeliveryDate}} <br />
+                                                            <strong>Giờ phát: </strong> {{item.DeliveryTime}} <br />
+                                                            <strong>Ký nhận: </strong> {{item.DeliveryTo}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end chon buu cuc-->
+</div>
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+
+        var fromDate = '@ViewBag.FromDate';
+
+        var toDate = '@ViewBag.ToDate';
+
+
+    </script>
+
+    <script type="text/javascript" src="~/Scripts/debit/employeedebit.js"></script>
+
+}
+

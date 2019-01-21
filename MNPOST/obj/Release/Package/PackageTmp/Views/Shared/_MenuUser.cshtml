@@ -1,0 +1,22 @@
+﻿@model IEnumerable<MNPOST.Utils.GroupMenuInfo>
+@{
+    Layout = null;
+}
+
+@foreach (var item in Model)
+{
+    <ul class="nav side-menu">
+        <li>
+            <a>@item.name <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+                @foreach (var menu in item.menus)
+                {
+                    <li><a href="@menu.link">@menu.name</a></li>
+                }
+            </ul>
+        </li>
+    </ul>
+
+
+}
+

@@ -1,0 +1,511 @@
+﻿@{
+    ViewBag.Title = "Quản lý sổ phát";
+}
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>QUẢN LÝ PHÁT - {{postHandle}}</h2>
+                <div class="nav navbar-right">
+                    <button type="button" class="btn btn-primary" ng-hide="showEdit" ng-click="getAutoRoutes()">Tạo từ chia tuyến</button>
+                    <button type="button" class="btn btn-warning" ng-show="showEdit" ng-click="fillMailerForEmployee()">Đổ danh sách</button>
+                    <button type="button" class="btn btn-success" ng-show="showEdit" ng-click="confirmAllMailers()">Cập nhật phát</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_monitor" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=false; showDeliveries = false;showUpdate = false">Theo dõi phát hàng</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showUpdate = false; showEdit=true;">Chi tiết</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_capnhatphat" role="tab" data-toggle="tab" aria-expanded="false">Cập nhật phát</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_monitor" aria-labelledby="home-tab">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Lọc theo nhân viên</label>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <select class="form-control" ui-select2 ng-model="monitorEmployeeChoose" ng-change="addEmployeeMonitor()">
+                                                    <option ng-repeat="x in employees" value="{{x.code}}">{{x.name + ' - ' + x.code}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button type="button" class="btn btn-primary" ng-click="getReportEmployeeDelivery()">Xem</button>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <span ng-repeat="x in listEmployeeMonitor">&nbsp;&nbsp;<span class="label label-default">{{x.name}} <span ng-click="removeMonitor($index)" class="glyphicon glyphicon-remove"></span></span></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <!-- table data-->
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Mã NV</th>
+                                                    <th>Tên NV</th>
+                                                    <th>Số đơn chưa phát</th>
+                                                    <th>Tiền CoD còn thu</th>
+                                                    <th>Tiền thu chưa nộp</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr ng-repeat="item in deliveryReports">
+                                                    <td>
+                                                        {{$index + 1}} <a class="label label-info" href="#" ng-click="showDocumentDetail(item.EmployeeID)">&nbsp;Xem bảng kê</a>
+                                                    </td>
+                                                    <td>{{item.EmployeeID}}</td>
+                                                    <td>{{item.EmployeeName}}</td>
+                                                    <td>{{item.AllMailer}} <a href="#" ng-click="showMailerOfDate(item.EmployeeID)">&nbsp;xem chi tiết</a></td>
+                                                    <td>{{item.AllCoD}}</td>
+                                                    <td>{{item.AllDebit}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+                            <div class="row" ng-show="showEdit">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Chọn ngày tạo để xem</label>
+                                        <form ng-submit="getDocumentDetail()">
+                                            <input type="text" ng-model="currentDocument.DocumentDate" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="">
+                                        </form>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nhân viên</label>
+                                        <input type="text" class="form-control" disabled value="{{currentDocument.EmployeeName + ' - ' + currentDocument.EmployeeID}}" />
+                                    </div>
+
+                                    <button class="btn btn-primary" ng-click="updateDocument()">Cập nhật thông tin</button>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Ghi chú</label>
+                                        <input type="text" class="form-control" ng-model="currentDocument.Notes" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chuyến xe</label>
+                                        <select class="form-control selectpicker" data-live-search="true" ng-model="currentDocument.NumberPlate">
+                                            <option value="">KHÔNG CHỌN</option>
+                                            <option ng-repeat="x in licensePlates" value="{{x.code}}">{{x.code}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <br />
+                                    <br />
+                                    <div class="x_title">
+                                        <h2><i class="fa fa-align-left"></i> Thông tin phát</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-4">
+                                    <strong>Số lượng: </strong>{{currentDocument.AllMailer}}<br />
+                                    <strong>Trọng lượng: </strong>{{currentDocument.Weight}} GRAM<br />
+                                    <strong>Đã phát: </strong>{{currentDocument.CountFinish}}<br />
+
+                                </div>
+                                <div class="col-sm-4">
+                                    <strong>Chưa phát: </strong>{{currentDocument.CountNotFinish}}<br />
+                                    <strong>Chưa phát được: </strong>{{currentDocument.CountFail}}<br />
+                                    <strong>Chuyển hoàn: </strong>{{currentDocument.CountReturn}}
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <hr />
+                                    <form ng-submit="addMailer()">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" ng-model="mailerId" required />
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Khối lượng</th>
+                                                    <th>Dịch vụ</th>
+                                                    <th>Nơi đến</th>
+                                                    <th>Hình thức</th>
+                                                    <th>Thụ hộ</th>
+                                                    <th>Ghi chú</th>
+                                                    <th>#</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in mailers">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>{{item.MailerID}}</td>
+                                                    <td><span class="label label-info">{{mailerStatus[item.DeliveryStatus].name}}</span></td>
+                                                    <td>{{item.Weight}} GRAM</td>
+                                                    <td>{{item.MailerTypeID}}</td>
+                                                    <td>
+                                                        {{item.RecieverAddress}} <br />
+                                                        <span class="label label-info">{{item.RecieProvinceName}}</span>&nbsp;&nbsp;<span class="label label-info">{{item.ReceiDistrictName}}</span>&nbsp;&nbsp;<span class="label label-info">{{item.ReceiWardName}}</span>
+                                                    </td>
+                                                    <td>{{item.PaymentMethodID}}</td>
+                                                    <td>Tiền hàng: {{item.COD}} <br />
+                                                        Tiền cước: {{item.Amount}} <br />
+                                                        Tiền phải thu: {{item.PaymentMethodID === "NNTT"?(item.COD + item.Amount):item.COD}}
+                                                    </td>
+                                                    <td>{{item.Notes}}</td>
+                                                    <td><a class="label label-danger" ng-show="item.DeliveryStatus===3" href="#" ng-click="detroyMailerDelivery(item.DetailId)">Hủy phát</a></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="tab_capnhatphat" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <form ng-submit="addMailerUpdate(addmailerupdatedelivery.$valid)" name="addmailerupdatedelivery">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" ng-model="mailerIdUpdate" required />
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button class="btn btn-primary" type="submit">Thêm</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="table-responsive scrollmenu">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT </th>
+                                                    <th>Tình trạng</th>
+                                                    <th>Ngày phát</th>
+                                                    <th>Giờ phát</th>
+                                                    <th>Người nhận</th>
+                                                    <th>Lý do</th>
+                                                    <th>Ghi chú</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>Khối lượng</th>
+                                                    <th>Dịch vụ</th>
+                                                    <th>Nơi đến</th>
+                                                    <th>Thụ hộ</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in mailerUpdates">
+                                                    <td>{{$index + 1}} <a href="#" class="label label-info" ng-click="confirmDeliveryMailer($index)">cập nhật</a></td>
+                                                    <td>
+                                                        <select ng-model="item.DeliveryStatus" class="tableinput" convert-to-number>
+                                                            <option value="4">ĐÃ PHÁT</option>
+                                                            <option value="5">CHUYỂN HOÀN</option>
+                                                            <option value="6">CHƯA PHÁT ĐƯỢC</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="success"><input type="text" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="item.DeliveryDate" required class="tableinput" /></td>
+                                                    <td class="success"><input type="text" ui-mask="99:99" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="item.DeliveryTime" required class="tableinput" /></td>
+                                                    <td class="success"><input type="text" ng-disabled="item.DeliveryStatus != 4" ng-model="item.DeliveryTo" class="tableinput" /></td>
+                                                    <td class="danger">
+                                                        <select ng-model="item.ReturnReasonID" class="tableinput" convert-to-number ng-change="changeReason($index)">
+                                                            <option ng-repeat="item in returnReasons" value="{{item.code}}">{{item.name}}</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="warning"><input type="text" ng-model="item.DeliveryNotes" class="tableinput" /></td>
+                                                    <td><strong>{{item.MailerID}}</strong></td>
+                                                    <td>{{item.Weight}}</td>
+                                                    <td>{{item.MailerTypeID}}</td>
+                                                    <td>{{item.RecieverAddress}}</td>
+                                                    <td>{{item.COD | currency: ''}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end chon buu cuc-->
+    <!--Lay tuyen tu dong -->
+    <div id="autoRoutes" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="table-responsive">
+
+                                <ul class="listroutes">
+                                    <li><span>Tổng vận đơn cần phân phát: <strong>{{countMailers}}</strong></span></li>
+                                    <li ng-repeat="item in autoRoutes">
+                                        <span><strong>{{item.EmployeeName + '-' + item.EmployeeID}}</strong></span><br />
+                                        <a href="#" class="label label-primary" ng-click="createAutoOneEmployee($index)" ng-show="item.Mailers.length > 0">Tạo bảng kê phát</a>
+                                        <table class="table table-striped scrollmenu">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>Người gửi</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Dịch vụ</th>
+                                                    <th>Nơi đến</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="mailer in item.Mailers">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>{{mailer.MailerID}}</td>
+                                                    <td>{{mailer.SenderName}}</td>
+                                                    <td><span class="label label-info">{{mailerStatus[mailer.CurrentStatusID].name}}</span></td>
+                                                    <td>{{mailer.MailerTypeID}}</td>
+                                                    <td>{{mailer.RecieverAddress}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="createAutoAllEmployee()" class="btn btn-default">Tạo toàn bộ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end lay tuyen tu dong -->
+    <!--Lay tuyen nhan vien -->
+    <div id="getmailerdelivery" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                        <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Từ chia tuyến</a>
+                            </li>
+                            <li role="presentation" class="">
+                                <a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Khác</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                                <div class="table-responsive scrollmenu">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th><input type="checkbox" ng-model="checkAllMailerAuto" ng-init="checkAllMailerAuto=false" ng-checked="checkAllMailerAuto" ng-change="changeCheckAllMailerEmplpoyeeAuto()" /></th>
+                                                <th>Vận đơn</th>
+                                                <th>Người gửi</th>
+                                                <th>Trạng thái</th>
+                                                <th>Dịch vụ</th>
+                                                <th>Nơi đến</th>
+                                                <th>Tỉnh thành</th>
+                                                <th>Quận huyện</th>
+                                                <th>Phường xã</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="mailer in employeeMailerFromRoutes.Mailers">
+                                                <td><input type="checkbox" ng-model="mailer.IsCheck" ng-init="mailer.IsCheck=false" ng-checked="mailer.IsCheck" />{{$index + 1}}</td>
+                                                <td>{{mailer.MailerID}}</td>
+                                                <td>{{mailer.SenderName}}</td>
+                                                <td>{{mailerStatus[mailer.CurrentStatusID].name}}</td>
+                                                <td>{{mailer.MailerTypeID}}</td>
+                                                <td>{{mailer.RecieverAddress}}</td>
+                                                <td>{{mailer.RecieverProvinceID}}</td>
+                                                <td>{{mailer.RecieverDistrictID}}</td>
+                                                <td>{{mailer.RecieverWardID}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br />
+                                <button type="button" class="btn btn-warning" ng-click="addMailerAutoFromRoutes('route')">Thêm vào danh sách</button>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Tỉnh thành</label>
+                                        <select class="form-control" ui-select2="select2Options" ng-model="provincesearch" ng-change="changeProvince()">
+                                            <option value="">Tất cả</option>
+                                            <option ng-repeat="item in provinces" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label>Quận huyện</label>
+                                        <select class="form-control" ui-select2="select2Options" ng-model="districtsearch">
+                                            <option value="">Tất cả</option>
+                                            <option ng-repeat="item in districts" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <br>
+                                        <button class="btn btn-primary" ng-click="findAllMailerForEmployee()">XEM</button>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <br />
+                                        <div class="table-responsive scrollmenu">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr class="headings">
+                                                        <th><input type="checkbox" ng-model="checkAllMailerForEmployee" ng-init="checkAllMailerForEmployee=false" ng-checked="checkAllMailerForEmployee" ng-change="checkAllMailerForEmployeeChange()" /></th>
+                                                        <th>Vận đơn</th>
+                                                        <th>Người gửi</th>
+                                                        <th>Trạng thái</th>
+                                                        <th>Dịch vụ</th>
+                                                        <th>Nơi đến</th>
+                                                        <th>Tỉnh thành</th>
+                                                        <th>Quận huyện</th>
+                                                        <th>Phường xã</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="mailer in mailerEmployeeFinds">
+                                                        <td><input type="checkbox" ng-model="mailer.IsCheck" ng-init="mailer.IsCheck=false" ng-checked="mailer.IsCheck" />{{$index + 1}}</td>
+                                                        <td>{{mailer.MailerID}}</td>
+                                                        <td>{{mailer.SenderName}}</td>
+                                                        <td>{{mailerStatus[mailer.CurrentStatusID].name}}</td>
+                                                        <td>{{mailer.MailerTypeID}}</td>
+                                                        <td>{{mailer.RecieverAddress}}</td>
+                                                        <td>{{mailer.RecieverProvinceID}}</td>
+                                                        <td>{{mailer.RecieverDistrictID}}</td>
+                                                        <td>{{mailer.RecieverWardID}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <br />
+                                        <button type="button" class="btn btn-primary" ng-click="addMailerAutoFromRoutes('province')">Thêm vào danh sách</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Lay tuyen nhan vien -->
+    <!-- show not finish -->
+    <div id="mailerNotfinish" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Số lượng chưa phát</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in mailerNotFinishOfDate">
+                                <td>{{item.DocumentDate}}</td>
+                                <td>{{item.AllMailer}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section styles {
+
+    <style type="text/css">
+        .tableinput {
+            width: 150px;
+            height: 25px;
+        }
+
+        .listroutes {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+        }
+    </style>
+
+
+}
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+
+        var reasonReturnDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.ReturnReasons)));
+        var provinceData = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Provinces)));
+
+        var currentDate = '@DateTime.Now.ToString("dd/MM/yyyy")';
+
+        var currentTime = '@DateTime.Now.ToString("HH:mm")';
+
+    </script>
+    <script src="~/Scripts/order/mailerdelivery.js"></script>
+}
+

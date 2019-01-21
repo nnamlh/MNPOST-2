@@ -1,0 +1,518 @@
+﻿@{
+    ViewBag.Title = "Show";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách khách hàng</h2>
+                <div class="nav navbar-right">
+                    <a class="btn btn-primary" href="/customergroup/show" target="_blank">Tạo nhóm</a>
+                    <a class="btn btn-warning" ng-click="addNew()">Thêm khách hàng</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <select ui-select2="select2Options" ng-model="searchText" ng-change="GetData()" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option ng-repeat="item in groups" value="{{item.code}}">{{item.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã KH</th>
+                                <th>Tên KH</th>
+                                <th>Bưu cục</th>
+                                <th>Địa chỉ</th>
+                                <th>Liên hệ</th>
+                                <th>Tài khoản</th>
+                                <th>Kích hoạt</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in allCustomer">
+                                <td>{{$index + 1}} <a class="label label-primary" href="#" ng-click="edit($index)">Chi tiết</a></td>
+                                <td>{{item.CustomerCode}}</td>
+                                <td>{{item.CustomerName}}</td>
+                                <td>{{item.PostOfficeID}}</td>
+                                <td>{{item.Address}} </td>
+                                <td>
+                                    <strong>Ng LH: </strong> {{item.Deputy}} <br />
+                                    <strong>ĐT: </strong> {{item.Phone}} <br />
+                                    <strong>Email: </strong> {{item.Email}} <br />
+                                </td>
+                                <td>{{item.ClientUser}} <a href="#" ng-show="existUserLogin(item.ClientUser)" ng-click="createUser($index)">Tạo tài khoản</a></td>
+                                <td><input type="checkbox" ng-model="item.IsActive" ng-checked="item.IsActive" ng-change="activeCustomer($index)" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table data-->
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+
+    <!-- tao model them moi-->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+
+
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                    <!-- body-->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Nhóm khách hàng</label>
+                                    <select ui-select2="select2Options" ng-model="CustomerInfo.CustomerGroupCode" class="form-control">
+                                        <option ng-repeat="item in groups" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tên khách hàng</label>
+                                    <input type="text" class="form-control" ng-model="CustomerInfo.CustomerName" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Người liên hệ</label>
+                                    <input type="text" ng-model="CustomerInfo.Deputy" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Di động</label>
+                                    <input type="text" ng-model="CustomerInfo.Phone" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="text" ng-model="CustomerInfo.Email" class="form-control" />
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" class="form-control" ng-model="CustomerInfo.Address"  />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tỉnh thành</label>
+                                    <select class="form-control" ng-model="CustomerInfo.ProvinceID" ng-change="provinceChange('district', 'send')">
+                                        <option ng-repeat="item in provinceSend" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Quận huyện</label>
+                                    <select class="form-control" ng-model="CustomerInfo.DistrictID" ng-change="provinceChange('ward', 'send')">
+                                        <option ng-repeat="item in districtSend" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phường xã</label>
+                                    <select class="form-control" ng-model="CustomerInfo.WardID" >
+                                        <option ng-repeat="item in wardSend" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Bưu cục</label>
+                                    <select class="form-control" ng-model="CustomerInfo.PostOfficeID" required>
+                                        <option ng-repeat="x in allPostOffice" value="{{x.code}}">{{x.name | uppercase}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+
+
+    <div id="createuser" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Tạo tài khoản</h4>
+                </div>
+
+
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishCreateUser()">
+                    <!-- body-->
+                    <div class="modal-body">
+                       <div class="form-group">
+                           <label>Khách hàng</label>
+                           <input type="text" class="form-control" ng-model="createUserInfo.name"/>
+                       </div>
+                        <div class="form-group">
+                            <label>Email tạo tài khoản</label>
+                            <input type="email" class="form-control" ng-model="createUserInfo.email" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại khách hàng</label>
+                            <input type="tel" class="form-control" ng-model="createUserInfo.phone" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" class="form-control" ng-model="createUserInfo.pass" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Nhập lại mật khẩu</label>
+                            <input type="password" class="form-control" ng-model="createUserInfo.repass" required />
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+
+
+</div>
+
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress', 'myDirective', 'ui.select2']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.select2Options = {
+                width: '100%'
+            };
+
+            $scope.allPostOffice = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllPostOffice))');
+
+            $scope.groups = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.Groups))');
+            $scope.searchText = "";
+            // lay du lieu
+            $scope.allCustomer = [];
+            $scope.GetData = function () {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/customer/getcustomer?search=" + $scope.searchText
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allCustomer = angular.copy(response.data.data);
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            // goi lay du liẹu
+
+            $scope.GetData();
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.CustomerInfo = {};
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+                $scope.CustomerInfo = { CustomerGroupCode: $scope.searchText };
+                $scope.modaltitle = "Thêm khách hàng";
+                $scope.IsAction = 'add';
+                showModel("insertmodal")
+
+            };
+
+            $scope.edit = function (index) {
+                var info = $scope.allCustomer[index];
+
+                $scope.CustomerInfo = angular.copy(info);
+                $scope.modaltitle = "Chỉnh sửa khách hàng";
+                $scope.IsAction = 'edit';
+                 $scope.provinceChange('district', 'send');
+                 $scope.provinceChange('ward', 'send');
+                showModel("insertmodal")
+            };
+
+
+            // tim index theo ma tinh
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.allCustomer.length; i++)
+                    if ($scope.allCustomer[i].CustomerCode == id)
+                        return i;
+                return -1;
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        $scope.sendCreate();
+                    } else if ($scope.IsAction === 'edit') {
+                        $scope.sendEdit();
+                    }
+
+                } else {
+                    showNotify('our form is missing');
+                }
+            }
+
+            $scope.provinceSend = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Provinces)));
+            $scope.districtSend = [];
+            $scope.wardSend = [];
+
+            $scope.provinceChange = function (pType, type) {
+
+                var url = '/mailerinit/GetProvinces?';
+
+                if (pType === "district") {
+                    url = url + "parentId=" + $scope.CustomerInfo.ProvinceID + "&type=district";
+                }
+
+                if (pType === "ward") {
+                    url = url + "parentId=" + $scope.CustomerInfo.DistrictID + "&type=ward";
+                }
+
+                $http.get(url).then(function (response) {
+
+                    if (pType === "district") {
+                        $scope.districtSend = angular.copy(response.data);
+                    }
+
+                    if (pType === "ward") {
+                        $scope.wardSend = angular.copy(response.data);
+                    }
+
+                });
+            };
+
+            // them tinh
+            $scope.sendCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/customer/create",
+                    data: $scope.CustomerInfo
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.searchText = result.data;
+                        $scope.GetData();
+
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm khách hàng");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/customer/edit",
+                    data: $scope.CustomerInfo
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+                            $scope.searchText = $scope.CustomerInfo.CustomerGroupCode;
+                            $scope.GetData();
+                            showNotify("Đã cập nhật");
+                            hideModel("insertmodal");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                    );
+            };
+
+            // check has ueser for login
+            $scope.existUserLogin = function (user) {
+
+                if (user === null || user === "" || user === undefined) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            };
+
+            $scope.activeCustomer = function (idx) {
+
+                $http({
+                    method: "POST",
+                    url: "/customer/active",
+                    data: {
+                        cusId: $scope.allCustomer[idx].CustomerID,
+                        isActive: $scope.allCustomer[idx].IsActive
+                    }
+                }).then(function sucess(reponse) {
+
+                    showNotify("Đã xong");
+
+                    }, function error(reponse) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    });
+
+            };
+            $scope.createUserInfo = {
+
+            };
+            $scope.createUser = function (idx) {
+
+                $scope.createUserInfo = {
+                    cusId: $scope.allCustomer[idx].CustomerID,
+                    name: $scope.allCustomer[idx].CustomerName,
+                    email: $scope.allCustomer[idx].Email,
+                    phone: $scope.allCustomer[idx].Phone,
+                    pass: '',
+                    repass: ''
+                };
+
+                showModel('createuser');
+            };
+
+
+            $scope.finishCreateUser = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/customer/SendCreateUser",
+                    data: $scope.createUserInfo
+                }).then(function sucess(response) {
+
+                    var result = angular.fromJson(response.data);
+                    if (result.error === 0) {
+
+                        $http({
+                            method: "POST",
+                            url: "/customer/UpdateUserCreate",
+                            data: {
+                                cusId: $scope.createUserInfo.cusId,
+                                user: result.user
+                            }
+                        }).then(function sucess(reponse) {
+                            showLoader(false);
+                            hideModel('createuser');
+
+                            showNotify("Đã xong");
+
+                            for (var i = 0; i < $scope.allCustomer.length; i++) {
+                                if ($scope.allCustomer[i].CustomerID === $scope.createUserInfo.cusId) {
+                                    $scope.allCustomer[i].ClientUser = result.user;
+                                }
+                            }
+
+                        }, function error(reponse) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        });
+
+                    } else {
+                        showLoader(false);
+                        alert(result.msg);
+                    }
+
+                    }, function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    });
+
+
+            };
+
+
+        });
+        //-- end controller
+
+    </script>
+}
+

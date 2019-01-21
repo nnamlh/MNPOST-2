@@ -1,0 +1,306 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>ĐƠN HÀNG MỚI {{postHandle}}</h2>
+                <div class="nav navbar-right">
+                    <button type="button" class="btn btn-success" ng-click="sendUpdateTake()" ng-init="updateTake=false" ng-show="updateTake">XÁC NHẬN ĐÃ LẤY HÀNG</button>
+                    <button type="button" class="btn btn-danger" ng-click="takeMailers()" ng-show="customerSearch.SenderID!=='' && tabds">LẤY HÀNG</button>
+                    <button type="button" class="btn btn-primary" ng-click="sendImport()"  ng-show="tabds">NHẬP KHO</button>
+                    <button class="btn btn-info" ng-show="tabds" ng-click="printMailers()">Print</button>
+                    <button type="button" class="btn btn-warning" ng-click="refeshData()" >TẢI LẠI</button>
+                    <button type="button" class="btn btn-danger" ng-click="cancelMailer()" ng-show="findCheck()" title="Hủy đơn" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="Hủy không nhận phát">HỦY ĐƠN</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_sophat" role="tab" data-toggle="tab" aria-expanded="false" ng-click="updateTake=false; tabds = true" >Chưa nhập kho <span class="badge">{{mailers.length}}</span></a>
+                        </li>
+                        <li role="presentation" >
+                            <a href="#tab_layhang" role="tab" data-toggle="tab" aria-expanded="false" ng-click="updateTake=false; tabds = false">Danh dách điều lấy hàng</a>
+                        </li>
+                        <li role="presentation" >
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="updateTake=true; tabds = false">Chi tiết</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_sophat" aria-labelledby="home-tab">
+                           <div class="row">
+                               <div class="col-md-4">
+                                   <div class="form-group">
+                                       <label>Lọc theo khách hàng</label>
+                                       <select ui-select2 ng-model="customerSearch.SenderID" class="form-control" ng-change="removeCheck()">
+                                           <option ng-repeat="item in customers" value="{{item.code}}">{{item.name}}</option>
+                                       </select>
+                                   </div>
+                               </div>
+                               <div class="col-md-4">
+                                   <div class="form-group">
+                                       <label>Tìm theo mã vận đơn</label>
+                                       <input type="text" ng-model="customerSearch.MailerID" class="form-control" />
+                                   </div>
+                               </div>
+                               <div class="col-md-12">
+                                   <div class="table-responsive scrollmenu">
+                                       <table class="table table-striped jambo_table bulk_action ">
+                                           <thead>
+                                               <tr class="headings">
+                                                   <th><input type="checkbox" ng-model="checkMailers" ng-change="checkAll()" /></th>
+                                                   <th>STT</th>
+                                                   <th>Mã vận đơn</th>
+                                                   <th>Trạng thái</th>
+                                                   <th>Ngày tạo</th>
+                                                   <th>Mã người gửi</th>
+                                                   <th>Người gửi</th>
+                                                   <th>Điện thoại</th>
+                                                   <th>Địa chỉ gửi</th>
+                                                   <th>Tỉnh thành gửi</th>
+                                                   <th>Quận huyện gửi</th>
+                                                   <th>Người nhận</th>
+                                                   <th>Điện thoại</th>
+                                                   <th>Địa chỉ nhận</th>
+                                                   <th>Tỉnh thành nhận</th>
+                                                   <th>Quận huyện nhận</th>
+                                                   <th>Phường xã nhận</th>
+                                                   <th>Dịch vụ</th>
+                                               </tr>
+                                           </thead>
+                                           <tbody>
+                                               <tr ng-repeat="item in mailers  | filter : customerSearch">
+                                                   <td><input type="checkbox" ng-model="item.isCheck" /></td>
+                                                   <td>{{$index + 1}}</td>
+                                                   <td>{{item.MailerID}}</td>
+                                                   <td><strong class="label" ng-class="{'label-success' : item.CurrentStatusID === 0, 'label-warning': item.CurrentStatusID === 8}">{{status[item.CurrentStatusID].name}}</strong></td>
+                                                   <td>{{item.AcceptDate}}</td>
+                                                   <td>{{item.SenderID}}</td>
+                                                   <td>{{item.SenderName}}</td>
+                                                   <td>{{item.SenderPhone}}</td>
+                                                   <td>{{item.SenderAddress}}</td>
+                                                   <td>{{item.SendProvinceName}}</td>
+                                                   <td>{{item.SendDistrictName}}</td>
+                                                   <td>{{item.RecieverName}}</td>
+                                                   <td>{{item.RecieverPhone}}</td>
+                                                   <td>{{item.RecieverAddress}}</td>
+                                                   <td>{{item.RecieProvinceName}}</td>
+                                                   <td>{{item.ReceiDistrictName}}</td>
+                                                   <td>{{item.ReceiWardName}}</td>
+                                                   <td>{{item.MailerTypeID}}</td>
+                                               </tr>
+                                           </tbody>
+                                       </table>
+                                   </div>
+                               </div>
+                           </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="tab_layhang" aria-labelledby="home-tab">
+                            <form ng-submit="sendGetTakeMailers()">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control" ui-mask="99/99/9999" ng-model="dateimport" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-disabled="isrungettake"/>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="table-responsive scrollmenu">
+                              
+                                <table class="table table-striped jambo_table bulk_action">
+                                    <thead>
+                                        <tr class="headings">
+                                            <th>STT</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Nhân viên lấy</th>
+                                            <th>Mã khách hàng</th>
+                                            <th>Tên khách hàng</th>
+                                            <th>Điện thoại</th>
+                                            <th>Địa chỉ</th>
+                                            <th>Nội dung</th>
+                                            <th>#</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in takeMailerDatas">
+                                            <td>{{$index + 1}}</td>
+                                            <td>{{item.CreateTime}}</td>
+                                            <td>{{item.EmployeeName + " - "+ item.EmployeeID}}</td>
+                                            <td>{{item.CustomerID}}</td>
+                                            <td>{{item.CustomerName}}</td>
+                                            <td>{{item.CustomerPhone}}</td>
+                                            <td>{{item.CustomerIDAddress}}</td>
+                                            <td>{{item.Content}}</td>
+                                            <td><a href="#" ng-click="showTakeDetail(item.DocumentID, $index)">Chi tiêt</a> <br />
+                                                   <a href="#" ng-click="cancelTake(item.DocumentID, $index)">Update tất cả</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="tab_chitiet" aria-labelledby="home-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped jambo_table bulk_action">
+                                    <thead>
+                                        <tr class="headings">
+                                            <th><input type="checkbox" ng-model="checkMailerTake" ng-change="checkTakeAll()" /></th>
+                                            <th>STT</th>
+                                            <th>Mã vận đơn</th>
+                                            <th>Tình trạng</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Người gửi</th>
+                                            <th>Điện thoại</th>
+                                            <th>Địa chỉ gửi</th>
+                                            <th>Tỉnh thành gửi</th>
+                                            <th>Quận huyện gửi</th>
+                                            <th>Dịch vụ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in takeDetailDatas">
+                                            <td><input type="checkbox" ng-model="item.isCheck" /></td>
+                                            <td>{{$index + 1}}<a class="label label-danger" href="#" ng-click="returnTake(item.MailerID, $index)">Thu hồi</a></td>
+                                            <td>{{item.MailerID}}</td>
+                                            <td>{{status[item.CurrentStatusID].name}}</td>
+                                            <td>{{item.AcceptDate}}</td>
+                                            <td>{{item.SenderName}}</td>
+                                            <td>{{item.SenderPhone}}</td>
+                                            <td>{{item.SenderAddress}}</td>
+                                            <td>{{item.SendProvinceName}}</td>
+                                            <td>{{item.SendDistrictName}}</td>
+                                            <td>{{item.MailerTypeID}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- giao nhan vien nhan -->
+
+    <div id="takemailers" class="modal fade" role="dialog" tabindex="-1">
+        <div class="modal-dialog SenderID">
+
+            <!-- Modal content-->
+            <div class="modal-content" >
+                <form name="takemailersform" ng-submit="sendTake(takemailersform.$valid)">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Mã khách hàng</label>
+                                    <input type="text" class="form-control" ng-disabled="true" value="{{sendTakeInfo.code}}" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Tên khách hàng</label>
+                                    <input type="text" class="form-control" ng-model="sendTakeInfo.name"  required/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ghi chú</label>
+                                    <input type="text" class="form-control" ng-model="sendTakeInfo.content" required/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" class="form-control" ng-model="sendTakeInfo.address"required />
+                                </div>
+                                <div class="form-group">
+                                    <label>Điện thoại</label>
+                                    <input type="tel" class="form-control" ng-model="sendTakeInfo.phone" required/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nhân viên đi lấy</label>
+                                    <select ui-select2="select2Options" class="form-control" ng-model="sendTakeInfo.employeeId">
+                                        <option ng-repeat="item in employees" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Xác nhận</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- end giao nhan vien nhan -->
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end chon buu cuc-->
+
+    <!-- cancel đơn -->
+    <div id="cancelMailerModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Lý do hủy đơn</label>
+                        <textarea class="form-control" ng-model="reasonCancel"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="finishCancalMailer()">Xác nhận</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+
+        var customerDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.AllCustomer)));
+
+
+        var currentDate = '@DateTime.Now.ToString("dd/MM/yyyy")';
+
+    </script>
+
+    <script src="~/Scripts/order/mailerimport.js" type="text/javascript"></script>
+
+
+}

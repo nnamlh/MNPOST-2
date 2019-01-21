@@ -1,0 +1,1296 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách h?c sinh theo nam h?c&nbsp;&nbsp;&nbsp;<a href="#" ng-click="addNew()"><i my-tool-tip="Thêm m?i" class="fa fa-plus"></i></a></h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                </div>
+
+                <!-- table data-->
+                <div ng-switch="Cap">
+                    <div class="row" ng-switch-when="TH">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr class="headings">
+                                        <th>STT</th>
+                                        <th>Nam h?c</th>
+                                        <th>L?p 1</th>
+                                        <th>L?p 2</th>
+                                        <th>L?p 3</th>
+                                        <th>L?p 4</th>
+                                        <th>L?p 5</th>
+                                        <th>#</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="item in allDanhMuc">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{item.NamHoc}}</td>
+                                        <td>{{item.Lop1}}</td>
+                                        <td>{{item.Lop2}}</td>
+                                        <td>{{item.Lop3}}</td>
+                                        <td>{{item.Lop4}}</td>
+                                        <td>{{item.Lop5}}</td>
+                                        <td><a href="#" ng-click="edit($index)">Chi ti?t</a></td>
+                                        <td><a href="#" ng-click="sendDeleteTH($index)">Xóa</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" ng-switch-when="THCS">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr class="headings">
+                                        <th>STT</th>
+                                        <th>Nam h?c</th>
+                                        <th>L?p 6</th>
+                                        <th>L?p 7</th>
+                                        <th>L?p 8</th>
+                                        <th>L?p 9</th>
+                                        <th>#</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="item in allDanhMuc">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{item.NamHoc}}</td>
+                                        <td>{{item.Lop6}}</td>
+                                        <td>{{item.Lop7}}</td>
+                                        <td>{{item.Lop8}}</td>
+                                        <td>{{item.Lop9}}</td>
+                                        <td><a href="#" ng-click="edit($index)">Chi ti?t</a></td>
+                                        <td><a href="#" ng-click="sendDeleteTHCS($index)">Xóa</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" ng-switch-when="THPT">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr class="headings">
+                                        <th>STT</th>
+                                        <th>Nam h?c</th>
+                                        <th>L?p 10</th>
+                                        <th>L?p 11</th>
+                                        <th>L?p 12</th>
+                                        <th>#</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="item in allDanhMuc">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{item.NamHoc}}</td>
+                                        <td>{{item.Lop10}}</td>
+                                        <td>{{item.Lop11}}</td>
+                                        <td>{{item.Lop12}}</td>
+                                        <td><a href="#" ng-click="edit($index)">Chi ti?t</a></td>
+                                        <td><a href="#" ng-click="sendDeleteTHPT($index)">Xóa</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" ng-switch-when="MN">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr class="headings">
+                                        <th>STT</th>
+                                        <th>Nam h?c</th>
+                                        <th>3->12 tháng</th>
+                                        <th>12->24 tháng</th>
+                                        <th>25->36 tháng</th>
+                                        <th>3->4 tu?i</th>
+                                        <th>4->5 tu?i</th>
+                                        <th>5->6 tu?i</th>
+                                        <th>#</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="item in allDanhMuc">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{item.NamHoc}}</td>
+                                        <td>{{item.Col1}}</td>
+                                        <td>{{item.Col2}}</td>
+                                        <td>{{item.Col3}}</td>
+                                        <td>{{item.Col4}}</td>
+                                        <td>{{item.Col5}}</td>
+                                        <td>{{item.Col6}}</td>
+                                        <td><a href="#" ng-click="edit($index)">Chi ti?t</a></td>
+                                        <td><a href="#" ng-click="sendDeleteMN($index)">Xóa</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- end table data-->
+
+                </div>
+                <!-- end x_content-->
+            </div>
+            <!-- end x_pannel-->
+        </div>
+
+
+        <!-- tao model them moi-->
+        <div id="insertmodal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">{{modaltitle}}</h4>
+                    </div>
+
+                    <!-- begin form-->
+                    <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                        <!-- body-->
+                        <div class="modal-body">
+                            <div ng-switch="Cap">
+                                <div class="row" ng-switch-when="TH">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Nam h?c</label>
+                                            <select class="form-control" ng-model="Info.NamHoc" required ng-disabled="DisNamHoc">
+                                                <option ng-repeat="x in AllNamHoc" value="{{x.NamHoc}}">{{x.NamHoc | uppercase}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>L?p 1</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop1" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>L?p 2</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop2" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 3</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop3" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 4</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop4" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 5</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop5" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>T?ng n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.Nu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.DanToc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Chính sách</label>
+                                            <input type="number" class="form-control" ng-model="Info.ChinhSach" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Khuy?t t?t</label>
+                                            <input type="number" class="form-control" ng-model="Info.KhuyetTat" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Luu ban</label>
+                                            <input type="number" class="form-control" ng-model="Info.LuuBan" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>B? h?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.BoHoc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Hai bu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.HaiBuoi" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Bán trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.BanTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>N?i trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.NoiTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="x_title">
+                                            <h2><i class="fa fa-align-left"></i>Tốt nghiệp</h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Số lượng</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiep" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dó n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepNu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepDT" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="x_title">
+                                            <h2><i class="fa fa-align-left"></i>Số lượng học sinh gỏi</h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Cấp huyện</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapHuyen" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Cấp tỉnh</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapTinh" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Quốc gia</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapQG" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" ng-switch-when="THCS">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Nam h?c</label>
+                                            <select class="form-control" ng-model="Info.NamHoc" required ng-disabled="DisNamHoc">
+                                                <option ng-repeat="x in AllNamHoc" value="{{x.NamHoc}}">{{x.NamHoc | uppercase}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 6</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop6" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 7</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop7" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 8</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop8" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 9</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop9" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>T?ng n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.Nu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.DanToc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Chính sách</label>
+                                            <input type="number" class="form-control" ng-model="Info.ChinhSach" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Khuy?t t?t</label>
+                                            <input type="number" class="form-control" ng-model="Info.KhuyetTat" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Luu ban</label>
+                                            <input type="number" class="form-control" ng-model="Info.LuuBan" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>B? h?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.BoHoc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Hai bu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.HaiBuoi" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Bán trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.BanTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>N?i trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.NoiTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>T?t nghi?p</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiep" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dó n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepNu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepDT" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p huy?n</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapHuyen" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p t?nh</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapTinh" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p qu?c gia</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapQG" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" ng-switch-when="THPT">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Nam h?c</label>
+                                            <select class="form-control" ng-model="Info.NamHoc" required ng-disabled="DisNamHoc">
+                                                <option ng-repeat="x in AllNamHoc" value="{{x.NamHoc}}">{{x.NamHoc | uppercase}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 10</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop10" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 11</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop11" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>L?p 12</label>
+                                            <input type="number" class="form-control" ng-model="Info.Lop12" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>T?ng n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.Nu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.DanToc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Chính sách</label>
+                                            <input type="number" class="form-control" ng-model="Info.ChinhSach" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Khuy?t t?t</label>
+                                            <input type="number" class="form-control" ng-model="Info.KhuyetTat" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Luu ban</label>
+                                            <input type="number" class="form-control" ng-model="Info.LuuBan" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>B? h?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.BoHoc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Hai bu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.HaiBuoi" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Bán trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.BanTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>N?i trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.NoiTru" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>T?t nghi?p</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiep" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dó n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepNu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Trong dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.TotNghiepDT" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p huy?n</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapHuyen" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p t?nh</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapTinh" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>S? lu?ng HS gi?i c?p qu?c gia</label>
+                                            <input type="number" class="form-control" ng-model="Info.GioiCapQG" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" ng-switch-when="MN">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Nam h?c</label>
+                                            <select class="form-control" ng-model="Info.NamHoc" required ng-disabled="DisNamHoc">
+                                                <option ng-repeat="x in AllNamHoc" value="{{x.NamHoc}}">{{x.NamHoc | uppercase}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 03 d?n 12 tháng tu?i	</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col1" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 13 d?n 24 tháng tu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col2" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 25 d?n 36 tháng tu?i	</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col3" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 3 d?n 4 tu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col4" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 4 d?n 5 tu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col5" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tr? t? 5 d?n 6 tu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.Col6" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>T?ng n?</label>
+                                            <input type="number" class="form-control" ng-model="Info.Nu" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Dân t?c</label>
+                                            <input type="number" class="form-control" ng-model="Info.DanToc" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Chính sách</label>
+                                            <input type="number" class="form-control" ng-model="Info.ChinhSach" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Khuy?t t?t</label>
+                                            <input type="number" class="form-control" ng-model="Info.KhuyetTat" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Tuy?n m?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.TuyenMoi" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Hai bu?i</label>
+                                            <input type="number" class="form-control" ng-model="Info.HaiBuoi" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Bán trú</label>
+                                            <input type="number" class="form-control" ng-model="Info.BanTru" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end body-->
+                        <!-- begin footer-->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-default">Hoàn thành</button>
+                        </div>
+                        <!-- end footer-->
+                    </form>
+                    <!-- end form-->
+                    <!-- end form-->
+
+                </div>
+                <!-- end modal content-->
+            </div>
+        </div>
+        <!-- end modal them-->
+    </div>
+</div>
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+            // tao controller
+            var app = angular.module('myApp', ['ui.bootstrap']);
+            app.controller('myCtrl', function ($scope, $http) {
+                $scope.AllNamHoc = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.NamHoc))');
+                $scope.Cap = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.Cap))');
+
+                // lay du lieu
+                $scope.allDanhMuc = [];
+                $scope.GetData = function () {
+                    if ($scope.Cap === 'TH') {
+                        showLoader(true);
+                        $http({
+                            method: "GET",
+                            url: "/SoHocSinh/getHocSinhTH"
+                        }).then(function mySuccess(response) {
+                            showLoader(false);
+
+                            if (response.data.error === 0) {
+                                $scope.allDanhMuc = response.data.data;
+                            }
+
+                        }, function myError(response) {
+                            showLoader(false);
+                            showNotify('Connect error');
+                        });
+                    } else if ($scope.Cap === 'THCS') {
+                        showLoader(true);
+                        $http({
+                            method: "GET",
+                            url: "/SoHocSinh/getHocSinhTHCS"
+                        }).then(function mySuccess(response) {
+                            showLoader(false);
+
+                            if (response.data.error === 0) {
+
+                                $scope.allDanhMuc = response.data.data;
+                            }
+
+                        }, function myError(response) {
+                            showLoader(false);
+                            showNotify('Connect error');
+                        });
+                    } else if ($scope.Cap === 'THPT') {
+                        showLoader(true);
+                        $http({
+                            method: "GET",
+                            url: "/SoHocSinh/getHocSinhTHPT"
+                        }).then(function mySuccess(response) {
+                            showLoader(false);
+
+                            if (response.data.error === 0) {
+
+                                $scope.allDanhMuc = response.data.data;
+                            }
+
+                        }, function myError(response) {
+                            showLoader(false);
+                            showNotify('Connect error');
+                        });
+                    } else if ($scope.Cap === 'MN') {
+                        showLoader(true);
+                        $http({
+                            method: "GET",
+                            url: "/SoHocSinh/getHocSinhMN"
+                        }).then(function mySuccess(response) {
+                            showLoader(false);
+
+                            if (response.data.error === 0) {
+
+                                $scope.allDanhMuc = response.data.data;
+                            }
+
+                        }, function myError(response) {
+                            showLoader(false);
+                            showNotify('Connect error');
+                        });
+                    }
+
+                }
+                // goi lay du li?u
+
+                $scope.GetData();
+                //
+                // khoi tao bien dung cho create va edit
+                $scope.Info = {};
+                $scope.IsAction = '';
+
+                $scope.addNew = function () {
+
+                    if ($scope.Cap === "TH") {
+                        $scope.Info = { "NamHoc": $scope.NamHoc, "Lop1": 0, "Lop2": 0, "Lop3": 0, "Lop4": 0, "Lop5": 0, "Nu": 0, "DanToc": 0, "ChinhSach": 0, "KhuyetTat": 0, "TuyenMoi": 0, "LuuBan": 0, "BoHoc": 0, "HaiBuoi": 0, "BanTru": 0, "NoiTru": 0, "TotNghiep": 0, "TotNghiepNu": 0, "TotNghiepDT": 0, "GioiCapHuyen": 0, "GioiCapTinh": 0, "GioiCapQG": 0 };
+                    } else if ($scope.Cap === "THCS") {
+                        $scope.Info = { "NamHoc": $scope.NamHoc, "Lop6": 0, "Lop7": 0, "Lop8": 0, "Lop9": 0, "Nu": 0, "DanToc": 0, "ChinhSach": 0, "KhuyetTat": 0, "TuyenMoi": 0, "LuuBan": 0, "BoHoc": 0, "HaiBuoi": 0, "BanTru": 0, "NoiTru": 0, "TotNghiep": 0, "TotNghiepNu": 0, "TotNghiepDT": 0, "GioiCapHuyen": 0, "GioiCapTinh": 0, "GioiCapQG": 0 };
+                    } else if ($scope.Cap === "THPT") {
+                        $scope.Info = { "NamHoc": $scope.NamHoc, "Lop10": 0, "Lop11": 0, "Lop12": 0, "Nu": 0, "DanToc": 0, "ChinhSach": 0, "KhuyetTat": 0, "TuyenMoi": 0, "LuuBan": 0, "BoHoc": 0, "HaiBuoi": 0, "BanTru": 0, "NoiTru": 0, "TotNghiep": 0, "TotNghiepNu": 0, "TotNghiepDT": 0, "GioiCapHuyen": 0, "GioiCapTinh": 0, "GioiCapQG": 0 };
+                    } else if ($scope.Cap === "MN") {
+                        $scope.Info = { "NamHoc": $scope.NamHoc, "Col1": 0, "Col2": 0, "Col3": 0, "Col4": 0, "Col5": 0, "Col6": 0, "Nu": 0, "DanToc": 0, "ChinhSach": 0, "KhuyetTat": 0, "TuyenMoi": 0, "LuuBan": 0, "BoHoc": 0, "HaiBuoi": 0, "BanTru": 0 };
+                    }
+
+                    $scope.modaltitle = "Thêm thông tin h?c sinh";
+                    $scope.DisNamHoc = false;
+                    $scope.IsAction = 'add';
+
+                    showModel("insertmodal");
+
+                };
+
+
+
+                $scope.edit = function (index) {
+                    var info = $scope.allDanhMuc[index];
+                    $scope.Info = angular.copy(info);
+                    $scope.DisNamHoc = true;
+                    $scope.modaltitle = "Ch?nh s?a thông tin h?c sinh";
+                    $scope.IsAction = 'edit';
+                    showModel("insertmodal");
+                };
+
+                // tim index theo ma tinh
+                function getSelectedIndex(id) {
+                    for (var i = 0; i < $scope.allDanhMuc.length; i++)
+                        if ($scope.allDanhMuc[i].NamHoc === id)
+                            return i;
+                    return -1;
+                };
+
+                // action
+
+                $scope.finishForm = function (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        if ($scope.Cap === 'TH') {
+                            $scope.sendCreateTH();
+                        } else if ($scope.Cap === 'THCS') {
+                            $scope.sendCreateTHCS();
+                        } else if ($scope.Cap === 'THPT') {
+                            $scope.sendCreateTHPT();
+                        }
+                        else if ($scope.Cap === 'MN') {
+                            $scope.sendCreateMN();
+                        }
+                    } else if ($scope.IsAction === 'edit') {
+                        if ($scope.Cap === 'TH') {
+                            $scope.sendEditTH();
+                        } else if ($scope.Cap === 'THCS') {
+                            $scope.sendEditTHCS();
+                        }
+                        else if ($scope.Cap === 'THPT') {
+                            $scope.sendEditTHPT();
+                        }
+                        else if ($scope.Cap === 'MN') {
+                            $scope.sendEditMN();
+                        }
+                    } else if ($scope.IsAction === 'delete') {
+                        if ($scope.Cap === 'TH') {
+                            $scope.Info = angular.copy(info);
+                            $scope.sendDeleteTH();
+                        } else if ($scope.Cap === 'THCS') {
+                            $scope.Info = angular.copy(info);
+                            $scope.sendDeleteTHCS();
+                        } else if ($scope.Cap === 'THPT') {
+                            $scope.Info = angular.copy(info);
+                            $scope.sendDeleteTHPT();
+                        } else if ($scope.Cap === 'MN') {
+                            $scope.Info = angular.copy(info);
+                            $scope.sendDeleteMN();
+                        }
+                    }
+                };
+                // them tinh
+                $scope.sendCreateTH = function () {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/createTH",
+                        data: { hs: $scope.Info }
+                    }).then(function success(response) {
+
+                        var result = response.data;
+                        console.log(result);
+                        if (result.error === 0) {
+                            $scope.GetData(1, "");
+                            $scope.allDanhMuc.unshift(result.data);
+                            hideModel("insertmodal");
+
+                            showNotify("Ðã thêm thông tin h?c sinh");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    }
+                        , function error(response) {
+                            showNotify("connect has disconnect");
+                            showLoader(false);
+                        });
+
+                };
+                // them tinh
+                $scope.sendCreateTHCS = function () {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/createTHCS",
+                        data: { hs: $scope.Info }
+                    }).then(function success(response) {
+
+                        var result = response.data;
+                        console.log(result);
+                        if (result.error === 0) {
+                            $scope.GetData(1, "");
+                            $scope.allDanhMuc.unshift(result.data);
+                            hideModel("insertmodal");
+                            showNotify("Ðã thêm thông tin h?c sinh");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    }
+                        , function error(response) {
+                            showNotify("connect has disconnect");
+                            showLoader(false);
+                        });
+
+                };
+                // them tinh
+                $scope.sendCreateTHPT = function () {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/createTHPT",
+                        data: { hs: $scope.Info }
+                    }).then(function success(response) {
+
+                        var result = response.data;
+                        console.log(result);
+                        if (result.error === 0) {
+                            $scope.GetData(1, "");
+                            $scope.allDanhMuc.unshift(result.data);
+                            hideModel("insertmodal");
+                            showNotify("Ðã thêm thông tin h?c sinh");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    }
+                        , function error(response) {
+                            showNotify("connect has disconnect");
+                            showLoader(false);
+                        });
+
+                };
+                // them tinh
+                $scope.sendCreateMN = function () {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/createmn",
+                        data: { hs: $scope.Info }
+                    }).then(function success(response) {
+
+                        var result = response.data;
+                        console.log(result);
+                        if (result.error === 0) {
+                            $scope.GetData(1, "");
+                            $scope.allDanhMuc.unshift(result.data);
+                            hideModel("insertmodal");
+                            showNotify("Ðã thêm thông tin h?c sinh");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    }
+                        , function error(response) {
+                            showNotify("connect has disconnect");
+                            showLoader(false);
+                        });
+
+                };
+                // cap nhat tinh
+                $scope.sendEditTH = function () {
+                    showLoader(true);
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/editth",
+                        data: { hs: $scope.Info }
+                    }).then(
+                        function success(response) {
+                            $scope.GetData(1, "");
+                            var result = response.data;
+
+                            if (result.error === 0) {
+
+                                var findIndex = getSelectedIndex(result.data.NamHoc);
+
+                                if (findIndex !== -1) {
+                                    $scope.allDanhMuc[findIndex] = angular.copy(result.data);
+                                }
+
+                                showNotify("Ðã c?p nh?t");
+                                hideModel("insertmodal");
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                };
+                // cap nhat tinh
+                $scope.sendEditTHCS = function () {
+                    showLoader(true);
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/editthcs",
+                        data: { hs: $scope.Info }
+                    }).then(
+                        function success(response) {
+                            $scope.GetData(1, "");
+                            var result = response.data;
+
+                            if (result.error === 0) {
+
+                                var findIndex = getSelectedIndex(result.data.NamHoc);
+
+                                if (findIndex !== -1) {
+                                    $scope.allDanhMuc[findIndex] = angular.copy(result.data);
+                                }
+
+                                showNotify("Ðã c?p nh?t");
+                                hideModel("insertmodal");
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                };
+                // cap nhat tinh
+                $scope.sendEditTHPT = function () {
+                    showLoader(true);
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/editthpt",
+                        data: { hs: $scope.Info }
+                    }).then(
+                        function success(response) {
+                            $scope.GetData(1, "");
+                            var result = response.data;
+
+                            if (result.error === 0) {
+
+                                var findIndex = getSelectedIndex(result.data.NamHoc);
+
+                                if (findIndex !== -1) {
+                                    $scope.allDanhMuc[findIndex] = angular.copy(result.data);
+                                }
+
+                                showNotify("Ðã c?p nh?t");
+                                hideModel("insertmodal");
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                };
+                // cap nhat tinh
+                $scope.sendEditMN = function () {
+                    showLoader(true);
+                    $http({
+                        method: "POST",
+                        url: "/SoHocSinh/editmn",
+                        data: { hs: $scope.Info }
+                    }).then(
+                        function success(response) {
+                            $scope.GetData(1, "");
+                            var result = response.data;
+
+                            if (result.error === 0) {
+
+                                var findIndex = getSelectedIndex(result.data.NamHoc);
+
+                                if (findIndex !== -1) {
+                                    $scope.allDanhMuc[findIndex] = angular.copy(result.data);
+                                }
+
+                                showNotify("Ðã c?p nh?t");
+                                hideModel("insertmodal");
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                };
+                // xoa du lieu
+                $scope.sendDeleteTH = function (index) {
+                    var info = $scope.allDanhMuc[index];
+                    var r = confirm("B?n mu?n xóa không ?");
+                    if (r) {
+                        showLoader(true);
+                        $http({
+                            method: "POST",
+                            url: "/SoHocSinh/deleteth",
+                            data: { hs: info }
+                        }).then(
+                            function success(response) {
+
+                                var result = response.data;
+
+                                if (result.error == 0) {
+
+                                    // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                    // if (findIndex !== -1) {
+                                    $scope.allDanhMuc.splice(index, 1);
+                                    //  }
+
+                                } else {
+
+                                    alert(result.msg);
+
+                                }
+
+                                showLoader(false);
+
+                            },
+                            function errror(response) {
+                                showLoader(false);
+                                showNotify("connect has disconnect");
+                            }
+                            );
+                    } else {
+
+                    }
+                }
+                // xoa du lieu
+                $scope.sendDeleteTHCS = function (index) {
+                    var info = $scope.allDanhMuc[index];
+                    var r = confirm("B?n mu?n xóa không ?");
+                    if (r) {
+                        showLoader(true);
+                        $http({
+                            method: "POST",
+                            url: "/SoHocSinh/deletethcs",
+                            data: { hs: info }
+                        }).then(
+                            function success(response) {
+
+                                var result = response.data;
+
+                                if (result.error == 0) {
+
+                                    // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                    // if (findIndex !== -1) {
+                                    $scope.allDanhMuc.splice(index, 1);
+                                    //  }
+
+                                } else {
+
+                                    alert(result.msg);
+
+                                }
+
+                                showLoader(false);
+
+                            },
+                            function errror(response) {
+                                showLoader(false);
+                                showNotify("connect has disconnect");
+                            }
+                            );
+                    } else {
+
+                    }
+                }
+                // xoa du lieu
+                $scope.sendDeleteTHPT = function (index) {
+                    var info = $scope.allDanhMuc[index];
+                    var r = confirm("B?n mu?n xóa không ?");
+                    if (r) {
+                        showLoader(true);
+                        $http({
+                            method: "POST",
+                            url: "/SoHocSinh/deletethpt",
+                            data: { hs: info }
+                        }).then(
+                            function success(response) {
+
+                                var result = response.data;
+
+                                if (result.error == 0) {
+
+                                    // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                    // if (findIndex !== -1) {
+                                    $scope.allDanhMuc.splice(index, 1);
+                                    //  }
+
+                                } else {
+
+                                    alert(result.msg);
+
+                                }
+
+                                showLoader(false);
+
+                            },
+                            function errror(response) {
+                                showLoader(false);
+                                showNotify("connect has disconnect");
+                            }
+                            );
+                    } else {
+
+                    }
+                }
+                // xoa du lieu
+                $scope.sendDeleteMN = function (index) {
+                    var info = $scope.allDanhMuc[index];
+                    var r = confirm("B?n mu?n xóa không ?");
+                    if (r) {
+                        showLoader(true);
+                        $http({
+                            method: "POST",
+                            url: "/SoHocSinh/deletemn",
+                            data: { hs: info }
+                        }).then(
+                            function success(response) {
+
+                                var result = response.data;
+
+                                if (result.error == 0) {
+
+                                    // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                    // if (findIndex !== -1) {
+                                    $scope.allDanhMuc.splice(index, 1);
+                                    //  }
+
+                                } else {
+
+                                    alert(result.msg);
+
+                                }
+
+                                showLoader(false);
+
+                            },
+                            function errror(response) {
+                                showLoader(false);
+                                showNotify("connect has disconnect");
+                            }
+                            );
+                    } else {
+
+                    }
+                }
+                //
+            });
+            //-- end controller
+
+    </script>
+}
+
+
+
+
+

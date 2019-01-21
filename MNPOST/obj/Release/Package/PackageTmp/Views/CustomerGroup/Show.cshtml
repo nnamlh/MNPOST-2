@@ -1,0 +1,358 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách nhóm khách hàng</h2>
+                <div class="nav navbar-right">
+                    <a class="btn btn-primary" href="#" ng-click="addNew()">Thêm khách hàng</a>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="searchText" my-enter="GetData(1)" />
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã KH</th>
+                                <th>Tên KH</th>
+                                <th>Công ty</th>
+                                <th>Thanh toán</th>
+                                <th>Liên hệ</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in allCustomerGroup">
+                                <td>{{$index + 1}} <a class="label label-primary" href="#" ng-click="edit($index)">chi tiêt</a></td>
+                                <td>{{item.CustomerGroupCode}}</td>
+                                <td>{{item.CustomerGroupName}}</td>
+                                <td>{{item.Company}}</td>
+                                <td>{{findPayment(item.PaymentMethodID)}}</td>
+                                <td>
+                                    <strong>ĐT: </strong>{{item.ConatctPhone}}<br />
+                                    <strong>Email: </strong>{{item.ContactEmail}}<br />
+                                    <strong>Địa chỉ: </strong>{{item.ContactAddress}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table data-->
+                <!--phan trang-->
+                <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                <!-- end phan trang-->
+
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+
+    <!-- tao model them moi-->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                    <!-- body-->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Tên khách hàng</label>
+                                    <input type="text" class="form-control" ng-model="CustomerGroupInfo.CustomerGroupName"  />
+                                </div>
+                                <div class="form-group">
+                                    <label>Tên công ty</label>
+                                    <input type="text" class="form-control" ng-model="CustomerGroupInfo.Company"  />
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" class="form-control" ng-model="CustomerGroupInfo.ContactAddress"  />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Hình thức thanh toán</label>
+                                    <select class="form-control" ng-model="CustomerGroupInfo.PaymentMethodID">
+                                        <option ng-repeat="item in payments" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Điện thoại</label>
+                                    <input type="text" class="form-control" ng-model="CustomerGroupInfo.ConatctPhone" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" ng-model="CustomerGroupInfo.ContactEmail" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+</div>
+
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.payments = [{ code: 'debt', name: 'CÔNG NỢ' }, { code: 'money', name: 'TIỀN MẶT' }];
+
+            $scope.findPayment = function (code) {
+                for (var i = 0; i < $scope.payments.length; i++) {
+                    if ($scope.payments[i].code === code) {
+                        return $scope.payments[i].name;
+                    }
+                }
+
+                return '';
+            };
+
+            // phan trang
+            $scope.numPages;
+            $scope.itemPerPage;
+            $scope.totalItems;
+            $scope.currentPage = 1;
+            $scope.maxSize = 5;
+            $scope.pageChanged = function () {
+                $scope.GetData($scope.currentPage);
+            };
+
+
+            // lay du lieu
+            $scope.allCountry = [];
+            $scope.searchText = "";
+            $scope.GetData = function (page) {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/customergroup/getcustomergroup?page=" + page + "&search=" + $scope.searchText
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allCustomerGroup = response.data.data;
+                        $scope.itemPerPage = response.data.pageSize;
+                        $scope.totalItems = response.data.toltalSize;
+                        $scope.numPages = Math.round($scope.totalItems / $scope.itemPerPage);
+
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            // goi lay du liẹu
+
+            $scope.GetData(1);
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.CustomerGroupInfo = {};
+
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+
+                $scope.CustomerGroupInfo = {};
+
+                $scope.modaltitle = "Thêm nhóm khách hàng";
+
+                $scope.IsAction = 'add';
+                showModel("insertmodal")
+
+            };
+
+
+
+            $scope.edit = function (index) {
+                var info = $scope.allCustomerGroup[index];
+
+                $scope.CustomerGroupInfo = angular.copy(info);
+
+                $scope.modaltitle = "Chỉnh sửa nhóm khách hàng";
+
+                $scope.IsAction = 'edit';
+                showModel("insertmodal")
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if ($scope.IsAction === 'add') {
+                    $scope.sendCreate();
+                } else if ($scope.IsAction === 'edit') {
+                    $scope.sendEdit();
+                }
+            }
+
+
+            // them tinh
+            $scope.sendCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/customergroup/create",
+                    data: $scope.CustomerGroupInfo
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.GetData(1, result.data);
+
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm nhóm khách hàng");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }, function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/customergroup/edit",
+                    data: $scope.CustomerGroupInfo
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error === 0) {
+
+                            showNotify("Đã cập nhật");
+
+                            for (var i = 0; i < $scope.allCustomerGroup.length; i++) {
+                                if ($scope.allCustomerGroup[i].CustomerGroupID === $scope.CustomerGroupInfo.CustomerGroupID) {
+                                    $scope.allCustomerGroup[i] = angular.copy($scope.CustomerGroupInfo);
+                                }
+                            }
+
+                            hideModel("insertmodal");
+
+                        } else {
+                            showNotify(result.msg);
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                    );
+            }
+
+            // xoa du lieu
+            $scope.sendDelete = function (index) {
+                var info = $scope.allCustomerGroup[index];
+
+                var r = confirm("Bạn muốn xóa không ?");
+                if (r == true) {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/customergroup/delete",
+                        data: { CustomerGroupID: info.CustomerGroupID }
+                    }).then(
+                        function success(response) {
+
+                            var result = response.data;
+
+                            if (result.error == 0) {
+                                $scope.allCustomerGroup.splice(index, 1);
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                } else {
+
+                }
+
+
+            }
+
+        });
+        //-- end controller
+
+    </script>
+}
+

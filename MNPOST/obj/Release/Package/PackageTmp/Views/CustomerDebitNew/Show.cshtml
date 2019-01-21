@@ -1,0 +1,506 @@
+﻿@{
+    ViewBag.Title = "Công nợ khách hàng đã trừ COD";
+}
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="x_title">
+                    <h2>Công nợ khách hàng</h2>
+                    <div class="nav navbar-right">
+                        <a class="btn btn-success" ng-click="addNew()">Tạo bảng kê</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_danhmuc" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=false">Danh sách công nợ</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=true">Thao tác</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_danhmuc" aria-labelledby="home-tab">
+                            <!-- begin tab-->
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Bắt đầu</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="DanhMuc.TuNgay" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Kết thúc</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="DanhMuc.DenNgay" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        </br>
+                                        <button type="button" class="btn btn-primary" ng-click="tim()">Tìm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-striped jambo_table bulk_action">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th><input type="checkbox" ng-model="chkAll" ng-checked="chkAll" ng-change="checkAllChange()" />In</th>
+                                                <th>STT</th>
+                                                <th>Chứng từ</th>
+                                                <th>Ngày lập</th>
+                                                <th>Khách hàng</th>
+                                                <th>Cước DV</th>
+                                                <th>Số tiền COD</th>
+                                                <th>Tổng nợ</th>
+                                                <th>Thanh toán</th>
+                                                <th>#</th>
+                                                <th>#</th>
+                                                <th>#</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in allDanhMuc">
+                                                <td><input type="checkbox" ng-model="item.isCheck" ng-checked="item.isCheck" /></td>
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{item.DocumentID}}</td>
+                                                <td>{{item.DocumentDate.slice(6, -2) | date : 'dd/MM/yyyy'}}</td>
+                                                <td>{{item.CustomerName}}</td>
+                                                <td>{{item.TotalAmount}}</td>
+                                                <td>{{item.CODAmount}}</td>
+                                                <td>{{item.Total}}</td>
+                                                <td><a href="#" ng-class="{'fa fa-check' : item.StatusID == 1, 'fa fa-close' : item.StatusID == 0}" ng-click="thanhtoan($index)"></a></td>
+                                                <td><a href="#" class="btn-xs btn-primary" ng-click="edit($index)">Xem</a></td>
+                                                <td><a href="#" class="btn-xs btn-danger" ng-click="sendDelete($index)">Xóa</a></td>
+                                                <td><a href="#" class="btn-xs btn-info" ng-click="showPDF('/customerdebit/ShowReport?docid=' + item.DocumentID)">Report</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end tab-->
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Số chứng từ</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.DocumentID" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Ngày chứng từ</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="CongNo.DocumentDate" required ui-mask="99/99/9999" ui-mask-placeholder ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Số tiền nợ</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.TotalAmount" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Khách hàng</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.CustomerName" ng-disabled="true" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-striped jambo_table bulk_action">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th>STT</th>
+                                                <th>Số phiếu</th>
+                                                <th>Ngày</th>
+                                                <th>Nơi đến</th>
+                                                <th>LH</th>
+                                                <th>DV</th>
+                                                <th>SL</th>
+                                                <th>TL</th>
+                                                <th>Cước</th>
+                                                <th>COD</th>
+                                                <th>Thu #</th>
+                                                <th>CK</th>
+                                                <th>Tổng</th>
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in allChiTiet">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{item.MailerID}}</td>
+                                                <td>{{item.AcceptDate.slice(6, -2) | date : 'dd/MM/yyyy'}}</td>
+                                                <td>{{item.ReciveprovinceID}}</td>
+                                                <td>{{item.MerchandiseID}}</td>
+                                                <td>{{item.MailerTypeID}}</td>
+                                                <td>{{item.Quantity}}</td>
+                                                <td>{{item.Weight}}</td>
+                                                <td>{{item.Price}}</td>
+                                                <td>{{item.COD}}</td>
+                                                <td>{{item.PriceService}}</td>
+                                                <td>{{item.Discount}}</td>
+                                                <td>{{item.Amount}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal them-->
+    <div id="congnomodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Công nợ khách hàng có trừ COD</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class=" label label-primary">Chọn thứ</label>
+                                <select class="form-control" ng-model="CongNo.Ngay" required>
+                                    <option ng-repeat="x in ListNgayChot" value="{{x.Ngay}}">{{x.Ten}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Khách hàng</label>
+                                <div class="row">
+                                    <div class="col-sm-9">
+                                        <select class="form-control" ng-model="CongNo.AllCustomer">
+                                            <option value="true">Tất cả khách hàng</option>
+                                            <option value="false">Theo theo sách</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="button" class="btn btn-primary" ng-click="showKH()">Chọn KH</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                </br>
+                                <button type="button" class="btn btn-primary" ng-click="sendCreate()">Tính công nợ</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- khach hang -->
+    <div id="khachhangmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Chọn danh sách khách hàng</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Chọn</th>
+                                <th>Mã KH</th>
+                                <th>Tên KH</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in allCustomer">
+                                <td>{{$index + 1}}</td>
+                                <td><input type="checkbox" ng-model="x.isCheck" ng-checked="x.isCheck"></td>
+                                <td>{{x.CustomerGroupCode}}</td>
+                                <td>{{x.CustomerGroupName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end content-->
+@section scripts {
+    <script>
+
+
+    // tao controller
+    var app = angular.module('myApp', ['ui.bootstrap', 'ui.mask']);
+    app.controller('myCtrl', function ($scope, $http, $filter) {
+
+        $scope.allCustomer = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allCustomer))');
+        $scope.allChiTiet = [];
+        $scope.DanhMuc = [];
+        $scope.ChotNgay = [];
+        $scope.CongNo = [];
+        var date = new Date();
+        var tngay = $filter('date')(date, "dd/MM/yyyy");
+        var dngay = $filter('date')(date, "dd/MM/yyyy");
+        var chotngay = $filter('date')(date, "MM/yyyy");
+        $scope.DanhMuc.TuNgay = tngay;
+        $scope.DanhMuc.DenNgay = dngay;
+
+        $scope.ListNgayChot = [            
+            { Ngay: 2, Ten: "Thứ 2" },
+            { Ngay: 3, Ten: "Thứ 3" },
+            { Ngay: 4, Ten: "Thứ 4" },
+            { Ngay: 5, Ten: "Thứ 5" },
+            { Ngay: 6, Ten: "Thứ 6" },
+            { Ngay: 7, Ten: "Thứ 7" },
+            { Ngay: 8, Ten: "Chủ nhật" },
+            { Ngay: 0, Ten: "Cuối tháng" }
+        ];
+
+            //không cho chọn ngày chốt
+            $scope.allDanhMuc = [];
+            $scope.DanhMuc.PostOfficeID = 'BCQ3';
+            $scope.GetData = function () {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/CustomerDebitNew/GetDebit?TuNgay=" + $scope.DanhMuc.TuNgay + "&DenNgay=" + $scope.DanhMuc.DenNgay + "&post=" + $scope.DanhMuc.PostOfficeID
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allDanhMuc = response.data.data;
+                        $('.nav-tabs a[href="#tab_danhmuc"]').tab('show');
+                       // console.log($scope.allDanhMuc);
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            $scope.tim = function () {
+                $scope.GetData();
+            }
+            $scope.showKH = function () {
+                $scope.allCustomer = [];
+                if ($scope.CongNo.AllCustomer === 'false')
+                {
+                    
+                        $http.get('/customerdebitnew/getkh?ngaychot=' + $scope.CongNo.Ngay).then(function (response) {
+                            var result = response.data;
+                            $scope.allCustomer = result;
+                        });
+
+                } else
+                {
+                    $scope.allCustomer = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allCustomer))');
+            }
+                showModel('khachhangmodal');
+            };
+
+
+        $scope.addNew = function () {
+            var fDate = $filter('date')(date, "dd/MM/yyyy");
+            $scope.CongNo = { "TuNgay": fDate, "DenNgay": fDate, "Thang": chotngay, "Ngay": "0", "AllCustomer": "true", "TheoNgayChot": "false" };
+            $scope.DisTimHS = false;
+            $scope.DisTimSTT = false;
+            $scope.IsAction = 'add';
+            showModel("congnomodal");
+        };
+        $scope.edit = function (index) {
+
+            var info = $scope.allDanhMuc[index];
+            $scope.CongNo = angular.copy(info);
+            var fDate = $filter('date')($scope.CongNo.DocumentDate.slice(6, -2), "dd/MM/yyyy");
+            $scope.CongNo.DocumentDate = fDate;
+            $('.nav-tabs a[href="#tab_chitiet"]').tab('show');
+            //check khách hàng
+            $http.get('/customerdebitnew/getDetail?documentid=' + $scope.CongNo.DocumentID).then(function (response) {
+                var result = response.data;
+                $scope.allChiTiet = result;
+            });
+
+        };
+
+        $scope.finishForm = function (isValid) {
+            if ($scope.IsAction === 'add') {
+                $scope.sendCreate();
+            } else if ($scope.IsAction === 'delete') {
+                $scope.Info = angular.copy(info);
+                $scope.sendDelete();
+            }
+        };
+        // them tinh
+        $scope.sendCreate = function () {
+            showLoader(true);
+            var listDebit = [];
+            for (var i = 0; i < $scope.allCustomer.length; i++) {
+                if ($scope.allCustomer[i].isCheck) {
+                    listDebit.push($scope.allCustomer[i].CustomerGroupCode);
+                }
+            }
+
+            $http({
+                method: "POST",
+                url: "/CustomerDebitnew/create",
+                data: { kh: listDebit, loai: $scope.CongNo.TheoNgayChot, ngaychot: $scope.CongNo.Ngay, thangchot: $scope.CongNo.Thang, tungay: $scope.CongNo.TuNgay, denngay: $scope.CongNo.DenNgay, allcus: $scope.CongNo.AllCustomer }
+            }).then(function success(response) {
+
+                var result = response.data;
+
+                if (result.error === 0) {
+
+                    $scope.GetData();
+                    //  $scope.allDanhMuc.unshift(result.data);
+                    $('.nav-tabs a[href="#tab_danhmuc"]').tab('show');
+                    hideModel("congnomodal");
+
+                    showNotify("Đã thêm mới thông tin");
+
+                } else {
+
+                    alert(result.msg);
+
+                }
+
+                showLoader(false);
+
+            }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+        };
+        // xoa du lieu
+        $scope.sendDelete = function (index) {
+            var info = $scope.allDanhMuc[index];
+
+            var r = confirm("Bạn muốn xóa không ?");
+            if (r == true) {
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/CustomerDebitnew/delete",
+                    data: { documentid: info.DocumentID }
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+                            $scope.allDanhMuc.splice(index, 1);
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                    );
+            } else {
+            }
+        };
+        // xác nhận thanh toán
+        $scope.thanhtoan = function (index) {
+            var info = $scope.allDanhMuc[index];
+            if (info.StatusID === 0) {
+                var r = confirm("Bạn có chắc muốn thanh toán ?");
+                if (r == true) {
+                    showLoader(true);
+                    $http({
+                        method: "POST",
+                        url: "/CustomerDebitnew/thanhtoan",
+                        data: { documentid: info.DocumentID }
+                    }).then(
+                        function success(response) {
+
+                            var result = response.data;
+
+                            if (result.error == 0) {
+                                $scope.GetData();
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                } else {
+
+                }
+            } else {
+                showNotify('Bảng kê đã được xác nhận thanh toán');
+            }
+        };
+        //in bang ke cong no
+        //chon tat ca bang ke tren man hình
+        $scope.chkAll = false;
+        $scope.checkAllChange = function () {
+            for (var i = 0; i < $scope.allDanhMuc.length; i++) {
+                $scope.allDanhMuc[i].isCheck = $scope.chkAll;
+            }
+        };
+        //duyet danh sach so chung tu duoc chon
+        $scope.printBK = function () {
+            var listTemp = '';
+            for (var i = 0; i < $scope.allDanhMuc.length; i++) {
+                if ($scope.allDanhMuc[i].isCheck) {
+                    listTemp = listTemp + ',' + $scope.allDanhMuc[i].STT;
+                }
+            }
+            if (listTemp.charAt(0) === ',') {
+                listTemp = listTemp.substr(1);
+            }
+            if (listTemp === '') {
+                showNotify("Phải chọn chứng từ cần in");
+            } else {
+                window.open("/customerdebitnew/printbk?docid=" + listTemp, "_blank");
+            }
+        }
+        //ket thuc in bang ke cong no
+
+        $scope.showPDF = function (url) {
+
+            runShowPDF(url);
+        };
+
+
+    });
+
+    </script>
+}

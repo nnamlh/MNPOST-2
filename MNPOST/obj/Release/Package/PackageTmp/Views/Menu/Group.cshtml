@@ -1,0 +1,153 @@
+﻿@model IEnumerable<MNPOSTCOMMON.UMS_GroupMenu>
+@{
+    ViewBag.Title = "Group";
+}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách nhóm Menu</h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li>
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="/menu/show">DS Menu</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+
+
+            <div class="x_content">
+                <p>
+                    Danh sách nhóm menu chức năng
+                </p>
+
+                <form class="form-horizontal form-label-left" novalidate id="formgroup" method="post" action="/menu/addgroup">
+                    <div class="row">
+                
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Tên nhóm</label>
+                                <input type="text" class="form-control" name="name" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Icon</label>
+                                <input type="text" class="form-control" name="icon" required />
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label>Vị trí</label>
+                                <input type="number" class="form-control" name="position" required />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <button type="button" onclick="submitForm('formgroup')" class="btn btn-primary">Thêm</button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <!-- table-->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Vi trí</th>
+                            <th>Tên nhóm </th>
+                            <th>Icon</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Position</td>
+                                <td>@item.Name</td>
+                                <td>@item.Icon</td>
+                                <td><a href="javascript:editGroup('@item.Name', '@item.Icon', '@item.Position', '@item.Id')">Sửa</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="groupmodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chỉnh sửa</h4>
+            </div>
+            <form id="formedit" method="post" action="/menu/editgroup">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="groupid22" value="sfdf" />
+
+                    <div class="form-group">
+                        <label>Tên nhóm</label>
+                        <input type="text" class="form-control" name="name" id="groupname" />
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <input type="text" class="form-control" name="icon" id="groupicon" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vị trí</label>
+                        <input type="number" class="form-control" name="position" id="groupposition" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="submitForm('formedit')">Chỉnh sửa</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+
+
+        function editGroup(name, icon, position, id) {
+            console.log(id);
+            $('#groupname').val(name);
+
+            $('#groupicon').val(icon);
+
+            $('#groupposition').val(position);
+
+            $('#groupid22').val(id);
+
+            showModel('groupmodal');
+        }
+    </script>
+
+}

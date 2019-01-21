@@ -1,0 +1,67 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Thêm khách hàng</h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <form method="get">
+            <div class="row">
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Tên khách hàng</label>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <input type="text" id="autocomplete" placeholder="Enter your address" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ đêbs</label>
+                        <input type="text" id="autocomplete2" placeholder="Enter your address" class="form-control" />
+                    </div>
+                    <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                    <pre>Page: {{currentPage}} / {{numPages}}</pre>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    var autocomplete;
+    var autocomplete2;
+
+    function fillInAddress() {
+
+        var place = autocomplete.getPlace();
+
+        document.getElementById('autocomplete').value = place.formatted_address;
+
+        console.log(handleAutoCompleteAddress(place));
+    }
+
+    function fillInAddress2() {
+
+        var place = autocomplete2.getPlace();
+        document.getElementById('autocomplete2').value = place.formatted_address;
+
+        console.log(handleAutoCompleteAddress(place));
+    }
+
+    function init() {
+        autocomplete = new createAutoCompleteAddress('autocomplete', fillInAddress);
+        autocomplete2= new createAutoCompleteAddress('autocomplete2', fillInAddress2);
+    }
+
+    init();
+
+
+</script>

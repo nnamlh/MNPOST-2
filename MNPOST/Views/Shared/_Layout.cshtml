@@ -1,0 +1,252 @@
+﻿@using Microsoft.AspNet.Identity
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@ViewBag.Title</title>
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" >
+
+    <!-- Select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <!-- Custom Theme Style -->
+    <link href="~/Content/build/css/custom.css" rel="stylesheet">
+
+    <style type="text/css">
+        #loader {
+            display: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: url('https://loading.io/assets/img/landing/curved-bars.svg') 50% 50% no-repeat rgb(249,249,249);
+            opacity: .8;
+        }
+
+        .css-form input.ng-invalid.ng-touched {
+            background-color: #FA787E;
+        }
+
+        .css-form input.ng-valid.ng-touched {
+            background-color: #78FA89;
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+        /*google place*/
+        .pac-container {
+            z-index: 10000 !important;
+        }
+
+        .center {
+            margin: auto;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .scrollmenu {
+            overflow: auto;
+            white-space: nowrap;
+            height: 550px;
+            border: 1px solid green;
+        }
+        #the-canvas {
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+    </style>
+
+    @RenderSection("styles", false)
+
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="/" class="site_title">MNP</a>
+                    </div>
+                    <div class="clearfix"></div>
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            @if (Request.IsAuthenticated)
+                            {
+                                @Html.Action("Menus", "Base")
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                       
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    @User.Identity.Name
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                    <li>
+                                        <a href="/account/manage">
+                                            Đổi mật khẩu
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;">
+                                            <span>Settings</span>
+                                        </a>
+                                    </li>
+                                    <li><a href="javascript:;">Help</a></li>
+                                    <li>
+                                        <a href="javascript:document.getElementById('logoutForm').submit()">
+                                            <span>Logout</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+
+            <div class="right_col" role="main">
+                <div class="clearfix"></div>
+                <div class="">
+                    @RenderBody()
+                </div>
+            </div>
+            <!-- /footer content -->
+            @if (Request.IsAuthenticated)
+            {
+                using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                }
+            }
+            <footer>
+      
+                <div class="clearfix"></div>
+            </footer>
+
+        </div>
+    </div>
+
+    <div id="loader"></div>
+
+    <div id="showreport" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="prev">Previous</button>
+                    <button id="next">Next</button>
+                    &nbsp; &nbsp;
+                    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                    &nbsp; &nbsp;
+                    <button id="printpdf">Print</button>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="the-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="~/Content/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  
+    <!-- Custom Theme Scripts -->
+    <script src="~/Content/build/js/custom.js"></script>
+    <script src="~/Scripts/bootstrap-notify.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular-animate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular-sanitize.min.js"></script>
+
+    <script src="~/Scripts/ui-bootstrap-tpls-2.5.0.min.js"></script>
+    <script src="~/Scripts/mask.min.js"></script>
+    <script src="~/Scripts/uploader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="~/Scripts/angular-select2.js"></script>
+
+    <script src="~/Scripts/myscript.keypress.js"></script>
+    <script src="~/Scripts/mydirective.js"></script>
+
+
+    <script src="~/Scripts/myscripts.js"></script>
+    <script src="~/Scripts/showpdf.js"></script>
+   
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+
+       /*
+        $('#sidebar-menu').find('li.active ul').hide();
+        $('#sidebar-menu').find('li.active').addClass('active-sm').removeClass('active');
+
+        $('body').toggleClass('nav-md nav-sm');
+        */
+ 
+    </script>
+
+    @RenderSection("Scripts", false)
+
+
+
+</body>
+
+</html>

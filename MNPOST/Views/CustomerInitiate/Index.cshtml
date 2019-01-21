@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+}
+<div ng-app="myApp">
+    <div class="row">
+     
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <a href="#/!" class="btn btn-default">Tất cả khách hàng</a>
+            <a href="#!create" class="btn btn-primary">Thêm khách hàng</a>
+
+            <div ng-view></div>
+           
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+
+    <script type="text/javascript" src="~/scripts/customer/cus_initiate.js"></script>
+
+}
+

@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\work temp\MMBox\MNPOSTAPI</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/Antlr3.Runtime.dll">
+      <publishTime>12/07/2018 11:46:04</publishTime>
+    </File>
+    <File Include="bin/Antlr3.Runtime.pdb">
+      <publishTime>09/19/2018 11:37:16</publishTime>
+    </File>
+    <File Include="bin/ASPSnippets.FaceBookAPI.dll">
+      <publishTime>10/27/2018 17:28:19</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.CrystalReports.Engine.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.ClientDoc.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.CommLayer.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.CommonControls.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.CommonObjectModel.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.Controllers.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.CubeDefModel.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.DataDefModel.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.DataSetConversion.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.ObjectFactory.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.Prompting.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.ReportDefModel.dll">
+      <publishTime>06/12/2018 06:53:18</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportAppServer.XmlSerialize.dll">
+      <publishTime>06/12/2018 06:53:20</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportSource.dll">
+      <publishTime>06/12/2018 06:53:20</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.Shared.dll">
+      <publishTime>06/12/2018 06:53:20</publishTime>
+    </File>
+    <File Include="bin/EntityFramework.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/EntityFramework.SqlServer.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNet.Identity.Core.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNet.Identity.EntityFramework.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.AspNet.Identity.Owin.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.Host.SystemWeb.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.Security.Cookies.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.Security.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Owin.Security.OAuth.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Web.Infrastructure.dll">
+      <publishTime>12/07/2018 11:46:07</publishTime>
+    </File>
+    <File Include="bin/MNPOSTAPI.dll">
+      <publishTime>01/18/2019 17:32:41</publishTime>
+    </File>
+    <File Include="bin/MNPOSTAPI.pdb">
+      <publishTime>10/31/2018 16:03:25</publishTime>
+    </File>
+    <File Include="bin/MNPOSTCOMMON.dll">
+      <publishTime>01/18/2019 17:16:47</publishTime>
+    </File>
+    <File Include="bin/MNPOSTCOMMON.dll.config">
+      <publishTime>01/16/2019 17:43:39</publishTime>
+    </File>
+    <File Include="bin/MNPOSTCOMMON.pdb">
+      <publishTime>10/31/2018 16:03:16</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITE.dll">
+      <publishTime>12/02/2018 18:49:26</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITE.dll.config">
+      <publishTime>11/27/2018 15:42:45</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITE.pdb">
+      <publishTime>10/31/2018 16:03:22</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITEMODEL.dll">
+      <publishTime>12/02/2018 18:26:19</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITEMODEL.dll.config">
+      <publishTime>10/27/2018 17:28:25</publishTime>
+    </File>
+    <File Include="bin/MNPOSTWEBSITEMODEL.pdb">
+      <publishTime>10/31/2018 16:03:16</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>01/01/2019 20:37:00</publishTime>
+    </File>
+    <File Include="bin/NLog.dll">
+      <publishTime>01/01/2019 20:36:59</publishTime>
+    </File>
+    <File Include="bin/NLog.Web.dll">
+      <publishTime>01/01/2019 20:36:59</publishTime>
+    </File>
+    <File Include="bin/Owin.dll">
+      <publishTime>12/07/2018 11:46:08</publishTime>
+    </File>
+    <File Include="bin/PagedList.dll">
+      <publishTime>10/27/2018 17:28:19</publishTime>
+    </File>
+    <File Include="bin/SixLabors.Core.dll">
+      <publishTime>01/01/2019 20:37:00</publishTime>
+    </File>
+    <File Include="bin/SixLabors.ImageSharp.dll">
+      <publishTime>01/01/2019 20:37:00</publishTime>
+    </File>
+    <File Include="bin/stdole.dll">
+      <publishTime>10/06/2018 14:34:43</publishTime>
+    </File>
+    <File Include="bin/System.Buffers.dll">
+      <publishTime>01/01/2019 20:37:00</publishTime>
+    </File>
+    <File Include="bin/System.Memory.dll">
+      <publishTime>01/01/2019 20:37:01</publishTime>
+    </File>
+    <File Include="bin/System.Net.Http.Formatting.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/System.Numerics.Vectors.dll">
+      <publishTime>01/01/2019 20:37:02</publishTime>
+    </File>
+    <File Include="bin/System.Runtime.CompilerServices.Unsafe.dll">
+      <publishTime>01/01/2019 20:37:04</publishTime>
+    </File>
+    <File Include="bin/System.Runtime.InteropServices.RuntimeInformation.dll">
+      <publishTime>01/01/2019 20:37:18</publishTime>
+    </File>
+    <File Include="bin/System.ValueTuple.dll">
+      <publishTime>01/01/2019 20:37:20</publishTime>
+    </File>
+    <File Include="bin/System.Web.Cors.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/System.Web.Helpers.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.Cors.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.Owin.dll">
+      <publishTime>01/01/2019 20:36:56</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.WebHost.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.Mvc.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.Optimization.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.Razor.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Deployment.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Razor.dll">
+      <publishTime>12/07/2018 11:46:06</publishTime>
+    </File>
+    <File Include="bin/WebGrease.dll">
+      <publishTime>12/07/2018 11:46:29</publishTime>
+    </File>
+    <File Include="Global.asax">
+      <publishTime>12/07/2018 11:45:54</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>01/01/2019 20:36:52</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>01/18/2019 17:32:42</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

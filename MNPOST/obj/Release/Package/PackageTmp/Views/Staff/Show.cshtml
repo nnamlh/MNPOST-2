@@ -1,0 +1,481 @@
+﻿@model PagedList.IPagedList<MNPOSTCOMMON.EMPLOYEE_GETALL_Result>
+
+@{
+    ViewBag.Title = "Show";
+}
+<div ng-app="myApp" ng-controller="myCtrl">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Danh sách nhân viên</h2>
+                    <div class="nav navbar-right">
+                        <a class="btn btn-primary" href="#" ng-click="createStaff()">Thêm nhân viên</a>
+                    </div>
+                    <div class="clearfix"></div>
+
+                </div>
+
+                <div class="x_content">
+                    <!--form search-->
+                    <form class="form-label-left" method="get">
+
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <select class="form-control" name="post">
+                                        <option value="">Tất cả</option>
+                                        @foreach (var item in ViewBag.AllPost as IEnumerable<MNPOSTCOMMON.BS_PostOffices>)
+                                        {
+                                            if (ViewBag.PostSearch == item.PostOfficeID)
+                                            {
+                                                <option value="@item.PostOfficeID" selected>@item.PostOfficeName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.PostOfficeID">@item.PostOfficeName</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" value="@ViewBag.SearchText" class="form-control" placeholder="Search for...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">Tìm</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                    <!-- end form search-->
+                    <!-- table-->
+                    <div class="table-responsive">
+                        <table class="table table-striped jambo_table bulk_action">
+                            <thead>
+                                <tr class="headings">
+                                    <th>Mã NV</th>
+                                    <th>Tên NV</th>
+                                    <th>Bưu cục</th>
+                                    <th>Vị trí</th>
+                                    <th>SDT</th>
+                                    <th>Email</th>
+                                    <th>UserLogin</th>
+                                    <th>Hoặt động</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="staff in listStaff" class="{{staff.IsActive?'':'danger'}}">
+                                    <td>{{staff.EmployeeID}}</td>
+                                    <td>{{staff.EmployeeName}}</td>
+                                    <td>{{staff.PostOfficeID}}</td>
+                                    <td>{{staff.PositionName}}</td>
+                                    <td>{{staff.Phone}}</td>
+                                    <td>{{staff.Email}}</td>
+                                    <td>{{staff.UserLogin}} <a href="#" ng-show="existUserLogin(staff.UserLogin)" ng-click="createUser(staff.EmployeeID)">Tạo tài khoản</a></td>
+                                    <td><input type="checkbox" ng-model="staff.IsActive" ng-change="staffActive(staff.EmployeeID)" /></td>
+                                    <td><a href="#" ng-click="editStaff(staff.EmployeeID)">Chi tiết</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- modal insert-->
+    <!-- Modal -->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{insertModalTitle}}</h4>
+                </div>
+                <form class="css-form" name="createStaffForm" ng-submit="finishForm(createStaffForm.$valid, EmployeeInfo, 'insertmodal')">
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+
+                                <input type="hidden" name="EmployeeID" value="{{EmployeeInfo.EmployeeID}}" />
+
+                                <div class="form-group" ng-show="ShowEmployeeID">
+                                    <label>Mã nhân viên</label>
+                                    <input type="text" class="form-control" value="{{EmployeeInfo.EmployeeID}}" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tên nhân viên</label>
+                                    <input type="text" class="form-control" required ng-model="EmployeeInfo.EmployeeName" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Số điện thoại</label>
+                                    <input type="text" class="form-control" required ng-model="EmployeeInfo.Phone" ng-minlength="10" ng-maxlength="12" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" required ng-model="EmployeeInfo.Email" />
+                                </div>
+                                <div class="form-group">
+                                    <label>CMND</label>
+                                    <input type="text" class="form-control" ng-model="EmployeeInfo.IdentifyCard" ng-maxlength="20" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Bưu cục</label>
+                                    <select class="form-control selectpicker" data-live-search="true" name="PostOfficeID" required id="PostOfficeID">
+                                        <option ng-repeat="x in listPost" value="{{x.PostOfficeID}}">{{x.PostOfficeName}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Chức vụ</label>
+                                    <select class="form-control selectpicker" data-live-search="true" name="PositionID" required id="Position">
+                                        <option ng-repeat="x in listPosition" value="{{x.PositionID}}">{{x.PositionName}}</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" ng-show="!existUserLogin(EmployeeInfo.UserLogin)">
+                                    <label>Tên đăng nhập</label>
+                                    <input type="text" class="form-control" value="{{EmployeeInfo.UserLogin}}" disabled />
+                                </div>
+
+                                <div class="form-group" ng-show="!existUserLogin(EmployeeInfo.UserLogin)">
+                                    <label>Nhóm người dùng</label>
+                                    <select class="form-control" name="GroupId" ng-model="EmployeeInfo.GroupId">
+                                        <option ng-repeat="x in GroupStaff" value="{{x.GroupID}}">{{x.GroupName}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" ng-show="!existUserLogin(EmployeeInfo.UserLogin)">
+                                    <label>Nấc quyền</label>
+                                    <select class="form-control" ng-model="EmployeeInfo.AccountType">
+                                        <option ng-repeat="x in StaffLevel" value="{{x.levelId}}">{{x.levelName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- model register-->
+    <div id="usermodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Tạo tài khoản</h4>
+                </div>
+                <form ng-submit="createUserLogin()">
+                    <div class="modal-body">
+                        <input type="hidden" value="{{userCreateIno.EmployeeID}}" name="StaffCode" />
+                        <div class="form-group">
+                            <label>Mã NV</label>
+                            <input type="text" class="form-control" value="{{userCreateIno.EmployeeID}}" required disabled />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tên NV</label>
+                            <input type="text" name="StaffName" class="form-control" ng-model="userCreateIno.EmployeeName" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>User</label>
+                            <input type="text" ng-model="userCreateIno.UserName" class="form-control" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" ng-model="userCreateIno.Password" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Nhóm người dùng</label>
+                            <select class="form-control" ng-model="userCreateIno.GroupId">
+                                <option ng-repeat="x in GroupStaff" value="{{x.GroupID}}">{{x.GroupName}}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nấc quyền</label>
+                            <select class="form-control" ng-model="userCreateIno.levelId">
+                                <option ng-repeat="x in StaffLevel" value="{{x.levelId}}">{{x.levelName}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Đồng ý</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--model update-->
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        @if (ViewBag.MSG != "")
+        {
+            @:alert('@ViewBag.MSG');
+
+        }
+        var myArray = '@Html.Raw(Json.Encode(Model))';
+
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.userCreateIno = {};
+
+            $scope.insertModalTitle = "Thêm nhân viên";
+
+            $scope.listStaff = JSON.parse(myArray);
+
+            $scope.listPost = JSON.parse('@Html.Raw(Json.Encode(ViewBag.AllPost))');
+
+            $scope.listPosition = JSON.parse('@Html.Raw(Json.Encode(ViewBag.AllPosition))');
+
+            $scope.GroupStaff = JSON.parse('@Html.Raw(Json.Encode(ViewBag.GroupStaff))');
+
+            $scope.StaffLevel = JSON.parse('@Html.Raw(Json.Encode(ViewBag.AllLevel))');
+
+            $scope.actionChoose = 1;
+
+            // check has ueser for login
+            $scope.existUserLogin = function (user) {
+
+                if (user === null || user === "") {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            };
+
+
+            // prepare for create user
+            $scope.createUser = function (id) {
+                var index = getSelectedIndex(id);
+                var staff = $scope.listStaff[index];
+
+                console.log(staff);
+
+                $scope.userCreateIno.EmployeeID = staff.EmployeeID;
+                $scope.userCreateIno.EmployeeName = staff.EmployeeName;
+
+                showModel('usermodal');
+            };
+            $scope.createUserLogin = function () {
+                showLoader(true);
+                $http({
+                    method: 'POST',
+                    url: '/Account/SignUpStaff',
+                    data: $scope.userCreateIno
+                }).then(
+                    function sucess(response) {
+                        showLoader(false);
+
+                        if (response.data.error === 0) {
+                            var idx = getSelectedIndex($scope.userCreateIno.EmployeeID);
+
+                            $scope.listStaff[idx].UserLogin = $scope.userCreateIno.UserName;
+
+                            hideModel('usermodal');
+                        } else {
+                            alert(response.data.msg);
+                        }
+
+                    },
+                    function error() {
+                        alert('Connect error');
+                        showLoader(false);
+                    });
+            };
+
+            // prepare for create staff --> resset empty
+            $scope.createStaff = function () {
+
+                $scope.EmployeeInfo = {
+                    "EmployeeID": "", "EmployeeName": "", "DepartmentID": "", "PostOfficeID": "", "Address": "", "Phone": "", "IdentifyCard": "",
+                    "Sex": "", "UserLogin": "", "PositionID": "", "GroupId": "", "AccountType": "1"
+                };
+                $scope.ShowEmployeeID = false;
+                $scope.insertModalTitle = "Thêm nhân viên";
+                $scope.actionChoose = 1;
+                showModel("insertmodal");
+
+            };
+
+            // prepare for edit staff
+            $scope.editStaff = function (id) {
+                var index = getSelectedIndex(id);
+                var staff = $scope.listStaff[index];
+
+                $scope.EmployeeInfo = angular.copy(staff);
+                $scope.insertModalTitle = "Chỉnh sửa nhân viên";
+                $scope.ShowEmployeeID = true;
+                $('#Position').val(staff.PositionID);
+                $('#PostOfficeId').val(staff.PostOfficeId);
+                $scope.actionChoose = 2;
+                showModel("insertmodal");
+
+                console.log($scope.EmployeeInfo);
+            };
+
+
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.listStaff.length; i++)
+                    if ($scope.listStaff[i].EmployeeID == id)
+                        return i;
+                return -1;
+            };
+
+            //them nhan vien
+            $scope.finishForm = function (isValid, staff, modelid) {
+
+                // isValid : check form da require ok
+                // staff : thong tin nhan vien
+                // modelid : id of modal de hide
+                staff.PositionID = $('#Position').val();
+                staff.PostOfficeID = $('#PostOfficeID').val();
+
+                if (isValid) {
+                    hideModel(modelid);
+
+                    if ($scope.actionChoose === 1) {
+                        sendCreate(staff);
+                    } else if ($scope.actionChoose === 2) {
+                        updateStaff(staff);
+                    }
+                } else {
+                     alert('Connect error');
+                    showLoader(false);
+                }
+            }
+
+
+            function updateStaff(staff) {
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/staff/updatestaff",
+                    data: staff
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+                    var data = response.data;
+                    if (data.error === 0) {
+
+                        var index = getSelectedIndex(id);
+                        $scope.listStaff[index].EmployeeName = data.result.EmployeeName;
+                        $scope.listStaff[index].Phone = data.result.Phone;
+                        $scope.listStaff[index].Email = data.result.Email;
+                        $scope.listStaff[index].IdentifyCard = data.result.IdentifyCard;
+                        $scope.listStaff[index].PostOfficeID = data.result.PostOfficeID;
+                        $scope.listStaff[index].PositionID = data.result.PositionID;
+                        $scope.listStaff[index].PositionName = data.result.PositionName;
+                        $scope.listStaff[index].GroupId = data.result.GroupId;
+                        $scope.listStaff[index].AccountType = data.result.AccountType;
+
+                        alert(response.data.msg);
+
+                    } else {
+                        alert('Đã thay đổi nhân viên');
+                        console.log(response.data.result);
+                    }
+                }, function myError(response) {
+                    alert('Connect error');
+                    showLoader(false);
+                });
+
+            }
+
+            function sendCreate(staff) {
+
+                showLoader(true);
+
+
+                $http({
+                    method: "POST",
+                    url: "/staff/addstaff",
+                    data: staff
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.error === 0) {
+                        alert(response.data.msg);
+                    } else {
+                        alert('Đã thêm nhân viên');
+                        console.log(response.data.result);
+                        $scope.listStaff.push(response.data.result);
+                    }
+                }, function myError(response) {
+                    alert('Connect error');
+                    showLoader(false);
+                });
+            }
+
+            // active staff
+            $scope.staffActive = function (id, active) {
+                var index = getSelectedIndex(id);
+                var staff = $scope.listStaff[index];
+                showLoader(true);
+
+
+                $http.post("/staff/active", { EmployeeID: staff.EmployeeID, IsActive: staff.IsActive }).then(function (response) {
+
+                    showLoader(false);
+
+                    var data = response.data;
+
+                    if (data.error === 1) {
+                        $scope.listStaff[index].IsActive = !$scope.listStaff[index].IsActive;
+
+                        alert(data.msg);
+                    } else {
+                        alert('Hoan thanh');
+                    }
+
+
+                });
+
+            }
+
+            //
+        });
+
+
+
+
+    </script>
+}

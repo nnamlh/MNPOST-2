@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Đăng nhập lại";
+}
+
+
+<div class="portlet portlet-boxed">
+
+    <div class="portlet-header">
+        <h3 class="portlet-title">Cảnh báo</h3><!-- /.portlet-title -->
+    </div><!-- /.portlet-header -->
+
+    <div class="portlet-body">
+
+        <br class="xs-80">
+
+        <div class="blank-slate">
+            <div class="blank-slate-icon">
+                <i class="fa fa-user"></i>
+            </div>
+            <h3 class="blank-slate-title">Tài khoản : @User.Identity.Name</h3>
+            <p class="blank-slate-lead">Bạn không có quyền truy cập chức năng này. Đăng nhập lại với quyền cao hơn.</p>
+            <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-primary">Đăng nhập lại</a>
+        </div>
+
+        <br class="xs-80" />
+
+    </div><!-- /.portlet-body -->
+</div><!-- /.portlet portlet-boxed -->

@@ -1,0 +1,211 @@
+﻿@model IEnumerable<MNPOSTCOMMON.GROUPUSER_GETLISTMENU_Result>
+@{
+    ViewBag.Title = "GrouUserMenu";
+}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Phân quyền</h2>
+                <ul class="nav navbar-right panel_toolbox">
+                    <li>
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="javascript:showModel('menumodal')">Thêm Menu</a>
+                            </li>
+                            <li>
+                                <a href="/menu/group">Thêm nhóm Menu</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <p>
+                    Phân quyền cho nhóm
+                </p>
+
+                <div class="row">
+
+                    <form method="get">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <select class="form-control" name="id" id="groupid">
+                                    @foreach (var item in ViewBag.GroupUser)
+                                    {
+                                        if (ViewBag.GroupChoose == item.GroupID)
+                                        {
+                                            <option value="@item.GroupID" selected>@item.GroupName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.GroupID">@item.GroupName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <button type="submit" class="btn btn-primary">Xem</button>
+                        </div>
+                    </form>
+
+                    <div class="col-sm-12">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Tên menu</th>
+                                    <th>Đường dẫn</th>
+                                    <th>Cấp quyền</th>
+                                    <th>Cho chỉnh sửa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null)
+                                {
+                                    var temp = "";
+
+                                    foreach (var item in Model)
+                                    {
+
+                                        var isShow = false;
+                                        if (item.groupUserId != null)
+                                        {
+                                            isShow = true;
+                                        }
+
+                                        var isEdit = false;
+                                        if (item.canedit == 1)
+                                        {
+                                            isEdit = true;
+                                        }
+
+                                        if (item.GroupMenuId != temp)
+                                        {
+                                            temp = item.GroupMenuId;
+
+                                            <tr>
+                                                <td><strong>@item.groupName</strong></td>
+                                            </tr>
+                                        }
+
+                                        <tr>
+                                            <td>@item.Code</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.Link</td>
+                                            <td>
+                                                <input type="checkbox" @(isShow == true ? "checked" : "") class="chk" data-uid="@item.Id" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" @(isEdit == true ? "checked" : "") @(isShow == false ? "disabled" : "") id="@item.Id" data-uid="@item.Id" class="chkedit" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+
+
+        $('.chkedit').change(function () {
+            var menuId = $(this).attr("data-uid");
+
+            var check = $(this).is(':checked');
+
+
+            console.log(menuId + "  " + check);
+
+            var groupId = $('#groupid').val();
+
+
+            console.log(groupId);
+
+            $.ajax({
+                type: "POST",
+                url: "/menu/addedit",
+                data: { menuId: menuId, role: check, groupId: groupId },
+                beforeSend: function (msg) {
+                    showLoader(true);
+                },
+                success: function (response) {
+                    showLoader(false);
+
+                    if (response.id === 0) {
+                        $(this).prop('checked', check);
+                    }
+
+                    alert(response.msg);
+                }
+            });
+
+
+        });
+
+
+
+        $(function () {
+            $(".chk").change(function () {
+                var menuId = $(this).attr("data-uid");
+
+                var check = $(this).is(':checked');
+
+
+                console.log(menuId + "  " + check);
+
+                var groupId = $('#groupid').val();
+
+
+                console.log(groupId);
+
+
+               
+
+                $.ajax({
+                    type: "POST",
+                    url: "/menu/addrole",
+                    data: { menuId: menuId, role: check, groupId: groupId },
+                    beforeSend: function(msg){
+                        showLoader(true);
+                    },
+                    success: function (response) {
+
+                        if (response.id === 1) {
+                            if (check) {
+                                $("#" + menuId).prop('disabled', false);
+                            } else {
+                                $("#" + menuId).prop('disabled', true);
+                            }
+                            $("#" + menuId).prop('checked', false);
+                        } else {
+                            $(this).prop('checked', check);
+                        }
+                        showLoader(false);
+                        alert(response.msg);
+                    }
+                });
+
+            });
+        });
+    </script>
+}

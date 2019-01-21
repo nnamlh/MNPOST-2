@@ -1,0 +1,345 @@
+﻿@{
+    ViewBag.Title = "Đề nghị chi hoa hồng";
+}
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_content">
+                <div class="x_title">
+                    <h2>Đề nghị chi hoa hồng</h2>
+                    <div class="nav navbar-right">
+                        <a class="btn btn-success" ng-click="addNew()">Tạo bảng kê</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#tab_danhmuc" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=false">Danh sách hoa hồng</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="showEdit=true">Thao tác</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_danhmuc" aria-labelledby="home-tab">
+                            <!-- begin tab-->
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Bắt đầu</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="DanhMuc.TuNgay" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Kết thúc</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="DanhMuc.DenNgay" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        </br>
+                                        <button type="button" class="btn btn-primary" ng-click="tim()">Tìm</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-striped jambo_table bulk_action">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th>STT</th>
+                                                <th>Chứng từ</th>
+                                                <th>Ngày lập</th>
+                                                <th>Khách hàng</th>
+                                                <th>Tiền hoa hồng</th>
+                                                <th>#</th>
+                                                <th>#</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in allDanhMuc">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{item.DocumentID}}</td>
+                                                <td>{{item.DocumentDate.slice(6, -2) | date : 'dd/MM/yyyy'}}</td>
+                                                <td>{{item.CustomerName}}</td>
+                                                <td>{{item.TotalCommissionAmount}}</td>
+                                                <td><a href="#" class="btn-xs btn-primary" ng-click="edit($index)">Xem</a></td>
+                                                <td><a href="#" class="btn-xs btn-danger" ng-click="sendDelete($index)">Xóa</a></td>
+                                               
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end tab-->
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_chitiet" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Số chứng từ</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.DocumentID" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Ngày chứng từ</label>
+                                        <input type="text" model-view-value="true" class="form-control" ng-model="CongNo.DocumentDate" required ui-mask="99/99/9999" ui-mask-placeholder ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Hoa hồng</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.TotalCommissionAmount" ng-disabled="true" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Khách hàng</label>
+                                        <input type="text" class="form-control" ng-model="CongNo.CustomerName" ng-disabled="true" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-striped jambo_table bulk_action">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th>STT</th>
+                                                <th>Số phiếu</th>
+                                                <th>Ngày</th>
+                                                <th>Nơi đến</th>
+                                                <th>LH</th>
+                                                <th>DV</th>
+                                                <th>SL</th>
+                                                <th>TL</th>
+                                                <th>Cước</th>
+                                                <th>Thu #</th>
+                                                <th>%</th>
+                                                <th>HH</th>
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in allChiTiet">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{item.MailerID}}</td>
+                                                <td>{{item.AcceptDate.slice(6, -2) | date : 'dd/MM/yyyy'}}</td>
+                                                <td>{{item.ReciveprovinceID}}</td>
+                                                <td>{{item.MerchandiseID}}</td>
+                                                <td>{{item.MailerTypeID}}</td>
+                                                <td>{{item.Quantity}}</td>
+                                                <td>{{item.Weight}}</td>
+                                                <td>{{item.Price}}</td>
+                                                <td>{{item.PriceService}}</td>
+                                                <td>{{item.CommissionPercent}}</td>
+                                                <td>{{item.CommissionAmount}}</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal them-->
+    <div id="congnomodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Đề nghị chi hoa hồng</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class=" label label-primary">Chọn tháng</label>
+                                <input type="text" model-view-value="true" class="form-control" ng-model="CongNo.Thang" required ui-mask="99/9999" ui-mask-placeholder ng-disabled="DisNgayChot" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                </br>
+                                <button type="button" class="btn btn-primary" ng-click="sendCreate()">Tính hoa hồng</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- end content-->
+@section scripts {
+    <script>
+
+
+    // tao controller
+    var app = angular.module('myApp', ['ui.bootstrap', 'ui.mask']);
+    app.controller('myCtrl', function ($scope, $http, $filter) {
+
+
+
+        $scope.allChiTiet = [];
+        $scope.allCustomer = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allCustomer))');
+        $scope.DanhMuc = [];
+        $scope.ChotNgay = [];
+        $scope.CongNo = [];
+        var date = new Date();
+        var tngay = $filter('date')(date, "dd/MM/yyyy");
+        var dngay = $filter('date')(date, "dd/MM/yyyy");
+        var chotngay = $filter('date')(date, "MM/yyyy");
+        $scope.DanhMuc.TuNgay = tngay;
+        $scope.DanhMuc.DenNgay = dngay;
+
+            $scope.allDanhMuc = [];
+            $scope.DanhMuc.PostOfficeID = 'BCQ3';
+            $scope.GetData = function () {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/CustomerCommission/GetCom?TuNgay=" + $scope.DanhMuc.TuNgay + "&DenNgay=" + $scope.DanhMuc.DenNgay + "&post=" + $scope.DanhMuc.PostOfficeID
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allDanhMuc = response.data.data;
+                        $('.nav-tabs a[href="#tab_danhmuc"]').tab('show');
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            $scope.addNew = function () {
+                //var date = new Date();
+                var fDate = $filter('date')(date, "dd/MM/yyyy");
+                $scope.CongNo = {  "Thang": chotngay};
+                $scope.IsAction = 'add';
+                showModel("congnomodal");
+            };
+            $scope.edit = function (index) {
+
+                var info = $scope.allDanhMuc[index];
+                $scope.CongNo = angular.copy(info);
+                var fDate = $filter('date')($scope.CongNo.DocumentDate.slice(6, -2), "dd/MM/yyyy");
+                $scope.CongNo.DocumentDate = fDate;
+                $('.nav-tabs a[href="#tab_chitiet"]').tab('show');
+                //check khách hàng
+                $http.get('/customercommission/getDetail?documentid=' + $scope.CongNo.DocumentID).then(function (response) {
+                    var result = response.data;
+                    $scope.allChiTiet = result;
+                    console.log($scope.allChiTiet);
+                });
+
+            };
+            $scope.tim = function () {
+                $scope.GetData();
+            }
+            $scope.finishForm = function (isValid) {
+                if ($scope.IsAction === 'add') {
+                    $scope.sendCreate();
+                } else if ($scope.IsAction === 'delete') {
+                    $scope.Info = angular.copy(info);
+                    $scope.sendDelete();
+                }
+            };
+            // them tinh
+            $scope.sendCreate = function () {
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/CustomerCommission/create",
+                    data: {  thangchot: $scope.CongNo.Thang}
+                }).then(function success(response) {
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.GetData();
+                        $('.nav-tabs a[href="#tab_danhmuc"]').tab('show');
+                        hideModel("congnomodal");
+                        showNotify("Đã thêm mới thông tin");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                    , function error(response) {
+                        showNotify("connect has disconnect");
+                        showLoader(false);
+                    });
+
+            };
+        // xoa du lieu
+            $scope.sendDelete = function (index) {
+                var info = $scope.allDiscountPolicy[index];
+
+                var r = confirm("Bạn muốn xóa không ?");
+                if (r == true) {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/CustomerCommission/delete",
+                        data: { documentid: info.DocumentID }
+                    }).then(
+                        function success(response) {
+
+                            var result = response.data;
+
+                            if (result.error == 0) {
+
+                                // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                // if (findIndex !== -1) {
+                                $scope.allDanhMuc.splice(index, 1);
+                                //  }
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                } else {
+
+                }
+            }
+
+
+        
+        });
+
+    </script>
+}

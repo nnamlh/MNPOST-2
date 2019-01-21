@@ -1,0 +1,310 @@
+﻿@{
+    ViewBag.Title = "Show";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách quận/huyện&nbsp;&nbsp;&nbsp;<a href="#" ng-click="addNew()"><i my-tool-tip="Thêm mới" class="fa fa-plus"></i></a></h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="searchText" my-enter="GetData(1,searchText)" />
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã quận/huyện</th>
+                                <th>Tên quận/huyện</th>
+                                <th>Mã tỉnh</th>
+                                <th>#</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in allDistrict">
+                                <td>{{$index + 1}}</td>
+                                <td>{{item.DistrictID}}</td>
+                                <td>{{item.DistrictName}}</td>
+                                <td>{{item.ProvinceID}}</td>
+                                <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table data-->
+                <!--phan trang-->
+                <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                <!-- end phan trang-->
+
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+
+    <!-- tao model them moi-->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+
+
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                    <!-- body-->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label>Mã quận/huyện</label>
+                                    <input type="text" maxlength="10" class="form-control" ng-model="DistrictInfo.DistrictID" required ng-disabled="DistrictIDDisable" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tên quận/huyện</label>
+                                    <input type="text" class="form-control" ng-model="DistrictInfo.DistrictName" required />
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Tỉnh thành</label>
+                                    <select class="form-control" ng-model="DistrictInfo.ProvinceID" required>
+                                        <option ng-repeat="x in allProvince" value="{{x.ProvinceID}}">{{x.ProvinceName | uppercase}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+
+
+
+</div>
+
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+            $scope.allProvince = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllProvince))');
+            //console.log($scope.allProvince);
+            // phan trang
+            $scope.numPages;
+            $scope.itemPerPage;
+            $scope.totalItems;
+            $scope.currentPage = 1;
+            $scope.maxSize = 5;
+            $scope.pageChanged = function () {
+                $scope.GetData($scope.currentPage);
+            };
+
+
+            // lay du lieu
+            $scope.allDistrict = [];
+            $scope.GetData = function (page, search) {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/district/getdistrict?page=" + page + "&search=" + search
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allDistrict = response.data.data;
+                        $scope.itemPerPage = response.data.pageSize;
+                        $scope.totalItems = response.data.toltalSize;
+                        $scope.numPages = Math.round($scope.totalItems / $scope.itemPerPage);
+
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            // goi lay du liẹu
+
+            $scope.GetData(1, "");
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.DistrictInfo = {};
+            $scope.DistrictIDDisable = false;
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+
+                $scope.DistrictInfo = { "DistrictID": "", "DistrictName": "", "ProvinceID": "HCM" };
+
+                $scope.modaltitle = "Thêm quận huyện";
+                $scope.DistrictIDDisable = false;
+                $scope.IsAction = 'add';
+                showModel("insertmodal")
+
+            };
+
+            $scope.edit = function (index) {
+                var info = $scope.allDistrict[index];
+
+                $scope.DistrictInfo = angular.copy(info);
+
+                $scope.modaltitle = "Chỉnh sửa quận huyện";
+                $scope.DistrictIDDisable = true;
+                $scope.IsAction = 'edit';
+                showModel("insertmodal")
+            };
+
+
+            // tim index theo ma tinh
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.allDistrict.length; i++)
+                    if ($scope.allDistrict[i].DistrictID == id)
+                        return i;
+                return -1;
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        $scope.sendCreate();
+                    } else if ($scope.IsAction === 'edit') {
+                        $scope.sendEdit();
+                    }
+
+                } else {
+                    showNotify('our form is missing');
+                }
+            }
+
+
+            // them tinh
+            $scope.sendCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/district/create",
+                    data: $scope.DistrictInfo
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.allDistrict.unshift(result.data);
+
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm quận huyện");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/district/edit",
+                    data: $scope.DistrictInfo
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+
+                            var findIndex = getSelectedIndex(result.data.DistrictID);
+
+                            if (findIndex !== -1) {
+                                $scope.allDistrict[findIndex] = angular.copy(result.data);
+                            }
+
+                            showNotify("Đã cập nhật");
+                            hideModel("insertmodal");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                );
+            }
+
+        });
+        //-- end controller
+
+    </script>
+}
+

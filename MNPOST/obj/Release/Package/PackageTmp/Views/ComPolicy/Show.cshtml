@@ -1,0 +1,800 @@
+﻿@{
+    ViewBag.Title = "Chính sách hoa hồng";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách hoa hồng</h2>
+                <div class="nav navbar-right">
+                    <a class="btn btn-warning" ng-click="addNew()">Thêm mới chính sách hoa hồng</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <select ui-select2="select2Options" ng-model="searchText" ng-change="GetData()" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option ng-repeat="item in groups" value="{{item.code}}">{{item.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã CS</th>
+                                <th>Bưu cục</th>
+                                <th>Ngày tạo</th>
+                                <th>Bắt đầu</th>
+                                <th>Kết thúc</th>
+                                <th>Trạng thái</th>
+                                <th>Diễn giải</th>
+                                <th>HH</th>
+                                <th>Tất cả KH</th>
+                                <th>Tất cả DV</th>
+                                <th>Cố định</th>
+                                <th>Xem</th>
+                                <th>Xóa</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in allDiscountPolicy">
+                                <td>{{$index + 1}}</td>
+                                <td>{{item.ComissionID}}</td>
+                                <td>{{item.PostOfficeID}}</td>
+                                <td>{{item.CreateDate.slice(6, -2) | date : 'dd/MM/yyyy'}}</td>
+                                <td>{{item.StartDate.slice(6, -2) | date : 'dd/MM/yyyy'}} </td>
+                                <td>{{item.EndDate.slice(6, -2) | date : 'dd/MM/yyyy'}} </td>
+                                <td>{{item.StatusID}} </td>
+                                <td>{{item.Description}} </td>
+                                <td>{{item.CommissionPercent}} </td>
+                                <td><i ng-class="{'fa fa-check' : item.AllCustomer == true, 'fa fa-close' : item.AllCustomer == false}"></i></td>
+                                <td><i ng-class="{'fa fa-check' : item.AllService == true, 'fa fa-close' : item.AllService == false}"></i></td>
+                                <td><i ng-class="{'fa fa-check' : item.PermanentCal == true, 'fa fa-close' : item.PermanentCal == false}"></i></td>
+                                <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                                <td><a href="#" ng-click="sendDelete($index)">Xóa</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table data-->
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+
+    <!-- tao model them moi-->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                    <!-- body-->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Bưu cục</label>
+                                    <select class="form-control" ng-model="chietKhau.PostOfficeID" required>
+                                        <option ng-repeat="x in allPost" value="{{x.PostOfficeID}}">{{x.PostOfficeID}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mã chính sách</label>
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <input type="text" ng-model="chietKhau.ComissionID" class="form-control" />
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary" ng-click="getMaxID()">*</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Diễn giải</label>
+                                    <input type="text" ng-model="chietKhau.Description" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Bắt lập</label>
+                                    <input type="text" model-view-value="true" class="form-control" ng-model="chietKhau.CreateDate" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                </div>
+                                <div class="form-group">
+                                    <label>Bắt đầu</label>
+                                    <input type="text" model-view-value="true" class="form-control" ng-model="chietKhau.StartDate" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                </div>
+                                <div class="form-group">
+                                    <label>Kết thúc</label>
+                                    <input type="text" model-view-value="true" class="form-control" ng-model="chietKhau.EndDate" required ui-mask="99/99/9999" ui-mask-placeholder />
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Trạng thái</label>
+                                    <select class="form-control" ng-model="chietKhau.StatusID" convert-to-number>
+                                        <option value="0">Khởi tạo</option>
+                                        <option value="1">Đang dùng</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hình thức tính</label>
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="chietKhau.PermanentCal">
+                                                <option value="true">Cố định</option>
+                                                <option value="false">Theo định mức</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary" ng-click="showHTTinh()">Nhập</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Dịch vụ</label>
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="chietKhau.AllService">
+                                                <option value="true">Tất cả dịch vụ</option>
+                                                <option value="false">Theo theo sách</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary" ng-click="showDV()">Chọn DV</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Áp dụng trên</label>
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="chietKhau.AllMethod" convert-to-number>
+                                                <option value="1">Cước chính</option>
+                                                <option value="2">Thu khác</option>
+                                                <option value="0">Cả hai</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary" ng-click="showPT()">Chọn HT</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Khách hàng</label>
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <select class="form-control" ng-model="chietKhau.AllCustomer">
+                                                <option value="true">Tất cả khách hàng</option>
+                                                <option value="false">Theo theo sách</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary" ng-click="showKH()">Chọn KH</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+    <!-- co dinh -->
+    <div id="hinhthuccodinhmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Nhập hình thức cố đính</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Trị giá đạt</label>
+                        <input type="number" class="form-control" ng-model="chietKhau.LimitValue" />
+                    </div>
+                    <div class="form-group">
+                        <label>Tỉ lệ(%)</label>
+                        <input type="number" class="form-control" ng-model="chietKhau.ComissionPercent" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- co dinh -->
+    <div id="hinhthucdinhmucmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Nhập hình thức theo định mức&nbsp;&nbsp;&nbsp;<a href="#" ng-click="addDinhMuc()"><i my-tool-tip="Thêm mới" class="fa fa-plus"></i></a></h4>
+                </div>
+                <div class="modal-body">
+
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>GTrị bắt đầu</th>
+                                <th>GTrị kết thúc</th>
+                                <th>GTrị chiết khấu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in chietKhau.HTDinhMuc">
+                                <td>{{$index + 1}}</td>
+                                <td><input style="width: 100px" ng-model="x.BatDau" type="number" /></td>
+                                <td><input style="width: 100px" ng-model="x.KetThuc" type="number" /></td>
+                                <td><input style="width: 100px" ng-model="x.TiLe" type="number" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- dich vu -->
+    <div id="dichvumucmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Chọn danh sách dịch vụ</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Chọn</th>
+                                <th>Mã DV</th>
+                                <th>Tên DV</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in allServicebyDis">
+                                <td>{{$index + 1}}</td>
+                                <td><input type="checkbox" ng-model="x.isCheck" ng-checked="x.isCheck"></td>
+                                <td>{{x.ServiceID}}</td>
+                                <td>{{x.ServiceName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- khach hang -->
+    <div id="khachhangmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Chọn danh sách dịch vụ</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Chọn</th>
+                                <th>Mã KH</th>
+                                <th>Tên KH</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in allCustomerDis">
+                                <td>{{$index + 1}}</td>
+                                <td><input type="checkbox" ng-model="x.isCheck" ng-checked="x.isCheck"></td>
+                                <td>{{x.CustomerGroupCode}}</td>
+                                <td>{{x.CustomerGroupName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- khach hang -->
+    <div id="phuongthucmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Chọn danh sách dịch vụ</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Chọn</th>
+                                <th>Mã DV</th>
+                                <th>Tên DV</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in allSVDis">
+                                <td>{{$index + 1}}</td>
+                                <td><input type="checkbox" ng-model="x.isCheck" ng-checked="x.isCheck"></td>
+                                <td>{{x.ServiceID}}</td>
+                                <td>{{x.ServiceName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress', 'myDirective', 'ui.select2', 'ui.mask']);
+
+        app.controller('myCtrl', function ($scope, $http, $filter) {
+
+            $scope.allPost = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllPost))');
+            $scope.allService = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allService))');
+            $scope.allCustomer = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allCustomer))');
+            $scope.allSV = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.allSV))');
+            $scope.searchText = "";
+            // lay du lieu
+            $scope.chietKhau = [];
+            $scope.allDiscountPolicy = [];
+            $scope.GetData = function () {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/ComPolicy/getComissionPolicy?search=" + $scope.searchText
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allDiscountPolicy = angular.copy(response.data.data);
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            //getMaxID
+            $scope.getMaxID = function () {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/ComPolicy/getMaxId?postid=" + $scope.chietKhau.PostOfficeID
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.chietKhau.ComissionID = response.data.data;
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            //end getMaxID
+            // goi lay du liẹu
+
+            $scope.GetData();
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.CustomerInfo = {};
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+                var date = new Date();
+                var fDate = $filter('date')(date, "dd/MM/yyyy");
+                var tDate = $filter('date')(date, "dd/MM/yyyy");
+                var cDate = $filter('date')(date, "dd/MM/yyyy");
+                $scope.chietKhau = { HTCoDinh: { GiaTriDat: 0 }, HTDinhMuc: [], StartDate: fDate, EndDate: tDate, CreateDate: cDate, LimitValue: 0, ComissionPercent: 0 };
+                $scope.modaltitle = "Thêm chính sách hoa hồng";
+                $scope.IsAction = 'add';
+                $scope.allServicebyDis = angular.copy($scope.allService);
+                $scope.allCustomerDis = angular.copy($scope.allCustomer);
+                $scope.allSVDis = angular.copy($scope.allSV);
+                showModel("insertmodal")
+            };
+
+            $scope.chietKhau = {};
+
+            $scope.edit = function (index) {
+
+                $scope.allServicebyDis = [];
+                $scope.allCustomerDis = [];
+                $scope.allSVDis = [];
+                var info = $scope.allDiscountPolicy[index];
+                $scope.chietKhau = angular.copy(info);
+
+                var fDate = $filter('date')($scope.chietKhau.StartDate.slice(6, -2), "dd/MM/yyyy");
+                var tDate = $filter('date')($scope.chietKhau.EndDate.slice(6, -2), "dd/MM/yyyy");
+                var cDate = $filter('date')($scope.chietKhau.CreateDate.slice(6, -2), "dd/MM/yyyy");
+
+
+                if ($scope.chietKhau.PermanentCal === true) {
+                    $scope.chietKhau.PermanentCal = 'true';
+
+                } else {
+                    $scope.chietKhau.PermanentCal = 'false';
+                }
+                if ($scope.chietKhau.AllService === true) {
+                    $scope.chietKhau.AllService = 'true';
+                } else {
+                    $scope.chietKhau.AllService = 'false';
+                }
+                if ($scope.chietKhau.AllCustomer === true) {
+                    $scope.chietKhau.AllCustomer = 'true';
+                } else {
+                    $scope.chietKhau.AllCustomer = 'false';
+                }
+
+                $scope.chietKhau.StartDate = fDate;
+                $scope.chietKhau.EndDate = tDate;
+                $scope.chietKhau.CreateDate = cDate;
+                var maCS = $scope.chietKhau.ComissionID;
+
+                // $scope.chietKhau.HTDinhMuc = [];
+                console.log($scope.chietKhau.HTDinhMuc);
+                //check dich vu
+                $http.get('/ComPolicy/CheckDV?discountid=' + maCS).then(function (response) {
+                    var result = response.data;
+                    for (var i = 0; i < $scope.allService.length; i++) {
+
+                        var SVInfo = $scope.allService[i];
+                        SVInfo.isCheck = false;
+                        for (var j = 0; j < result.length; j++) {
+
+                            if (result[j].ServiceID === SVInfo.ServiceID) {
+                                SVInfo.isCheck = true;
+                            }
+                        }
+
+                        $scope.allServicebyDis.push(SVInfo);
+                    }
+
+                });
+                //check khách hàng
+                $http.get('/ComPolicy/CheckKH?discountid=' + maCS).then(function (response) {
+                    var result = response.data;
+                    for (var i = 0; i < $scope.allCustomer.length; i++) {
+
+                        var KHInfo = $scope.allCustomer[i];
+                        KHInfo.isCheck = false;
+                        for (var j = 0; j < result.length; j++) {
+
+                            if (result[j].CustomerID === KHInfo.CustomerGroupCode) {
+                                KHInfo.isCheck = true;
+                            }
+                        }
+                        $scope.allCustomerDis.push(KHInfo);
+                    }
+                });
+
+                //hien thi thong tin hinh thu tinh
+                if ($scope.chietKhau.PermanentCal === false) //co dinh
+                {
+                    $http.get('/ComPolicy/getDinhMuc?discountid=' + maCS).then(function (response) {
+                        var result = response.data;
+                    });
+                }
+
+                //check hinh thuc tinh
+                $http.get('/compolicy/CheckPT?discountid=' + maCS).then(function (response) {
+                    var result = response.data;
+
+                    for (var i = 0; i < $scope.allSV.length; i++) {
+
+                        var SVInfo = $scope.allSV[i];
+                        SVInfo.isCheck = false;
+                        for (var j = 0; j < result.length; j++) {
+
+                            if (result[j].ServiceID === SVInfo.ServiceID) {
+                                SVInfo.isCheck = true;
+                            }
+                        }
+                        $scope.allSVDis.push(SVInfo);
+                    }
+
+
+                });
+
+                $scope.modaltitle = "Chỉnh sửa chính sách hoa hồng";
+                // $scope.CountryIDDisable = true;
+                $scope.IsAction = 'edit';
+                showModel("insertmodal")
+            };
+
+
+            // tim index theo ma tinh
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.allCustomer.length; i++)
+                    if ($scope.allCustomer[i].CustomerCode == id)
+                        return i;
+                return -1;
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        $scope.sendCreate();
+                    } else if ($scope.IsAction === 'edit') {
+                        $scope.sendEdit();
+                    } else if ($scope.IsAction === 'delete') {
+                        $scope.sendDelete();
+                    }
+
+                } else {
+                    showNotify('our form is missing');
+                }
+            }
+
+            // mới chính sách chiết khấu
+            $scope.sendCreate = function () {
+                showLoader(true);
+                //
+                var listDV = [];
+                var listKH = [];
+                var listSV = [];
+
+                for (var i = 0; i < $scope.allServicebyDis.length; i++) {
+                    if ($scope.allServicebyDis[i].isCheck) {
+                        listDV.push($scope.allServicebyDis[i].ServiceID);
+                    }
+                }
+                //khach hang
+                for (var i = 0; i < $scope.allCustomerDis.length; i++) {
+                    if ($scope.allCustomerDis[i].isCheck) {
+                        listKH.push($scope.allCustomerDis[i].CustomerGroupCode);
+                    }
+                }
+
+                for (var i = 0; i < $scope.allSVDis.length; i++) {
+                    if ($scope.allSVDis[i].isCheck) {
+                        listSV.push($scope.allSVDis[i].ServiceID);
+                    }
+                }
+
+                $http({
+                    method: "POST",
+                    url: "/ComPolicy/create",
+                    data: { csck: $scope.chietKhau, tuNgay: $scope.chietKhau.StartDate, denNgay: $scope.chietKhau.EndDate, ngayTao: $scope.chietKhau.CreateDate, htdm: $scope.chietKhau.HTDinhMuc, dv: listDV, cus: listKH, pt: listSV }
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.searchText = result.data;
+                        $scope.GetData();
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm chính sách");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+                showLoader(true);
+                //
+                var listDV = [];
+                var listKH = [];
+                var listSV = [];
+
+                for (var i = 0; i < $scope.allServicebyDis.length; i++) {
+                    if ($scope.allServicebyDis[i].isCheck) {
+                        listDV.push($scope.allServicebyDis[i].ServiceID);
+                    }
+                }
+                //khach hang
+                for (var i = 0; i < $scope.allCustomerDis.length; i++) {
+                    if ($scope.allCustomerDis[i].isCheck) {
+                        listKH.push($scope.allCustomerDis[i].CustomerGroupCode);
+                    }
+                }
+                for (var i = 0; i < $scope.allSVDis.length; i++) {
+                    if ($scope.allSVDis[i].isCheck) {
+                        listSV.push($scope.allSVDis[i].ServiceID);
+                    }
+                }
+
+                $http({
+                    method: "POST",
+                    url: "/ComPolicy/edit",
+                    data: { csck: $scope.chietKhau, tuNgay: $scope.chietKhau.StartDate, denNgay: $scope.chietKhau.EndDate, ngayTao: $scope.chietKhau.CreateDate, htdm: $scope.chietKhau.HTDinhMuc, dv: listDV, cus: listKH, pt: listSV }
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.searchText = result.data;
+                        $scope.GetData();
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm chính sách");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+            };
+
+            $scope.showHTTinh = function () {
+
+                if ($scope.chietKhau.PermanentCal === 'true') {
+                    showModel('hinhthuccodinhmodal');
+                } else {
+
+                    if ($scope.IsAction === 'edit') {
+                        showLoader(true);
+                        $http.get('/ComPolicy/GetDiscountPolicyDinhMuc?discountid=' + $scope.chietKhau.DiscountID).then(function (response) {
+                            $scope.chietKhau.HTDinhMuc = angular.copy(response.data.data);
+                            showLoader(false);
+                            showModel('hinhthucdinhmucmodal');
+                        });
+                    } else {
+                        showModel('hinhthucdinhmucmodal');
+                    }
+
+
+                }
+            };
+            // hien thi dich vu
+            $scope.showDV = function () {
+
+                if ($scope.chietKhau.AllService === 'false') {
+                    showModel('dichvumucmodal');
+                }
+            };
+            // hien thi khach hang
+            $scope.showKH = function () {
+
+                if ($scope.chietKhau.AllCustomer === 'false') {
+                    showModel('khachhangmodal');
+                }
+            };
+            // hien thi phuong thuc
+            $scope.showPT = function () {
+
+                if ($scope.chietKhau.AllMethod === 0) {
+                    showModel('phuongthucmodal');
+                } if ($scope.chietKhau.AllMethod === 2) {
+                    showModel('phuongthucmodal');
+                }
+            };
+            $scope.addDinhMuc = function () {
+                var data = { BatDau: 0, KetThuc: 1, ChietKhau: 2 };
+                $scope.chietKhau.HTDinhMuc.push(data);
+            };
+            // xoa du lieu
+            $scope.sendDelete = function (index) {
+                var info = $scope.allDiscountPolicy[index];
+
+                var r = confirm("Bạn muốn xóa không ?");
+                if (r == true) {
+                    showLoader(true);
+
+                    $http({
+                        method: "POST",
+                        url: "/ComPolicy/delete",
+                        data: { discountid: info.ComissionID }
+                    }).then(
+                        function success(response) {
+
+                            var result = response.data;
+
+                            if (result.error == 0) {
+
+                                // var findIndex = getSelectedIndex(result.data.CountryID);
+
+                                // if (findIndex !== -1) {
+                                $scope.allDiscountPolicy.splice(index, 1);
+                                //  }
+
+                            } else {
+
+                                alert(result.msg);
+
+                            }
+
+                            showLoader(false);
+
+                        },
+                        function errror(response) {
+                            showLoader(false);
+                            showNotify("connect has disconnect");
+                        }
+                        );
+                } else {
+
+                }
+            }
+        });
+        //-- end controller
+
+    </script>
+}
+

@@ -1,0 +1,388 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách bưu cục&nbsp;&nbsp;&nbsp;<a href="#" ng-click="addNew()"><i my-tool-tip="Thêm mới" class="fa fa-plus"></i></a></h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="searchText" my-enter="GetData(1,searchText)" />
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã bưu cục</th>
+                                <th>Tên bưu cục</th>
+                                <th>Địa chỉ</th>
+                                <th>Khu vực</th>
+                                <th>Tỉnh thành</th>
+                                <th>Điện thoại</th>
+                                <th>FaxnNo</th>
+                                <th>Email</th>
+                                <th>CTV</th>                               
+                                <th>#</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in allPostOffice">
+                                <td>{{$index + 1}}</td>
+                                <td>{{item.PostOfficeID}}</td>
+                                <td>{{item.PostOfficeName}}</td>
+                                <td>{{item.Address}}</td>
+                                <td>{{item.ZoneID}}</td>
+                                <td>{{item.ProvinceID}}</td>
+                                <td>{{item.Phone}}</td>
+                                <td>{{item.FaxNo}}</td>
+                                <td>{{item.Email}}</td>
+                                <td>{{item.IsCollaborator}}</td>
+                                <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end table data-->
+                <!--phan trang-->
+                <ul items-per-page="itemPerPage" uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" boundary-link-numbers="true" rotate="false" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+                <!-- end phan trang-->
+
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+
+    <!-- tao model them moi-->
+    <div id="insertmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{modaltitle}}</h4>
+                </div>
+
+
+                <!-- begin form-->
+                <form class="css-form" name="createForm" ng-submit="finishForm(createForm.$valid)">
+                    <!-- body-->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label>Mã bưu cục</label>
+                                    <input type="text" maxlength="10" class="form-control" ng-model="PostOfficeInfo.PostOfficeID" required ng-disabled="PostOfficeIDDisable" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tên bưu cục</label>
+                                    <input type="text" class="form-control" ng-model="PostOfficeInfo.PostOfficeName" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" class="form-control" ng-model="PostOfficeInfo.Address" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Số điện thoại</label>
+                                    <input type="text" class="form-control" ng-model="PostOfficeInfo.Phone"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Số Fax</label>
+                                    <input type="text" class="form-control" ng-model="PostOfficeInfo.FaxNo" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" ng-model="PostOfficeInfo.Email" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Khu vực</label>
+                                    <select class="form-control" ng-model="PostOfficeInfo.ZoneID" required>
+                                        <option ng-repeat="x in allZone" value="{{x.ZoneID}}">{{x.ZoneName | uppercase}}</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">                                                             
+
+                                <div class="form-group">
+                                    <label>Tỉnh thành</label>
+                                    <select class="form-control" ng-model="PostOfficeInfo.ProvinceID" required>
+                                        <option ng-repeat="x in allProvince" value="{{x.ProvinceID}}">{{x.ProvinceName | uppercase}}</option>
+                                    </select>
+                                </div>
+                               
+                                <div class="form-group">
+                                    <label>Mã số thuế</label>
+                                    <input type="text" ng-model="PostOfficeInfo.TaxCode" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Ngân hàng</label>
+                                    <input type="text" ng-model="PostOfficeInfo.BankName" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tài khoản</label>
+                                    <input type="text" ng-model="PostOfficeInfo.BankAccount" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Ghi chú</label>
+                                    <input type="text" ng-model="PostOfficeInfo.Notes" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Là CTV</label>
+                                    <input type="checkbox" ng-model="PostOfficeInfo.IsCollaborator" class="form-control" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end body-->
+                    <!-- begin footer-->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Hoàn thành</button>
+                    </div>
+                    <!-- end footer-->
+                </form>
+                <!-- end form-->
+
+            </div>
+            <!-- end modal content-->
+        </div>
+    </div>
+    <!-- end modal them-->
+
+
+
+</div>
+
+
+<!-- end content-->
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.allProvince = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllProvince))');
+            $scope.allZone = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.AllZone))');
+
+            // phan trang
+            $scope.numPages;
+            $scope.itemPerPage;
+            $scope.totalItems;
+            $scope.currentPage = 1;
+            $scope.maxSize = 5;
+            $scope.pageChanged = function () {
+                $scope.GetData($scope.currentPage);
+            };
+
+
+            // lay du lieu
+            $scope.allPostOffice = [];
+            $scope.GetData = function (page, search) {
+                showLoader(true);
+                $http({
+                    method: "GET",
+                    url: "/postoffice/getpostoffice?page=" + page + "&search=" + search
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+
+                        $scope.allPostOffice = response.data.data;
+                        $scope.itemPerPage = response.data.pageSize;
+                        $scope.totalItems = response.data.toltalSize;
+                        $scope.numPages = Math.round($scope.totalItems / $scope.itemPerPage);
+
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+            }
+            // goi lay du liẹu
+
+            $scope.GetData(1, "");
+            //
+            // khoi tao bien dung cho create va edit
+            $scope.PostOfficeInfo = {};
+            $scope.PostOfficeIDDisable = false;
+            $scope.IsAction = '';
+
+            $scope.addNew = function () {
+
+                $scope.PostOfficeInfo = {
+                    "PostOfficeID": "",
+                    "PostOfficeName": "",
+                    "Address": "",
+                    "ZoneID": "",
+                    "ProvinceID": "",
+                    "Phone": "",
+                    "FaxNo": "",
+                    "Email": "",
+                    "IsCollaborator": "",
+                    "Notes": "",
+                    "TaxCode": "",
+                    "BankAccount": "",
+                    "BankName":""
+                };
+
+                $scope.modaltitle = "Thêm bưu cục";
+                $scope.PostOfficeIDDisable = false;
+                $scope.IsAction = 'add';
+                showModel("insertmodal")
+
+            };
+
+            $scope.edit = function (index) {
+                var info = $scope.allPostOffice[index];
+
+                $scope.PostOfficeInfo = angular.copy(info);
+
+                $scope.modaltitle = "Chỉnh sửa bưu cục";
+                $scope.PostOfficeIDDisable = true;
+                $scope.IsAction = 'edit';
+                showModel("insertmodal")
+            };
+
+
+            // tim index theo ma tinh
+            function getSelectedIndex(id) {
+                for (var i = 0; i < $scope.allPostOffice.length; i++)
+                    if ($scope.allPostOffice[i].PostOfficeID == id)
+                        return i;
+                return -1;
+            };
+
+            // action
+            $scope.finishForm = function (isValid) {
+                if (isValid) {
+                    if ($scope.IsAction === 'add') {
+                        $scope.sendCreate();
+                    } else if ($scope.IsAction === 'edit') {
+                        $scope.sendEdit();
+                    }
+
+                } else {
+                    showNotify('our form is missing');
+                }
+            }
+
+
+            // them tinh
+            $scope.sendCreate = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/postoffice/create",
+                    data: $scope.PostOfficeInfo
+                }).then(function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error === 0) {
+
+                        $scope.allPostOffice.unshift(result.data);
+
+                        hideModel("insertmodal");
+
+                        showNotify("Đã thêm bưu cục");
+
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                }
+                , function error(response) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+                });
+
+            };
+
+            // cap nhat tinh
+            $scope.sendEdit = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: "POST",
+                    url: "/postoffice/edit",
+                    data: $scope.PostOfficeInfo
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+
+                            var findIndex = getSelectedIndex(result.data.PostOfficeID);
+
+                            if (findIndex !== -1) {
+                                $scope.allPostOffice[findIndex] = angular.copy(result.data);
+                            }
+
+                            showNotify("Đã cập nhật");
+                            hideModel("insertmodal");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                );
+            }
+
+        });
+        //-- end controller
+
+    </script>
+}

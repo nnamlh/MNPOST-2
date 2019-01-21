@@ -1,0 +1,18 @@
+2019-01-16 02:46:20.9220|INFO|MNPOSTAPI.Controllers.PartnerWebHookController|Viettel send tracking...
+2019-01-16 02:46:23.9231|INFO|MNPOSTAPI.Controllers.PartnerWebHookController|{
+  "DATA": {
+    "ORDER_NUMBER": "1507560909HWG",
+    "ORDER_REFERENCE": "IDO150753393",
+    "ORDER_STATUSDATE": "09/10/2017 14:55:09",
+    "ORDER_STATUS": 103,
+    "STATUS_NAME": "Giao cho buu c?c",
+          "LOCALION_CURRENTLY": "Yên Nghia - Hà N?i",
+    "NOTE": "Giao cho buu c?c",
+    "MONEY_COLLECTION": 8000000,
+    "MONEY_FEECOD": 0,
+    "MONEY_TOTAL": 0
+    },
+  "TOKEN": "8DDDFA02-E82A-418C-ACC7-7D8AB8B52660"  
+}
+
+2019-01-16 02:46:31.2576|ERROR|MNPOSTAPI.Controllers.PartnerWebHookController|An error occurred while executing the command definition. See the inner exception for details.

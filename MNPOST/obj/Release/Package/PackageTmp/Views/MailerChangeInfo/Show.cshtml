@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "Cập nhật thông tin phiếu gửi";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+    <!-- body-->
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class=" label label-primary">Số phiếu</label>
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <input type="text" class="form-control" ng-model="Info.MailerID" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-primary" ng-click="Tim()">Tìm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class=" label label-danger">Số lượng</label>
+                    <input type="number" class="form-control" ng-model="Info.Quantity" />
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class=" label label-primary">Trọng lượng</label>
+                    <input type="number" class="form-control" ng-model="Info.Weight" />
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class=" label label-primary">Cước DV</label>
+                    <input type="number" class="form-control" ng-model="Info.Price" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end body-->
+    <!-- begin footer-->
+    <div class="modal-footer">
+        <button ng-click="edit()" class="btn btn-primary">Lưu</button>
+    </div>
+    <!-- end footer-->
+</div>
+
+@section scripts {
+
+    <script>
+
+        // tao controller
+        var app = angular.module('myApp', ['ui.bootstrap', 'myDirective']);
+        //var app = angular.module('myApp', ['ngRoute']);
+        app.controller('myCtrl', function ($scope, $http) {
+
+            //$scope.AllNamHoc = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.NamHoc))');
+
+            $scope.edit = function () {
+                showLoader(true);
+                //update data
+                $http({
+                    method: "POST",
+                    url: "/MailerChangeInfo/edit",
+                    data: $scope.Info
+                }).then(
+                    function success(response) {
+
+                        var result = response.data;
+
+                        if (result.error == 0) {
+
+                            showNotify("Đã cập nhật");
+
+                        } else {
+
+                            alert(result.msg);
+
+                        }
+
+                        showLoader(false);
+
+                    },
+                    function errror(response) {
+                        showLoader(false);
+                        showNotify("connect has disconnect");
+                    }
+                    );
+                //ket thuc update
+            };
+            $scope.Tim = function () {
+
+                $http({
+                    method: "GET",
+                    url: "/MailerChangeInfo/getmailer?mailerid=" + $scope.Info.MailerID
+                }).then(function mySuccess(response) {
+                    showLoader(false);
+
+                    if (response.data.error === 0) {
+                        $scope.Info = response.data.data;
+                    }
+
+                }, function myError(response) {
+                    showLoader(false);
+                    showNotify('Connect error');
+                });
+
+
+            }
+        });
+
+    </script>
+}

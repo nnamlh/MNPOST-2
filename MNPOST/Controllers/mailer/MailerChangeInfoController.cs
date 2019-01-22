@@ -7,7 +7,7 @@ using MNPOST.Models;
 using MNPOSTCOMMON;
 namespace MNPOST.Controllers.mailer
 {
-    public class MailerChangeInfoController : Controller
+    public class MailerChangeInfoController : BaseController
     {
         // GET: MailerChangeInfo
         public ActionResult Show()

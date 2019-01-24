@@ -37,6 +37,11 @@ namespace MNPOSTAPI.Controllers
 
                 var findMailer = db.MM_Mailers.Where(p => p.ThirdpartyDocID == thirtCode).FirstOrDefault();
 
+                if(findMailer == null)
+                {
+                    findMailer = db.MM_Mailers.Where(p => p.MailerID == order).FirstOrDefault();
+                }
+
                 if (findMailer == null)
                     throw new Exception("Sai mã order");
 
@@ -56,6 +61,18 @@ namespace MNPOSTAPI.Controllers
 
                 db.MM_TrackingPartner.Add(tracking);
                 db.SaveChanges();
+
+
+                if(tracking.StatusID == "501")
+                {
+                    findMailer.DeliveryTo = paser.DATA.NOTE;
+                    findMailer.DeliveryDate = date;
+                    findMailer.DeliveryNotes = "Đã phát";
+                    findMailer.CurrentStatusID = 4;
+
+                    db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
+                }
 
             } catch(Exception e)
             {

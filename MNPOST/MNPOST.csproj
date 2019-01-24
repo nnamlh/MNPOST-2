@@ -233,6 +233,7 @@
     <Compile Include="Controllers\mnpostinfo\ReturnReasonController.cs" />
     <Compile Include="Controllers\mnpostinfo\RouteController.cs" />
     <Compile Include="Controllers\mnpostinfo\StaffController.cs" />
+    <Compile Include="Controllers\mnpostinfo\VSVXController.cs" />
     <Compile Include="Controllers\mnpostinfo\WardController.cs" />
     <Compile Include="Controllers\mnpostinfo\ZoneController.cs" />
     <Compile Include="Controllers\NoticeController.cs" />
@@ -1855,6 +1856,7 @@
     <Folder Include="Views\Notice\" />
     <Folder Include="Views\SendPartner\" />
     <Folder Include="Views\Tracking\" />
+    <Folder Include="Views\VSVX\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

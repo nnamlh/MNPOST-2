@@ -43,7 +43,23 @@ namespace MNPOST.Controllers.mnpostinfo
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        
+        [HttpGet]
+        public ActionResult VSVX(string code, bool vsvx)
+        {
+            var find = db.BS_Districts.Where(p => p.DistrictID == code).FirstOrDefault();
+
+            if(find != null)
+            {
+                find.VSVS = vsvx;
+                db.Entry(find).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return Json(new ResultInfo()
+            {
+
+            }, JsonRequestBehavior.AllowGet);
+        }
 
 
 

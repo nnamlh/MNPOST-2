@@ -32,6 +32,7 @@
                                 <th>Mã quận/huyện</th>
                                 <th>Tên quận/huyện</th>
                                 <th>Mã tỉnh</th>
+                                <th>VSVX</th>
                                 <th>#</th>
                             </tr>
                         </thead>
@@ -42,6 +43,7 @@
                                 <td>{{item.DistrictID}}</td>
                                 <td>{{item.DistrictName}}</td>
                                 <td>{{item.ProvinceID}}</td>
+                                <td><input type="checkbox" ng-model="item.VSVS" ng-checked="item.VSVS" ng-change="checkChangeVSVX($index)"/></td>
                                 <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
                             </tr>
                         </tbody>
@@ -186,6 +188,19 @@
                 $scope.DistrictIDDisable = false;
                 $scope.IsAction = 'add';
                 showModel("insertmodal")
+
+            };
+
+            $scope.checkChangeVSVX = function (idx) {
+
+                var item = $scope.allDistrict[idx];
+                console.log(item);
+                $http.get("/district/vsvx?code=" + item.DistrictID + "&vsvx=" + item.VSVS).then(function (res) {
+
+                    
+
+                });
+
 
             };
 

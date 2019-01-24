@@ -53,7 +53,7 @@ namespace MNPOST.Controllers.customerdebit
                         join cg in db.BS_CustomerGroups
                         on cdv.CustomerGroupID equals cg.CustomerGroupCode
                         where cdv.PostOfficeID == post && cdv.DocumentDate >= dateFrom && cdv.DocumentDate <= dateTo
-
+                        orderby cdv.DocumentID
                         select new
                         {
                             DocumentID = cdv.DocumentID,
@@ -105,7 +105,7 @@ namespace MNPOST.Controllers.customerdebit
                                PriceService = mm.PriceService,
                                Discount = mm.Discount,
                                Amount = mm.Amount,
-                               COD= mm.COD
+                               COD = mm.COD
                            }).ToList();
             //var chiTiet = db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid).ToList();
             return Json(results, JsonRequestBehavior.AllowGet);
@@ -138,10 +138,11 @@ namespace MNPOST.Controllers.customerdebit
 
             string sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
             string customer = string.Empty;
+            decimal? returncost = 0;
 
             //cap nhat chiet khau cho khach hang
             //exec AC_CustomerDebitVoucher_procUpdateDiscountMailer @FromDate='2018-11-28 00:00:00',@ToDate='2018-11-28 00:00:00',@PostOfficeID=N'CNTT',@PaymentMethodID=N'GN',@CustomerID=N'CNTT-2-CNTT, CNTT1-2-CNTT, HUNG-2-CNTT',@GroupByRep=0,@ByDebtDate=0
-
+            allcus = false;
             if (allcus == true)
             {
                 var listcustomer = db.BS_CustomerGroups.Select(p => p.CustomerGroupCode).ToList();
@@ -161,7 +162,7 @@ namespace MNPOST.Controllers.customerdebit
                 }
                 customer = customer.Remove(customer.Length - 1); // bỏ đi dấu trừ cuối cùng
             }
-            
+
             var _tungay = new SqlParameter("@FromDate", "1900.01.01");
             var _denngay = new SqlParameter("@ToDate", DateTime.Now.Date.ToString("yyyy-MM-dd"));
             var _post = new SqlParameter("@PostOfficeID", "BCQ3");
@@ -192,25 +193,51 @@ namespace MNPOST.Controllers.customerdebit
                         var results = db.Database.SqlQuery<IdentityDebit>("get_mailerfordebit @CustID,@FromDate,@ToDate", _cus, _fdate, _tdate).ToList();
                         foreach (var item1 in results)
                         {
+                            if (item1.IsReturn == true)
+                            {
+                                var checkext = db.MM_MailerServices.Where(p => p.MailerID == item1.MailerID).FirstOrDefault();
+                                if (checkext == null)
+                                {
+                                    returncost = item1.Price / 2; //nếu có chuyển hoàn.
+                                    //thêm vào bảng dịch vụ cộng thêm
+                                    MM_MailerServices ms = new MM_MailerServices();
+                                    ms.MailerID = item1.MailerID;
+                                    ms.ServiceID = "CH";
+                                    ms.SellingPrice = decimal.Parse(returncost.ToString());
+                                    ms.PriceDefault = 0;
+                                    ms.IsPercentage = true;
+                                    ms.BfVATAmount = decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                                    ms.VATAmount = decimal.Parse(returncost.ToString()) - decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                                    ms.AfVATAmount = decimal.Parse(returncost.ToString());
+                                    ms.LastEditDate = DateTime.Now;
+                                    ms.CreationDate = DateTime.Now;
+                                    db.MM_MailerServices.Add(ms);
+                                    //update thu khac vào bảng mm_mailers
+                                    var checkmm = db.MM_Mailers.Where(p => p.MailerID == item1.MailerID).FirstOrDefault();
+                                    checkmm.PriceService = checkmm.PriceService + decimal.Parse(returncost.ToString());
+                                    db.Entry(checkmm).State = System.Data.Entity.EntityState.Modified;
+                                    db.SaveChanges();
+                                }
+
+                            }
                             string tttt = item1.MailerID;
-                            //double? _amount =double.Parse( item1.Amount);
                             AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
                             ct.DocumentID = maxid;
                             ct.MailerID = item1.MailerID;
-                            ct.Amount = double.Parse((item1.Amount ??0).ToString());
+                            ct.Amount = double.Parse((item1.Amount ?? 0).ToString());
                             ct.Price = decimal.Parse((double.Parse((item1.Price ?? 0).ToString()) / 1.1).ToString());
-                            //ct.Price = 0;
-                            ct.PriceService = decimal.Parse((item1.PriceService ??0).ToString());
+                            ct.PriceService = decimal.Parse((item1.PriceService ?? 0).ToString()) + decimal.Parse(returncost.ToString());
                             ct.DiscountPercent = decimal.Parse((item1.DiscountPercent ?? 0).ToString());
                             ct.Discount = decimal.Parse((item1.Discount ?? 0).ToString());
                             ct.VATpercent = decimal.Parse((item1.VATPercent ?? 0).ToString());
-                            ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
-                            ct.VATamount = decimal.Parse((item1.VATAmount ?? 0).ToString());
+                            // ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
+                            ct.BfVATamount = decimal.Round(decimal.Parse((item1.BfVATAmount ?? 0).ToString()));
+                            ct.VATamount = decimal.Round(decimal.Parse((item1.VATAmount ?? 0).ToString()));
                             ct.AcceptDate = DateTime.Parse(item1.AcceptDate.ToString());
                             ct.Quantity = int.Parse(item1.Quantity.ToString());
                             ct.Weight = decimal.Parse(item1.Weight.ToString());
                             db.AC_CustomerDebitVoucherDetail.Add(ct);
-                            totalamount += double.Parse((item1.Amount ??0).ToString());
+                            totalamount += double.Parse((item1.Amount ?? 0).ToString());
                             totalcod += double.Parse((item1.COD ?? 0).ToString());
                             db.SaveChanges();
                         }
@@ -223,7 +250,7 @@ namespace MNPOST.Controllers.customerdebit
                             mt.PostOfficeID = "BCQ3";
                             mt.CustomerGroupID = item;
                             mt.StatusID = 0;
-                            mt.ToTalAmount = totalamount;
+                            mt.ToTalAmount = Math.Round(totalamount, 0);
                             mt.CODTotal = totalcod;
                             mt.DebtMonth = DateTime.Now.Date;
                             mt.Description = "";
@@ -249,8 +276,34 @@ namespace MNPOST.Controllers.customerdebit
                         var results = db.Database.SqlQuery<IdentityDebit>("get_mailerfordebit @CustID,@FromDate,@ToDate", _cus, _fdate, _tdate).ToList();
                         foreach (var item1 in results)
                         {
+
+                            if (item1.IsReturn == true)
+                            {
+                                var checkext = db.MM_MailerServices.Where(p => p.MailerID == item1.MailerID).FirstOrDefault();
+                                if (checkext == null)
+                                {
+                                    returncost = item1.Price / 2; //nếu có chuyển hoàn.
+                                    //thêm vào bảng dịch vụ cộng thêm
+                                    MM_MailerServices ms = new MM_MailerServices();
+                                    ms.MailerID = item1.MailerID;
+                                    ms.ServiceID = "CH";
+                                    ms.SellingPrice = decimal.Parse(returncost.ToString());
+                                    ms.PriceDefault = 0;
+                                    ms.IsPercentage = true;
+                                    ms.BfVATAmount = decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                                    ms.VATAmount = decimal.Parse(returncost.ToString()) - decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                                    ms.AfVATAmount = decimal.Parse(returncost.ToString());
+                                    ms.LastEditDate = DateTime.Now;
+                                    ms.CreationDate = DateTime.Now;
+                                    db.MM_MailerServices.Add(ms);
+
+                                    var checkmm = db.MM_Mailers.Where(p => p.MailerID == item1.MailerID).FirstOrDefault();
+                                    checkmm.PriceService = checkmm.PriceService + decimal.Parse(returncost.ToString());
+                                    db.Entry(checkmm).State = System.Data.Entity.EntityState.Modified;
+                                    db.SaveChanges();
+                                }
+                            }
                             string tttt = item1.MailerID;
-                            //double? _amount =double.Parse( item1.Amount);
                             AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
                             ct.DocumentID = maxid;
                             ct.MailerID = item1.MailerID;
@@ -260,8 +313,11 @@ namespace MNPOST.Controllers.customerdebit
                             ct.DiscountPercent = decimal.Parse((item1.DiscountPercent ?? 0).ToString());
                             ct.Discount = decimal.Parse((item1.Discount ?? 0).ToString());
                             ct.VATpercent = decimal.Parse((item1.VATPercent ?? 0).ToString());
-                            ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
-                            ct.VATamount = decimal.Parse((item1.VATAmount ?? 0).ToString());
+                            // ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
+                            // ct.VATamount = decimal.Parse((item1.VATAmount ?? 0).ToString());
+                            ct.BfVATamount = decimal.Round(decimal.Parse((item1.BfVATAmount ?? 0).ToString()));
+                            ct.VATamount = decimal.Round(decimal.Parse((item1.VATAmount ?? 0).ToString()));
+
                             ct.AcceptDate = DateTime.Parse(item1.AcceptDate.ToString());
                             ct.Quantity = int.Parse(item1.Quantity.ToString());
                             ct.Weight = decimal.Parse(item1.Weight.ToString());
@@ -279,7 +335,7 @@ namespace MNPOST.Controllers.customerdebit
                             mt.PostOfficeID = "BCQ3";
                             mt.CustomerGroupID = item;
                             mt.StatusID = 0;
-                            mt.ToTalAmount = totalamount;
+                            mt.ToTalAmount = Math.Round(totalamount, 0);
                             mt.CODTotal = totalcod;
                             mt.DebtMonth = DateTime.Now.Date;
                             mt.Description = "";
@@ -327,17 +383,17 @@ namespace MNPOST.Controllers.customerdebit
 
             var check = db.AC_CustomerDebitVoucher.Where(p => p.DocumentID == documentid).FirstOrDefault();
             var listcg = (from mm in db.MM_Mailers
-                           join d in db.AC_CustomerDebitVoucherDetail
-                           on mm.MailerID equals d.MailerID
-                           where d.DocumentID == documentid
-                           select new
-                           {
-                               MailerID = mm.MailerID,
-                               COD = mm.COD
-                           }).ToList();
-            foreach(var item in listcg)
+                          join d in db.AC_CustomerDebitVoucherDetail
+                          on mm.MailerID equals d.MailerID
+                          where d.DocumentID == documentid
+                          select new
+                          {
+                              MailerID = mm.MailerID,
+                              COD = mm.COD
+                          }).ToList();
+            foreach (var item in listcg)
             {
-                if(item.COD > 0)
+                if (item.COD > 0)
                 {
                     var checkcg = db.MM_Mailers.Where(p => p.MailerID == item.MailerID).FirstOrDefault();
                     checkcg.PaidCoD = 2;

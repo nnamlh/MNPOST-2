@@ -215,6 +215,7 @@
     <Compile Include="Controllers\employeedebit\EmployeeDebitController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\mailer\MailerChangeInfoController.cs" />
     <Compile Include="Controllers\mailer\MailerController.cs" />
     <Compile Include="Controllers\mailer\MailerDeliveryController.cs" />
     <Compile Include="Controllers\mailer\MailerImportController.cs" />
@@ -1843,6 +1844,7 @@
     <Content Include="Views\Home\Show.cshtml" />
     <Content Include="Views\CustomerDebitNew\Show.cshtml" />
     <Content Include="Views\MailerPartner\GetTrackViettel.cshtml" />
+    <Content Include="Views\MailerChangeInfo\Show.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

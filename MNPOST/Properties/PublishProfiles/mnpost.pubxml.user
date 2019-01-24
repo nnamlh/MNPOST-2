@@ -3514,13 +3514,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/07/2018 11:46:07</publishTime>
     </File>
     <File Include="bin/MNPOST.dll">
-      <publishTime>01/18/2019 17:16:48</publishTime>
+      <publishTime>01/22/2019 10:27:51</publishTime>
     </File>
     <File Include="bin/MNPOST.pdb">
       <publishTime>09/24/2018 11:21:29</publishTime>
     </File>
     <File Include="bin/MNPOSTCOMMON.dll">
-      <publishTime>01/18/2019 17:16:47</publishTime>
+      <publishTime>01/22/2019 10:27:49</publishTime>
     </File>
     <File Include="bin/MNPOSTCOMMON.dll.config">
       <publishTime>01/16/2019 17:43:39</publishTime>
@@ -16411,7 +16411,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/01/2019 20:36:44</publishTime>
     </File>
     <File Include="Views/CustomerDebitNew/Show.cshtml">
-      <publishTime>01/15/2019 14:38:29</publishTime>
+      <publishTime>01/22/2019 10:05:16</publishTime>
     </File>
     <File Include="Views/CustomerDebitVoucher/Show.cshtml">
       <publishTime>01/09/2019 16:34:46</publishTime>
@@ -16435,7 +16435,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/01/2019 20:36:44</publishTime>
     </File>
     <File Include="Views/EmployeeDebit/Show.cshtml">
-      <publishTime>01/09/2019 15:52:58</publishTime>
+      <publishTime>01/22/2019 10:27:31</publishTime>
     </File>
     <File Include="Views/Error/Index.cshtml">
       <publishTime>01/01/2019 20:36:44</publishTime>
@@ -16466,6 +16466,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Views/Mailer/ShowReportMailer.cshtml">
       <publishTime>10/27/2018 17:28:12</publishTime>
+    </File>
+    <File Include="Views/MailerChangeInfo/Show.cshtml">
+      <publishTime>01/22/2019 10:05:16</publishTime>
     </File>
     <File Include="Views/MailerDelivery/Show.cshtml">
       <publishTime>01/18/2019 17:00:49</publishTime>
@@ -16549,7 +16552,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/07/2018 11:45:49</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>01/16/2019 02:10:36</publishTime>
+      <publishTime>01/22/2019 10:27:57</publishTime>
     </File>
   </ItemGroup>
 </Project>

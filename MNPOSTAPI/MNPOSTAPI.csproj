@@ -259,7 +259,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MNCOMMON\MNPOSTCOMMON\MNPOSTCOMMON.csproj">
+    <ProjectReference Include="..\..\MNPOSTCOMMON\MNPOSTCOMMON.csproj">
       <Project>{86535a9f-fb29-4141-951a-30bcbedef8c0}</Project>
       <Name>MNPOSTCOMMON</Name>
     </ProjectReference>

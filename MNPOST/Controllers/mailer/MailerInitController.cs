@@ -45,6 +45,9 @@ namespace MNPOST.Controllers.mailer
 
             }).ToList(); ;
 
+
+
+
             // tinh thanh
             ViewBag.Provinces = GetProvinceDatas("", "province");
             // buu cuc
@@ -492,6 +495,8 @@ namespace MNPOST.Controllers.mailer
                 // save service
                 if (item.Services != null)
                 {
+
+                    decimal? totalPriceService = 0;
                     foreach (var service in item.Services)
                     {
                         var checkService = db.BS_Services.Where(p => p.ServiceID == service.code && p.IsActive == true).FirstOrDefault();
@@ -503,7 +508,7 @@ namespace MNPOST.Controllers.mailer
                             {
                                 servicePrice = (servicePrice * mailerIns.Price) / 100;
                             }
-
+                            totalPriceService = totalPriceService + servicePrice;
                             var mailerService = new MM_MailerServices()
                             {
                                 MailerID = item.MailerID,
@@ -516,6 +521,12 @@ namespace MNPOST.Controllers.mailer
                         }
                     }
 
+                    db.SaveChanges();
+
+                    mailerIns.PriceService = totalPriceService;
+                    mailerIns.Amount = mailerIns.Price + mailerIns.PriceCoD + mailerIns.PriceService;
+
+                    db.Entry(mailerIns).State = System.Data.Entity.EntityState.Modified;
                     db.SaveChanges();
                 }
 

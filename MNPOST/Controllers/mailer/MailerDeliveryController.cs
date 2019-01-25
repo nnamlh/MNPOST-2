@@ -14,7 +14,7 @@ namespace MNPOST.Controllers.mailer
         public ActionResult Show()
         {
             ViewBag.PostOffices = EmployeeInfo.postOffices;
-            List<CommonData> allProvince = GetProvinceDatas("", "province");
+            List<AddressCommom> allProvince = GetProvinceDatas("", "province");
             ViewBag.Provinces = allProvince;
             ViewBag.ReturnReasons = db.BS_ReturnReasons.Select(p => new { name = p.ReasonName, code = p.ReasonID }).ToList();
             return View();

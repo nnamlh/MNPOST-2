@@ -193,19 +193,20 @@ namespace MNPOST.Controllers
         }
 
         //
-        public List<CommonData> GetProvinceDatas(string parentId, string type)
+        public List<AddressCommom> GetProvinceDatas(string parentId, string type)
         {
             if (type == "district")
             {
-                return db.BS_Districts.Where(p => p.ProvinceID == parentId).Select(p => new CommonData()
+                return db.BS_Districts.Where(p => p.ProvinceID == parentId).Select(p => new AddressCommom()
                 {
                     code = p.DistrictID,
-                    name = p.DistrictName
+                    name = p.DistrictName,
+                    vsvx = p.VSVS
                 }).ToList();
             }
             else if (type == "ward")
             {
-                return db.BS_Wards.Where(p => p.DistrictID == parentId).Select(p => new CommonData()
+                return db.BS_Wards.Where(p => p.DistrictID == parentId).Select(p => new AddressCommom()
                 {
                     code = p.WardID,
                     name = p.WardName
@@ -213,7 +214,7 @@ namespace MNPOST.Controllers
             }
             else if (type == "province")
             {
-                return db.BS_Provinces.Select(p => new CommonData()
+                return db.BS_Provinces.Select(p => new AddressCommom()
                 {
                     code = p.ProvinceID,
                     name = p.ProvinceName
@@ -221,7 +222,7 @@ namespace MNPOST.Controllers
             }
             else
             {
-                return new List<CommonData>();
+                return new List<AddressCommom>();
             }
 
         }

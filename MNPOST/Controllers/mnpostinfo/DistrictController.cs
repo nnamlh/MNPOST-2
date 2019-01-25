@@ -27,7 +27,12 @@ namespace MNPOST.Controllers.mnpostinfo
             int pageNumber = (page ?? 1);
 
 
-            var data = db.BS_Districts.Where(p => p.DistrictID.Contains(search) || p.DistrictName.Contains(search)).ToList();
+            var data = db.BS_Districts.Where(p => p.ProvinceID == search).ToList();
+
+            if(search == "")
+            {
+                data = db.BS_Districts.OrderBy(p=> p.ProvinceID).ToList();
+            }
 
             ResultInfo result = new ResultWithPaging()
             {

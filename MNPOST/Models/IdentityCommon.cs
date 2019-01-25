@@ -72,6 +72,11 @@ namespace MNPOST.Models
         public string name { get; set; }
     }
 
+    public class AddressCommom : CommonData
+    {
+        public bool?  vsvx { get; set; }
+    }
+
     public class ItemPriceCommon : CommonData
     {
         public decimal? price { get; set; }

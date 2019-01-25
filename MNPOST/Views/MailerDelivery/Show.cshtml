@@ -169,9 +169,13 @@
                                                         <span class="label label-info">{{item.RecieProvinceName}}</span>&nbsp;&nbsp;<span class="label label-info">{{item.ReceiDistrictName}}</span>&nbsp;&nbsp;<span class="label label-info">{{item.ReceiWardName}}</span>
                                                     </td>
                                                     <td>{{item.PaymentMethodID}}</td>
-                                                    <td>Tiền hàng: {{item.COD}} <br />
-                                                        Tiền cước: {{item.Amount}} <br />
-                                                        Tiền phải thu: {{item.PaymentMethodID === "NNTT"?(item.COD + item.Amount):item.COD}}
+                                                    <td>
+                                                        <div ng-show="!item.IsReturn">
+                                                            Tiền hàng: {{item.COD}} <br />
+                                                            Tiền cước: {{item.Amount}} <br />
+                                                            Tiền phải thu: {{item.PaymentMethodID === "NNTT"?(item.COD + item.Amount):item.COD}}
+                                                        </div>
+                                                        <p ng-show="item.IsReturn">Hàng chuyển hoàn không thu tiền</p>
                                                     </td>
                                                     <td>{{item.Notes}}</td>
                                                     <td><a class="label label-danger" ng-show="item.DeliveryStatus===3" href="#" ng-click="detroyMailerDelivery(item.DetailId)">Hủy phát</a></td>

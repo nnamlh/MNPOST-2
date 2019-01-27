@@ -21,6 +21,7 @@ app.controller('myCtrl', function ($scope, $http, $interval) {
     $scope.document = {};
     $scope.details = [];
 
+
     $scope.status = [
         {
             "code": 0,

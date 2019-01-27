@@ -15,57 +15,36 @@ namespace MNPOST.Controllers.customerdebit
 {
     public class CustomerDebitController : BaseController
     {
-        // GET: CustomerDebit
+
         public ActionResult Show()
         {
-            ViewBag.allCustomer = db.BS_CustomerGroups.ToList();
+
+            ViewBag.CustomerGroup = db.BS_CustomerGroups.Select(p => new
+            {
+                code = p.CustomerGroupCode,
+                name = p.CustomerGroupName
+            }).ToList();
             return View();
         }
-        [HttpGet]
-        public ActionResult GetDebit(string tungay, string denngay, string post)
+
+
+        public ActionResult ReportDebit()
+        {
+            var data = db.CUS_DEBIT_NOTPAY().ToList();
+
+            return Json(data, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+
+        [HttpPost]
+        public ActionResult GetDebit(int month, int year, string cusId)
         {
 
-            string tngay = tungay.Substring(0, 2);
-            string tthang = tungay.Substring(3, 2);
-            string tnam = tungay.Substring(6, 4);
+            var data = db.CUS_DEBIT_GETDocuments(month, year).ToList();
 
-            string dngay = denngay.Substring(0, 2);
-            string dthang = denngay.Substring(3, 2);
-            string dnam = denngay.Substring(6, 4);
 
-            string sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-
-            //format sever M/d/yyyy
-            DateTime dateFrom;
-            DateTime dateTo;
-
-            if (sysFormat == "M/d/yyyy")
-            {
-                dateFrom = DateTime.Parse(tthang + '/' + tngay + '/' + tnam);
-                dateTo = DateTime.Parse(dthang + '/' + dngay + '/' + dnam);
-            }
-            else
-            {
-                dateFrom = DateTime.Parse(tungay);
-                dateTo = DateTime.Parse(denngay);
-            }
-            var data = (from cdv in db.AC_CustomerDebitVoucher
-                        join cg in db.BS_CustomerGroups
-                        on cdv.CustomerGroupID equals cg.CustomerGroupCode
-                        where cdv.PostOfficeID == post && cdv.DocumentDate >= dateFrom && cdv.DocumentDate <= dateTo
-
-                        select new
-                        {
-                            DocumentID = cdv.DocumentID,
-                            DocumentDate = cdv.DocumentDate,
-                            CustomerGroupID = cdv.CustomerGroupID,
-                            CustomerName = cg.CustomerGroupName,
-                            TotalAmount = cdv.ToTalAmount,
-                            DebtMonth = cdv.DebtMonth,
-                            StatusID = cdv.StatusID,
-                            Description = cdv.Description
-
-                        }).ToList();
             // var data;
             ResultInfo result = new ResultInfo()
             {
@@ -76,20 +55,16 @@ namespace MNPOST.Controllers.customerdebit
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-        [HttpPost]
-        public ActionResult edit(List<string> kh, bool loai, int ngaychot, string thangchot, string tungay, string denngay)
-        {
-            return Json(new ResultInfo() { error = 0, msg = "", data = "" }, JsonRequestBehavior.AllowGet);
-        }
-        [HttpGet]
-        public ActionResult getDetail(string documentid)
+
+
+        public ActionResult GetDetails(string documentId)
         {
             var results = (from mm in db.MM_Mailers
                            join d in db.AC_CustomerDebitVoucherDetail
                            on mm.MailerID equals d.MailerID
                            join p in db.BS_Provinces
                            on mm.RecieverProvinceID equals p.ProvinceID
-                           where d.DocumentID == documentid
+                           where d.DocumentID == documentId
                            select new
                            {
                                MailerID = mm.MailerID,
@@ -102,11 +77,13 @@ namespace MNPOST.Controllers.customerdebit
                                Price = d.Price,
                                PriceService = mm.PriceService,
                                Discount = mm.Discount,
-                               Amount = mm.Amount
+                               Amount = mm.Amount,
+                               COD = mm.COD
                            }).ToList();
-            //var chiTiet = db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid).ToList();
+
             return Json(results, JsonRequestBehavior.AllowGet);
         }
+
         public string getMaxid()
         {
             //lay ra gia tri maxid
@@ -128,391 +105,159 @@ namespace MNPOST.Controllers.customerdebit
             };
             return maxndg;
         }
+
+
         [HttpPost]
-        //kh: listDebit, loai: $scope.CongNo.TheoNgayChot, ngaychot: $scope.ChotNgay.Ngay, thangchot: $scope.ChotNgay.Thang, tungay: $scope.CongNo.TuNgay, denngay: $scope.CongNo.DenNgay, allcus: $scope.CongNo.AllCustomer
-        public ActionResult create(List<string> kh, bool loai, int ngaychot, string thangchot, string tungay, string denngay, bool allcus)
+        public ActionResult GetNotDebit(string CusId, string DethTime)
         {
-            //loai: theo ngay chot true or false
-            if (String.IsNullOrEmpty(tungay))
-                return Json(new ResultInfo() { error = 1, msg = "Missing info" }, JsonRequestBehavior.AllowGet);
-            // 20/12/2018
-            string tngay = tungay.Substring(0, 2);
-            string tthang = tungay.Substring(3, 2);
-            string tnam = tungay.Substring(6, 4);
 
-            string dngay = denngay.Substring(0, 2);
-            string dthang = denngay.Substring(3, 2);
-            string dnam = denngay.Substring(6, 4);
-
-            //convert thang chot
-
-            string sysFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-            string dateFrom;
-            string dateTo;
-            //format sever M/d/yyyy
-            if(loai == false)
+            try
             {
-                 dateFrom = tnam + '-' + tthang + '-' + tngay;
-                 dateTo = dnam + '-' + dthang + '-' + dngay;
-            }else
-            {
-                var _fday = new SqlParameter("@DebtDay", ngaychot);
-                var _fmonth = new SqlParameter("@Month", thangchot.Substring(0,2));
-                var _fyear = new SqlParameter("@Year", thangchot.Substring(3, 4));
-                var _fdate = new SqlParameter("@DefaultDate", DateTime.Now);
-                var _from = db.Database.SqlQuery<ReturnDate>("proc_getFromDateOfCust @DebtDay,@Month,@Year,@DefaultDate", _fday, _fmonth, _fyear, _fdate).FirstOrDefault();
+                var denNgay = DateTime.ParseExact(DethTime, "dd/MM/yyyy", null).ToString("yyyy-MM-dd");
+                var _tungay = new SqlParameter("@FromDate", "1900.01.01");
+                var _denngay = new SqlParameter("@ToDate", denNgay);
+                var _post = new SqlParameter("@PostOfficeID", EmployeeInfo.currentPost);
+                var _payment = new SqlParameter("@PaymentMethodID", "NGTT");
+                var _customerid = new SqlParameter("@CustomerID", CusId);
+                var _groupbyrep = new SqlParameter("@GroupByRep", false);
+                var _bydebtdate = new SqlParameter("@ByDebtDate", true);
+                var data = db.Database.SqlQuery<ReturnValue>("AC_CustomerDebitVoucher_procUpdateDiscountMailer @FromDate,@ToDate,@PostOfficeID,@PaymentMethodID,@CustomerID,@GroupByRep,@ByDebtDate", _tungay, _denngay, _post, _payment, _customerid, _groupbyrep, _bydebtdate).ToList();
 
-                var _tday = new SqlParameter("@DebtDay", ngaychot);
-                var _tmonth = new SqlParameter("@Month", thangchot.Substring(0, 2));
-                var _tyear = new SqlParameter("@Year", thangchot.Substring(3, 4));
-                var _tdate = new SqlParameter("@DefaultDate", DateTime.Now);
-                var _to = db.Database.SqlQuery<ReturnDate>("proc_getToDateOfCust @DebtDay,@Month,@Year,@DefaultDate", _tday, _tmonth, _tyear, _tdate).FirstOrDefault();
-                
-                dateFrom = _from.Ngay.ToString("yyyy-MM-dd");
-                dateTo = _to.Ngay.ToString("yyyy-MM-dd");
+                var findCus = db.BS_CustomerGroups.Where(p => p.CustomerGroupCode == CusId).FirstOrDefault();
+
+                if (findCus == null)
+                    throw new Exception("Sai thông tin");
+
+                var listMailer = db.get_mailerfordebit(findCus.CustomerGroupID, denNgay).ToList();
+
+                return Json(new { error = 0, data = listMailer }, JsonRequestBehavior.AllowGet);
+
             }
-           
-            string customer = string.Empty;
-
-            //cap nhat chiet khau cho khach hang
-            //exec AC_CustomerDebitVoucher_procUpdateDiscountMailer @FromDate='2018-11-28 00:00:00',@ToDate='2018-11-28 00:00:00',@PostOfficeID=N'CNTT',@PaymentMethodID=N'GN',@CustomerID=N'CNTT-2-CNTT, CNTT1-2-CNTT, HUNG-2-CNTT',@GroupByRep=0,@ByDebtDate=0
-
-            if (allcus == true && loai == true)
+            catch (Exception e)
             {
-                var listcustomer = db.BS_CustomerGroups.Where(p => p.DebitDate == ngaychot).Select(p => p.CustomerGroupCode).ToList();
-                if (listcustomer.Count == 0)
-                    return Json(new ResultInfo() { error = 1, msg = "Không có khách hàng thỏa điều kiện" }, JsonRequestBehavior.AllowGet);
-                foreach (var item in listcustomer)
-                {
-                    customer += item + ',';
-                }
-                customer = customer.Remove(customer.Length - 1); // bỏ đi dấu trừ cuối cùng
+                return Json(new { error = 1 }, JsonRequestBehavior.AllowGet);
             }
-            else if (allcus == false && loai == true)
-            {
-                foreach (var item in kh)
-                {
-                    customer += item + ',';
-                }
-                customer = customer.Remove(customer.Length - 1); // bỏ đi dấu trừ cuối cùng
-            }
-            else if (allcus == true && loai == false)
-            {
-                var listcustomer = db.BS_CustomerGroups.Select(p => p.CustomerGroupCode).ToList();
-                foreach (var item in listcustomer)
-                {
-                    customer += item + ',';
-                }
-                customer = customer.Remove(customer.Length - 1); // bỏ đi dấu trừ cuối cùng
-            }
-            else if (allcus == false && loai == false)
-            {
-                foreach (var item in kh)
-                {
-                    customer += item + ',';
-                }
-                customer = customer.Remove(customer.Length - 1); // bỏ đi dấu trừ cuối cùng
-            }
-            var _tungay = new SqlParameter("@FromDate", dateFrom);
-            var _denngay = new SqlParameter("@ToDate", dateTo);
-            var _post = new SqlParameter("@PostOfficeID", "BCQ3");
-            var _payment = new SqlParameter("@PaymentMethodID", "NGTT");
-            var _customerid = new SqlParameter("@CustomerID", customer);
-            var _groupbyrep = new SqlParameter("@GroupByRep", false);
-            var _bydebtdate = new SqlParameter("@ByDebtDate", true);
-            var data = db.Database.SqlQuery<ReturnValue>("AC_CustomerDebitVoucher_procUpdateDiscountMailer @FromDate,@ToDate,@PostOfficeID,@PaymentMethodID,@CustomerID,@GroupByRep,@ByDebtDate", _tungay, _denngay, _post, _payment, _customerid, _groupbyrep, _bydebtdate).ToList();
-            //ket thuc gia trị maxid
-            //lưu công nợ khách hàng
-            //lay ra danh sach so CG ko co trong bang ke cong no truoc do va thoai thoi gian tìm kiem
-            DateTime fromdate =DateTime.Parse( dateFrom);
-            DateTime todate = DateTime.Parse(dateTo);
 
-            double totalamount = 0;
-            if(allcus == true)
-            {
-                if(loai == true)
-                {
-                    var listcustomer = db.BS_CustomerGroups.Where(p => p.DebitDate == ngaychot).Select(p => p.CustomerGroupCode).ToList();
-                    foreach(var item in listcustomer)
-                    {
-                        var groupid = db.BS_CustomerGroups.Where(p => p.CustomerGroupCode == item).Select(p => p.CustomerGroupID).FirstOrDefault();
-                        var listcus = db.BS_Customers.Where(p => p.CustomerGroupID == groupid).Select(p => p.CustomerCode).ToList();
-                        string maxid = getMaxid();
-                        foreach (var x in listcus)
-                        {
-                            var _cus = new SqlParameter("@CustID", x);
-                            var _fdate = new SqlParameter("@FromDate", fromdate.ToString("yyyy-MM-dd"));
-                            var _tdate = new SqlParameter("@ToDate", todate.ToString("yyyy-MM-dd"));
-                            var results = db.Database.SqlQuery<IdentityDebit>("get_mailerfordebit @CustID,@FromDate,@ToDate", _cus, _fdate, _tdate).ToList();
-                            foreach (var item1 in results)
-                            {
-                                string tttt = item1.MailerID;
-                                //double? _amount =double.Parse( item1.Amount);
-                                AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
-                                ct.DocumentID = maxid;
-                                ct.MailerID = item1.MailerID;
-                                ct.Amount = double.Parse((item1.Amount).ToString());
-                                ct.Price = decimal.Parse((double.Parse(item1.Price.ToString())/1.1).ToString());
-                                //ct.Price = 0;
-                                ct.PriceService = decimal.Parse((item1.PriceService).ToString());
-                                ct.DiscountPercent = decimal.Parse((item1.DiscountPercent ?? 0).ToString());
-                                ct.Discount = decimal.Parse((item1.Discount ?? 0).ToString());
-                                ct.VATpercent = decimal.Parse((item1.VATPercent).ToString());
-                                ct.BfVATamount = decimal.Parse((item1.BfVATAmount).ToString());
-                                ct.VATamount = decimal.Parse((item1.VATAmount).ToString());
-                                ct.AcceptDate = DateTime.Parse(item1.AcceptDate.ToString());
-                                ct.Quantity = int.Parse(item1.Quantity.ToString());
-                                ct.Weight = decimal.Parse(item1.Weight.ToString());
-                                db.AC_CustomerDebitVoucherDetail.Add(ct);
-                                totalamount += double.Parse((item1.Amount).ToString());
-                                db.SaveChanges();
-                            }
-                            if (results.Count > 0)
-                            {
-                                //thông tin bảng master
-                                AC_CustomerDebitVoucher mt = new AC_CustomerDebitVoucher();
-                                mt.DocumentID = maxid;
-                                mt.DocumentDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
-                                mt.PostOfficeID = "BCQ3";
-                                mt.CustomerGroupID = item;
-                                mt.StatusID = 0;
-                                mt.ToTalAmount = totalamount;
-                                mt.DebtMonth = todate;
-                                mt.Description = "Từ ngày " + fromdate.ToString("dd/MM/yyyy") + " đến ngày " + todate.ToString("dd/MM/yyyy");
-                                db.AC_CustomerDebitVoucher.Add(mt);
-                                db.SaveChanges();
-                            }
+        }
 
-                        }
-                    }
-                }else
-                {
-                    var listcustomer = db.BS_CustomerGroups.Select(p => p.CustomerGroupCode).ToList();
-                    foreach (var item in listcustomer)
-                    {
-                        var groupid = db.BS_CustomerGroups.Where(p => p.CustomerGroupCode == item).Select(p => p.CustomerGroupID).FirstOrDefault();
-                        var listcus = db.BS_Customers.Where(p => p.CustomerGroupID == groupid).Select(p => p.CustomerCode).ToList();
-                        string maxid = getMaxid();
-                        foreach (var x in listcus)
-                        {
-                            var _cus = new SqlParameter("@CustID", x);
-                            var _fdate = new SqlParameter("@FromDate", fromdate.ToString("yyyy-MM-dd"));
-                            var _tdate = new SqlParameter("@ToDate", todate.ToString("yyyy-MM-dd"));
-                            var results = db.Database.SqlQuery<IdentityDebit>("get_mailerfordebit @CustID,@FromDate,@ToDate", _cus, _fdate, _tdate).ToList();
-                            foreach (var item1 in results)
-                            {
-                                string tttt = item1.MailerID;
-                                //double? _amount =double.Parse( item1.Amount);
-                                AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
-                                ct.DocumentID = maxid;
-                                ct.MailerID = item1.MailerID;
-                                ct.Amount = double.Parse((item1.Amount).ToString());
-                                ct.Price = decimal.Parse((double.Parse(item1.Price.ToString()) / 1.1).ToString());
-                                ct.PriceService = decimal.Parse((item1.PriceService).ToString());
-                                ct.DiscountPercent = decimal.Parse((item1.DiscountPercent ?? 0).ToString());
-                                ct.Discount = decimal.Parse((item1.Discount ?? 0).ToString());
-                                ct.VATpercent = decimal.Parse((item1.VATPercent).ToString());
-                                ct.BfVATamount = decimal.Parse((item1.BfVATAmount).ToString());
-                                ct.VATamount = decimal.Parse((item1.VATAmount).ToString());
-                                ct.AcceptDate = DateTime.Parse(item1.AcceptDate.ToString());
-                                ct.Quantity = int.Parse(item1.Quantity.ToString());
-                                ct.Weight = decimal.Parse(item1.Weight.ToString());
-                                db.AC_CustomerDebitVoucherDetail.Add(ct);
-                                totalamount += double.Parse((item1.Amount).ToString());
-                                db.SaveChanges();
-                            }
-                            if (results.Count > 0)
-                            {
-                                //thông tin bảng master
-                                AC_CustomerDebitVoucher mt = new AC_CustomerDebitVoucher();
-                                mt.DocumentID = maxid;
-                                mt.DocumentDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
-                                mt.PostOfficeID = "BCQ3";
-                                mt.CustomerGroupID = item;
-                                mt.StatusID = 0;
-                                mt.ToTalAmount = totalamount;
-                                mt.DebtMonth = todate;
-                                mt.Description = "Từ ngày " + fromdate.ToString("dd/MM/yyyy") + " đến ngày " + todate.ToString("dd/MM/yyyy");
-                                db.AC_CustomerDebitVoucher.Add(mt);
-                                db.SaveChanges();
-                            }
-
-                        }
-                    }
-                }
-                
-            }else
-            {
-                foreach (var item in kh)
-                {
-                    //lay ra danh sach ma khach hang thuoc nhom khach hang
-                    var groupid = db.BS_CustomerGroups.Where(p => p.CustomerGroupCode == item).Select(p => p.CustomerGroupID).FirstOrDefault();
-                    var listcus = db.BS_Customers.Where(p => p.CustomerGroupID == groupid).Select(p => p.CustomerCode).ToList();
-                    string maxid = getMaxid();
-                    foreach (var x in listcus)
-                    {
-                        var _cus = new SqlParameter("@CustID", x);
-                        var _fdate = new SqlParameter("@FromDate", fromdate.ToString("yyyy-MM-dd"));
-                        var _tdate = new SqlParameter("@ToDate", todate.ToString("yyyy-MM-dd"));
-                        var results = db.Database.SqlQuery<IdentityDebit>("get_mailerfordebit @CustID,@FromDate,@ToDate", _cus, _fdate, _tdate).ToList();
-                        foreach (var item1 in results)
-                        {
-                            string tttt = item1.MailerID;
-                            //double? _amount =double.Parse( item1.Amount);
-                            AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
-                            ct.DocumentID = maxid;
-                            ct.MailerID = item1.MailerID;
-                            ct.Amount = double.Parse((item1.Amount).ToString());
-                            ct.Price = decimal.Parse((double.Parse(item1.Price.ToString()) / 1.1).ToString());
-                            ct.PriceService = decimal.Parse((item1.PriceService).ToString());
-                            ct.DiscountPercent = decimal.Parse((item1.DiscountPercent ?? 0).ToString());
-                            ct.Discount = decimal.Parse((item1.Discount ?? 0).ToString());
-                            ct.VATpercent = decimal.Parse((item1.VATPercent).ToString());
-                            ct.BfVATamount = decimal.Parse((item1.BfVATAmount).ToString());
-                            ct.VATamount = decimal.Parse((item1.VATAmount).ToString());
-                            ct.AcceptDate = DateTime.Parse(item1.AcceptDate.ToString());
-                            ct.Quantity = int.Parse(item1.Quantity.ToString());
-                            ct.Weight = decimal.Parse(item1.Weight.ToString());
-                            db.AC_CustomerDebitVoucherDetail.Add(ct);
-                            totalamount += double.Parse((item1.Amount).ToString());
-                            db.SaveChanges();
-                        }
-                        if (results.Count > 0)
-                        {
-                            //thông tin bảng master
-                            AC_CustomerDebitVoucher mt = new AC_CustomerDebitVoucher();
-                            mt.DocumentID = maxid;
-                            mt.DocumentDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
-                            mt.PostOfficeID = "BCQ3";
-                            mt.CustomerGroupID = item;
-                            mt.StatusID = 0;
-                            mt.ToTalAmount = totalamount;
-                            mt.DebtMonth = todate;
-                            mt.Description = "Từ ngày " + fromdate.ToString("dd/MM/yyyy") + " đến ngày " + todate.ToString("dd/MM/yyyy");
-                            db.AC_CustomerDebitVoucher.Add(mt);
-                            db.SaveChanges();
-                        }
-
-                    }
-
-                }
-            }
+        [HttpPost]
+        public ActionResult Create(string CusId, string DethTime, string Notes, List<string> ListMailers)
+        {
             
 
-            return Json(new ResultInfo() { error = 0, msg = "", data = sysFormat }, JsonRequestBehavior.AllowGet);
-
-        }
-        [HttpPost]
-        public ActionResult delete(string documentid)
-        {
-            if (String.IsNullOrEmpty(documentid))
-                return Json(new ResultInfo() { error = 1, msg = "Missing info" }, JsonRequestBehavior.AllowGet);
-
-            var check = db.AC_CustomerDebitVoucher.Where(p => p.DocumentID == documentid).FirstOrDefault();
-
-            if (check == null)
-                return Json(new ResultInfo() { error = 1, msg = "Không tìm thấy thông tin" }, JsonRequestBehavior.AllowGet);
-            var listup = db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid).Select(p => p.MailerID).ToList();
-            foreach(var item in listup)
+            try
             {
-                var mailerid = db.MM_Mailers.Where(p => p.MailerID == item).FirstOrDefault();
-                mailerid.DiscountPercent = 0;
-                mailerid.Discount = 0;
-                db.Entry(mailerid).State = System.Data.Entity.EntityState.Modified;
-            }           
-            db.AC_CustomerDebitVoucherDetail.RemoveRange(db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid));
-            db.Entry(check).State = System.Data.Entity.EntityState.Deleted;
-            db.SaveChanges();
-            return Json(new ResultInfo() { error = 0, msg = "", data = check }, JsonRequestBehavior.AllowGet);
+                if (ListMailers.Count() == 0)
+                    throw new Exception("Chọn mailer");
+
+
+                var ngayChot = DateTime.ParseExact(DethTime, "dd/MM/yyyy", null);
+                var findCus = db.BS_CustomerGroups.Where(p => p.CustomerGroupCode == CusId).FirstOrDefault();
+
+                var allCusChild = db.BS_Customers.Where(p => p.CustomerGroupID == findCus.CustomerGroupID).Select(p => p.CustomerCode).ToList();
+
+                if (findCus == null)
+                    throw new Exception("Sai thông tin");
+                double totalamount = 0;
+                double totalcod = 0;
+                string maxid = getMaxid();
+
+                AC_CustomerDebitVoucher mt = new AC_CustomerDebitVoucher();
+                mt.DocumentID = maxid;
+                mt.DocumentDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
+                mt.PostOfficeID = EmployeeInfo.currentPost;
+                mt.CustomerGroupID = findCus.CustomerGroupCode;
+                mt.StatusID = 2;
+                mt.ToTalAmount = Math.Round(totalamount, 0);
+                mt.CODTotal = totalcod;
+                mt.DebtMonth = ngayChot;
+                mt.Description = Notes;
+                mt.CDay = ngayChot.Day;
+                mt.CMonth = ngayChot.Month;
+                mt.CYear = ngayChot.Year;
+
+                db.AC_CustomerDebitVoucher.Add(mt);
+                db.SaveChanges();
+
+                foreach (var item in ListMailers)
+                {
+                    decimal? returncost = 0;
+                    var findMailer = db.MM_Mailers.Find(item);
+
+                    if (findMailer == null)
+                        continue;
+
+                    if (!allCusChild.Contains(findMailer.SenderID))
+                        continue;
+
+                    if (findMailer.IsReturn == true)
+                    {
+                        var checkext = db.MM_MailerServices.Where(p => p.MailerID == findMailer.MailerID).FirstOrDefault();
+                        if (checkext == null)
+                        {
+                            returncost = findMailer.Price / 2; //nếu có chuyển hoàn.
+                                                          //thêm vào bảng dịch vụ cộng thêm
+                            MM_MailerServices ms = new MM_MailerServices();
+                            ms.MailerID = findMailer.MailerID;
+                            
+                            ms.ServiceID = "CH";
+                            ms.SellingPrice = decimal.Parse(returncost.ToString());
+                            ms.PriceDefault = 0;
+                            ms.IsPercentage = true;
+                            ms.BfVATAmount = decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                            ms.VATAmount = decimal.Parse(returncost.ToString()) - decimal.Parse((double.Parse(returncost.ToString()) * 0.9).ToString());
+                            ms.AfVATAmount = decimal.Parse(returncost.ToString());
+                            ms.LastEditDate = DateTime.Now;
+                            ms.CreationDate = DateTime.Now;
+                            db.MM_MailerServices.Add(ms);
+                            //update thu khac vào bảng mm_mailers
+                        }
+
+                    }
+
+                    findMailer.PriceService = findMailer.PriceService + decimal.Parse(returncost.ToString());
+                    findMailer.IsPayment = 2;
+                    db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    string tttt = findMailer.MailerID;
+                    AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
+                    ct.DocumentID = maxid;
+                    ct.MailerID = findMailer.MailerID;
+                    ct.Amount = double.Parse((findMailer.Amount ?? 0).ToString());
+                    ct.Price = decimal.Parse((double.Parse((findMailer.Price ?? 0).ToString()) / 1.1).ToString());
+                    ct.PriceService = decimal.Parse((findMailer.PriceService ?? 0).ToString()) + decimal.Parse(returncost.ToString());
+                    ct.DiscountPercent = decimal.Parse((findMailer.DiscountPercent ?? 0).ToString());
+                    ct.Discount = decimal.Parse((findMailer.Discount ?? 0).ToString());
+                    ct.VATpercent = decimal.Parse((findMailer.VATPercent ?? 0).ToString());
+                    // ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
+                    ct.BfVATamount = decimal.Round(decimal.Parse((findMailer.BefVATAmount ?? 0).ToString()));
+                    ct.VATamount = decimal.Round(decimal.Parse((findMailer.VATAmount ?? 0).ToString()));
+                    ct.AcceptDate = DateTime.Parse(findMailer.AcceptDate.ToString());
+                    ct.Quantity = int.Parse(findMailer.Quantity.ToString());
+                    ct.Weight = decimal.Parse(findMailer.Weight.ToString());
+                    db.AC_CustomerDebitVoucherDetail.Add(ct);
+                    totalamount += double.Parse((findMailer.Amount ?? 0).ToString());
+                    totalcod += double.Parse((findMailer.COD ?? 0).ToString());
+                    db.SaveChanges();
+
+                }
+
+                mt.ToTalAmount = Math.Round(totalamount, 0);
+                mt.CODTotal = totalcod;
+
+                db.Entry(mt).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+
+
+                return Json(new { error = 0}, JsonRequestBehavior.AllowGet);
+
+            } catch (Exception e)
+            {
+                return Json(new { error = 1, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
         }
-        [HttpPost]
-        public ActionResult thanhtoan(string documentid)
-        {
-            if (String.IsNullOrEmpty(documentid))
-                return Json(new ResultInfo() { error = 1, msg = "Missing info" }, JsonRequestBehavior.AllowGet);
 
-            var check = db.AC_CustomerDebitVoucher.Where(p => p.DocumentID == documentid).FirstOrDefault();
-
-            if (check == null)
-                return Json(new ResultInfo() { error = 1, msg = "Không tìm thấy thông tin" }, JsonRequestBehavior.AllowGet);
-
-            check.StatusID = 1;
-            db.Entry(check).State = System.Data.Entity.EntityState.Modified;
-            db.SaveChanges();
-            return Json(new ResultInfo() { error = 0, msg = "", data = check }, JsonRequestBehavior.AllowGet);
-        }
-        [HttpGet]
-        public ActionResult getkh(int ngaychot)
-        {
-            var results = db.BS_CustomerGroups.Where(p => p.DebitDate == ngaychot).ToList();
-            //var chiTiet = db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid).ToList();
-            return Json(results, JsonRequestBehavior.AllowGet);
-        }
-        [HttpGet]
-        public ActionResult ShowReport(string docid)
-        {
-             // lam như phân lấy dữ liệu thư viện
-            Dictionary<string, string> textValues = new Dictionary<string, string>();
-            var listmaster = db.AC_CustomerDebitVoucher.Where(p => p.DocumentID == docid).FirstOrDefault();
-
-            textValues.Add("txtDocumentID", docid);
-            textValues.Add("txtDebtMonth", DateTime.Parse( listmaster.DebtMonth.ToString()).ToString("MM/yyyy"));
-            textValues.Add("txtGhiChu", listmaster.Description);
-            textValues.Add("txtCustomerID", listmaster.CustomerGroupID);
-            textValues.Add("txttotal", string.Format("{0:n0}", listmaster.ToTalAmount)); //tong tien
-
-            //txttenkh
-            var query =
-                   (from a in db.AC_CustomerDebitVoucher
-                   join b in db.BS_CustomerGroups on a.CustomerGroupID equals b.CustomerGroupCode
-                   where a.DocumentID == docid
-                   select b.CustomerGroupName).FirstOrDefault();
-            textValues.Add("txttenkh", query);
-            //
-            decimal totalprice = (from a in db.AC_CustomerDebitVoucherDetail
-                                where a.DocumentID == docid
-                                select a.Price).Sum();
-            textValues.Add("txttongcuoc", string.Format("{0:n0}", totalprice));
-
-            decimal discount = (from a in db.AC_CustomerDebitVoucherDetail
-                        where a.DocumentID == docid
-                        select a.Discount).Sum();
-            textValues.Add("txtgiamtru", string.Format("{0:n0}", discount));
-
-            decimal vat = (from a in db.AC_CustomerDebitVoucherDetail
-                                where a.DocumentID == docid
-                                select a.VATamount).Sum();
-            textValues.Add("txtgiamtru", string.Format("{0:n0}", discount));
-            textValues.Add("txtvat", string.Format("{0:n0}", vat));
-
-            Dictionary<string, Dictionary<string, string>> values = new Dictionary<string, Dictionary<string, string>>();
-            values.Add("Section2", textValues); // 
-
-            //lay data
-            var results = (from mm in db.MM_Mailers
-                           join d in db.AC_CustomerDebitVoucherDetail
-                           on mm.MailerID equals d.MailerID
-                           join p in db.BS_Provinces
-                           on mm.RecieverProvinceID equals p.ProvinceID
-                           where d.DocumentID == docid
-                           select new
-                           {
-                               SoPhieu = mm.MailerID,
-                               NgayGui = mm.AcceptDate,
-                               NoiDen = p.ProvinceCode,                              
-                               DichVu = mm.MailerTypeID,
-                               SoLuong = mm.Quantity,
-                               TrongLuong = mm.Weight,
-                               CuocPhi = d.Price,
-                               PhuPhi = d.PriceService,
-                               ThanhTien = d.BfVATamount
-                           }).ToList();
-
-
-
-            Stream stream = REPORTUTILS.GetReportStream(ReportPath.RptAC_CustomerDebitDetails, results);
-
-            return File(stream, "application/pdf");
-        }
     }
 }

@@ -303,7 +303,6 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                 $scope.mailers[i].ListWardRecive = [];
             }
 
-
             $http({
                 method: "POST",
                 url: "/mailerinit/InsertMailers",
@@ -354,7 +353,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
     };
 
 
-    $scope.provinceChange = function (pType, type, idx, callback) {
+    $scope.provinceChange = function (pType, type, idx) {
 
         var url = '/mailerinit/GetProvinces?';
 
@@ -371,6 +370,21 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
         } else {
             if (pType === "district") {
                 url = url + "parentId=" + $scope.mailers[idx].RecieverProvinceID + "&type=district";
+
+                for (var i = 0; i < $scope.mailers[idx].ListDistrictRecive.length; i++) {
+                    if ($scope.mailers[idx].ListDistrictRecive[i].code === $scope.mailers[idx].RecieverProvinceID) {
+                        for (j = 0; i < $scope.mailers[idx].Services.length; i++) {
+                            if ($scope.mailers[idx].Services[j].code === 'VSVX') {
+                                $scope.mailers[idx].Services[j].choose = $scope.mailers[idx].ListDistrictRecive[i].vsvx;
+                            }
+                        }
+                    }
+                }
+
+                
+
+               
+
             }
 
             if (pType === "ward") {
@@ -399,9 +413,10 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                     $scope.mailers[idx].ListWardRecive = angular.copy(response.data);
                 }
             } 
+            /*
             if (typeof (callback) === typeof (Function)) {
                 callback();
-            }
+            }*/
         });
 
     };
@@ -649,6 +664,17 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
             url = url + $scope.mailer.SenderProvinceID + "&districtId=" + $scope.mailer.SenderDistrictID;
         } else {
             url = url + $scope.mailer.RecieverProvinceID + "&districtId=" + $scope.mailer.RecieverDistrictID;
+
+            for (var i = 0; i < $scope.mailer.ListDistrictRecive.length; i++) {
+                if ($scope.mailer.ListDistrictRecive[i].code === $scope.mailer.RecieverProvinceID) {
+                    for (j = 0; i < $scope.mailer.Services.length; i++) {
+                        if ($scope.mailer.Services[j].code === 'VSVX') {
+                            $scope.mailer.Services[j].choose = $scope.mailer.ListDistrictRecive[i].vsvx;
+                        }
+                    }
+                }
+            }
+
         }
 
         $http.get(url).then(function (response) {

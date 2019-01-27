@@ -97,13 +97,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/07/2018 11:46:07</publishTime>
     </File>
     <File Include="bin/MNPOSTAPI.dll">
-      <publishTime>01/23/2019 13:42:01</publishTime>
+      <publishTime>01/27/2019 19:19:13</publishTime>
     </File>
     <File Include="bin/MNPOSTAPI.pdb">
       <publishTime>10/31/2018 16:03:25</publishTime>
     </File>
     <File Include="bin/MNPOSTCOMMON.dll">
-      <publishTime>01/23/2019 13:35:12</publishTime>
+      <publishTime>01/27/2019 19:17:45</publishTime>
     </File>
     <File Include="bin/MNPOSTCOMMON.dll.config">
       <publishTime>01/16/2019 17:43:39</publishTime>

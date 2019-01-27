@@ -454,7 +454,10 @@ namespace MNPOST.Controllers.mailer
                     SenderProvinceID = item.SenderProvinceID,
                     SenderWardID = item.SenderWardID,
                     PaidCoD = 0,
-                    CreateType = 0
+                    CreateType = 0,
+                    VATPercent = 10,
+                    IsReturn = false,
+                    IsPayment = 0
                 };
 
                 // 

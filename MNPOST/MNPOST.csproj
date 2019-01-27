@@ -1748,6 +1748,7 @@
     <Content Include="Content\vendors\jquery.inputmask\bower.json" />
     <None Include="Properties\PublishProfiles\mnpost.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\debit\congnokhachhang.js" />
     <Content Include="Scripts\debit\customerdebit.js" />
     <Content Include="Scripts\debit\employeedebit.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

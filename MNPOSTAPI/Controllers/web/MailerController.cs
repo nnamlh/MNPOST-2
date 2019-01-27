@@ -86,7 +86,9 @@ namespace MNPOSTAPI.Controllers.web
                     SenderProvinceID = findCus.ProvinceID,
                     SenderWardID = findCus.WardID,
                     PaidCoD = 0,
-                    CreateType = 1
+                    CreateType = 1,
+                    IsReturn = false,
+                    IsPayment = 0
                 };
 
                 // 

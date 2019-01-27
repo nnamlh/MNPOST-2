@@ -17,7 +17,10 @@
                     <!-- search-->
                     <div class="col-sm-6">
                         <div class="form-group">
-                            <input type="text" class="form-control" ng-model="searchText" my-enter="GetData(1,searchText)" />
+                            <label>Tỉnh thành</label>
+                            <select class="form-control" ng-model="searchText" required ng-change="GetData(1,searchText)">
+                                <option ng-repeat="x in allProvince" value="{{x.ProvinceID}}">{{x.ProvinceName | uppercase}}</option>
+                            </select>
                         </div>
                     </div>
                     <!-- search-->
@@ -143,7 +146,7 @@
             $scope.currentPage = 1;
             $scope.maxSize = 5;
             $scope.pageChanged = function () {
-                $scope.GetData($scope.currentPage);
+                $scope.GetData($scope.currentPage, $scope.searchText);
             };
 
 

@@ -49,7 +49,7 @@ app.service('mailerService', function () {
             'SenderProvinceID': '', 'SenderPhone': '', 'RecieverName': ''
             , 'RecieverAddress': '', 'RecieverWardID': '', 'RecieverDistrictID': '', 'RecieverProvinceID': '',
             'RecieverPhone': '', 'Weight': 0.01, 'Quantity': 1, 'PaymentMethodID': 'NGTT', 'MailerTypeID': 'SN',
-            'PriceService': 0, 'MerchandiseID': 'H', 'Services': [], 'MailerDescription': '', 'Notes': '', 'COD': 0, 'LengthSize': 0, 'WidthSize': 0, 'HeightSize': 0, 'Amount': 0, 'PriceCoD': 0,
+            'PriceService': 0, 'MerchandiseID': 'H', 'Services': angular.copy(servicesGet), 'MailerDescription': '', 'Notes': '', 'COD': 0, 'LengthSize': 0, 'WidthSize': 0, 'HeightSize': 0, 'Amount': 0, 'PriceCoD': 0,
             'PriceDefault': 0, 'ListProvinceSend': provinceSendGet, 'ListDistrictSend': [], 'ListProvinceRecive': provinceSendGet, 'ListDistrictRecive': [], 'ListWardRecive':[]
         };
     };
@@ -370,30 +370,29 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
         } else {
             if (pType === "district") {
                 url = url + "parentId=" + $scope.mailers[idx].RecieverProvinceID + "&type=district";
-
-                for (var i = 0; i < $scope.mailers[idx].ListDistrictRecive.length; i++) {
-                    if ($scope.mailers[idx].ListDistrictRecive[i].code === $scope.mailers[idx].RecieverProvinceID) {
-                        for (j = 0; i < $scope.mailers[idx].Services.length; i++) {
-                            if ($scope.mailers[idx].Services[j].code === 'VSVX') {
-                                $scope.mailers[idx].Services[j].choose = $scope.mailers[idx].ListDistrictRecive[i].vsvx;
-                            }
-                        }
-                    }
-                }
-
-                
-
-               
-
             }
 
             if (pType === "ward") {
                 url = url + "parentId=" + $scope.mailers[idx].RecieverDistrictID + "&type=ward";
+                console.log(JSON.stringify($scope.mailers[idx].ListDistrictRecive));
+                for (var i = 0; i < $scope.mailers[idx].ListDistrictRecive.length; i++) {
+                    if ($scope.mailers[idx].ListDistrictRecive[i].code === $scope.mailers[idx].RecieverDistrictID) {
+                       
+                        for (j = 0; j < $scope.mailers[idx].Services.length; j++) {
+                            if ($scope.mailers[idx].Services[j].code === 'VSVX') {
+                                $scope.mailers[idx].Services[j].choose = $scope.mailers[idx].ListDistrictRecive[i].vsvx;
+                            }
+                        }
+
+                        console.log(JSON.stringify($scope.mailers[idx].Services));
+                    }
+                }
             }
         }
 
-        $http.get(url).then(function (response) {
 
+        $http.get(url).then(function (response) {
+            console.log(JSON.stringify(response.data));
             if (type === 'send') {
 
                 if (pType === "district") {
@@ -482,6 +481,22 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
             $scope.mailers[index].PriceDefault = response.data.price;
             $scope.mailers[index].PriceCoD = response.data.codPrice;
 
+            var total = 0;
+            // $scope.mailer.Services = [];
+            for (var i = 0; i < $scope.mailers[index].Services.length; i++) {
+                if ($scope.mailers[index].Services[i].choose) {
+                    if ($scope.mailers[index].Services[i].percent) {
+                        total = total + ($scope.mailers[index].Services[i].price * $scope.mailers[index].PriceDefault) / 100;
+                    } else {
+                        total = total + $scope.mailers[index].Services[i].price;
+                    }
+
+                    //  $scope.mailer.Services.push($scope.otherServices[i]);
+                }
+            }
+
+            $scope.mailers[index].PriceService = total;
+
             $scope.mailers[index].Amount = $scope.mailers[index].PriceDefault + $scope.mailers[index].PriceCoD + $scope.mailers[index].PriceService;
 
         }, function myError(response) {
@@ -535,7 +550,6 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                         alert(result.msg);
                     } else {
                        
-                       
                         for (var i = 0; i < result.data.length; i++) {
 
                             var item = result.data[i];
@@ -579,6 +593,7 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
       // $scope.otherServices = angular.copy(servicesGet);
         $scope.actionEdit = args.actionEdit;
 
+        /*
         for (var i = 0; i < $scope.mailer.Services.length; i++) {
             for (var j = 0; j < $scope.otherServices.length; j++) {
 
@@ -588,7 +603,7 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
                 }
 
             }
-        }
+        }*/
     });
 
 
@@ -596,16 +611,16 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
 
     $scope.addSeviceMorePrice = function () {
         var total = 0;
-        $scope.mailer.Services = [];
-        for (var i = 0; i < $scope.otherServices.length; i++) {
-            if ($scope.otherServices[i].choose) {
-                if ($scope.otherServices[i].percent) {
-                    total = total + ($scope.otherServices[i].price * $scope.mailer.PriceDefault)/100;
+       // $scope.mailer.Services = [];
+        for (var i = 0; i < $scope.mailer.Services.length; i++) {
+            if ($scope.mailer.Services[i].choose) {
+                if ($scope.mailer.Services[i].percent) {
+                    total = total + ($scope.mailer.Services[i].price * $scope.mailer.PriceDefault)/100;
                 } else {
-                    total = total + $scope.otherServices[i].price;
+                    total = total + $scope.mailer.Services[i].price;
                 }
                 
-                $scope.mailer.Services.push($scope.otherServices[i]);
+              //  $scope.mailer.Services.push($scope.otherServices[i]);
             }
         }
         console.log(total);
@@ -666,10 +681,14 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
             url = url + $scope.mailer.RecieverProvinceID + "&districtId=" + $scope.mailer.RecieverDistrictID;
 
             for (var i = 0; i < $scope.mailer.ListDistrictRecive.length; i++) {
-                if ($scope.mailer.ListDistrictRecive[i].code === $scope.mailer.RecieverProvinceID) {
+                if ($scope.mailer.ListDistrictRecive[i].code === $scope.mailer.RecieverDistrictID) {
                     for (j = 0; i < $scope.mailer.Services.length; i++) {
                         if ($scope.mailer.Services[j].code === 'VSVX') {
                             $scope.mailer.Services[j].choose = $scope.mailer.ListDistrictRecive[i].vsvx;
+                            if ($scope.mailer.ListDistrictRecive[i].vsvx)
+                            {
+                                $scope.mailer.Services.push($scope.otherServices[i]);
+                            }
                         }
                     }
                 }
@@ -719,6 +738,16 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
 
             if (pType === "ward") {
                 url = url + "parentId=" + $scope.mailer.RecieverDistrictID + "&type=ward";
+
+                for (var i = 0; i < $scope.mailer.ListDistrictRecive.length; i++) {
+                    if ($scope.mailer.ListDistrictRecive[i].code === $scope.mailer.RecieverDistrictID) {
+                        for (j = 0; j < $scope.mailer.Services.length; j++) {
+                            if ($scope.mailer.Services[j].code === 'VSVX') {
+                                $scope.mailer.Services[j].choose = $scope.mailer.ListDistrictRecive[i].vsvx;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -785,7 +814,7 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
             console.log(response.data);
             $scope.mailer.PriceDefault = response.data.price;
             $scope.mailer.PriceCoD = response.data.codPrice;
-
+            $scope.addSeviceMorePrice();
             $scope.mailer.Amount = $scope.mailer.PriceDefault + $scope.mailer.PriceCoD + $scope.mailer.PriceService;
 
         }, function myError(response) {

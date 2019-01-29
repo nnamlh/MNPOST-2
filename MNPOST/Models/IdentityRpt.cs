@@ -52,5 +52,7 @@ namespace MNPOST.Models
         public string ServicePrice { get; set; }
 
         public string Amount { get; set; }
+
+        public string TotalMoney { get; set; }
     }
 }

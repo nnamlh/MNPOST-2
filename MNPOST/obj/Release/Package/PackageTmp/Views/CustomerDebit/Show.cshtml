@@ -44,7 +44,8 @@
                                                         <th>STT</th>
                                                         <th>Mã KH</th>
                                                         <th>Khách hàng</th>
-                                                        <th>Số đơn chưa thanh toán</th>
+                                                        <th>Ngày chốt</th>
+                                                        <th>Tổng phải thu cước</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -52,6 +53,7 @@
                                                         <td>{{$index + 1}}</td>
                                                         <td>{{item.CustomerGroupCode}}</td>
                                                         <td>{{item.CustomerGroupName}}</td>
+                                                        <td>{{findNgayChot(item.CODDebitDate)}}</td>
                                                         <td>{{item.AllNotPay}}</td>
                                                     </tr>
                                                 </tbody>
@@ -62,11 +64,11 @@
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_phieuthu" aria-labelledby="profile-tab">
                                 <div class="row">
-                                    <form name="formSearch" ng-submit="GetData()">
+                                    <form name="formSearch" ng-submit="getData()">
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label>Lọc theo khách hàng</label>
-                                                <select ui-select2="select2Options" ng-model="searchInfo.customerId" class="form-control" ng-change="changeCusCreate()">
+                                                <select ui-select2="select2Options" ng-model="searchInfo.cusId" class="form-control" ng-change="changeCusCreate()">
                                                     <option value="">Tất cả</option>
                                                     <option ng-repeat="item in groups" value="{{item.code}}">{{item.name}}</option>
                                                 </select>
@@ -83,7 +85,7 @@
                                                         <input type="text" ui-mask='9999' model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" required class="form-control"  ng-model="searchInfo.year">
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <button class="btn btn-primary" type="submit">Xem thông tin</button>
+                                                        <button class="btn btn-primary" type="submit" ng-click="getData()">Xem thông tin</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -106,6 +108,7 @@
                                                         <th>Thanh toán</th>
                                                         <th>#</th>
                                                         <th>#</th>
+                                                        <th>#</th>
                                                     </tr>
                                                 </thead>
 
@@ -121,6 +124,7 @@
                                                         <td>{{item.Total}}</td>
                                                         <td><a href="#" ng-class="{'fa fa-check' : item.StatusID == 1, 'fa fa-close' : item.StatusID == 0}" ng-click="thanhtoan($index)"></a></td>
                                                         <td><a href="#" class="btn-xs btn-primary" ng-click="edit($index)">Xem</a></td>
+                                                        <td><a href="#" class="btn-xs btn-danger" ng-click="sendDelete($index)">Xóa</a></td>
                                                         <td><a href="#" class="btn-xs btn-info" ng-click="showPDF('/customerdebit/ShowReport?docid=' + item.DocumentID)">Report</a></td>
                                                     </tr>
                                                 </tbody>
@@ -188,11 +192,19 @@
                                                 <label>Ngày chốt</label>
                                                 <input type="text" model-view-value="true"  class="form-control" ng-model="createDocument.DethTime" required ui-mask="99/99/9999" ui-mask-placeholder/>
                                             </div>
+                                            <div class="form-group">
+                                                <label>Tổng đơn</label>
+                                                <input type="text" class="form-control" value="{{createDocument.AllMailer}}" />
+                                            </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label>Ghi chú</label>
                                                 <input type="text" class="form-control" ng-model="createDocument.Notes" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Tổng tiền</label>
+                                                <input type="text" class="form-control" value="{{createDocument.AllMoney | currency:'VND'}}" />
                                             </div>
                                         </div>
                                     </form>
@@ -205,6 +217,7 @@
                                             <div class="col-sm-4">
                                                 <a href="#" class="btn btn-danger" ng-click="getMailerDebit()">Tải danh sách</a>
                                             </div>
+
                                         </div>
                                         <div class="table-responsive">
                                             <table class="table table-striped jambo_table bulk_action">
@@ -214,6 +227,7 @@
                                                         <th>Mã đơn</th>
                                                         <th>Khách hàng</th>
                                                         <th>Tiền CoD</th>
+                                                        <th>Tiền cước</th>
                                                         <th>Thông tin phát</th>
                                                     </tr>
                                                 </thead>
@@ -228,7 +242,13 @@
                                                             <strong>Phone: </strong> {{item.SenderPhone}}
                                                         </td>
                                                         <td><h4 class="label label-info">{{item.COD | currency: 'VND '}}</h4><br />
-                                                            <p>{{item.PaidCoD === 2?'Đã thanh toán':'Chưa thanh toán'}}</p>
+                                                            <p>{{item.CurrentStatusID === 11?'Đơn chuyển hoàn':(item.PaidCoD === 2?'Đã thanh toán':'Chưa thanh toán')}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <span>Phí vận chuyển: <strong>{{item.Price | currency: 'VND '}}</strong></span><br />
+                                                            <span>Cước COD: <strong>{{item.CODPrice | currency: 'VND '}}</strong></span><br />
+                                                            <span>DV thêm: <strong>{{item.ServicePrices | currency: 'VND '}}</strong></span> <br />
+                                                            <span>Tổng: <strong>{{item.Amount | currency: 'VND '}}</strong></span>
                                                         </td>
                                                         <td>
                                                             <strong>Ngày phát: </strong> {{item.DeliveryDate}} <br />

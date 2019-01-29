@@ -448,7 +448,7 @@
                                                 <div class="serviceMorePrice">
                                                     <table class="table">
                                                         <tbody>
-                                                            <tr ng-repeat="opt in otherServices">
+                                                            <tr ng-repeat="opt in mailer.Services">
                                                                 <td><input type="checkbox" ng-model="opt.choose" ng-change="addSeviceMorePrice()"></td>
                                                                 <td>{{opt.name}}</td>
                                                                 <td><input type="number" step="any" ng-model="opt.price" ng-change="addSeviceMorePrice()" />&nbsp;&nbsp;{{opt.price | currency:"VND"}}</td>

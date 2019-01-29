@@ -43,7 +43,8 @@ namespace MNPOST.Controllers.report
                 Quantity = p.Quantity + "",
                 Amount = p.Amount != null ? p.Amount.Value.ToString("C", MNPOST.Utils.Cultures.VietNam) : "0",
                 Price = p.Price != null ? p.Price.Value.ToString("C", MNPOST.Utils.Cultures.VietNam) : "0",
-                ServicePrice = p.PriceService != null ? p.PriceService.Value.ToString("C", MNPOST.Utils.Cultures.VietNam): "0"
+                ServicePrice = p.PriceService != null ? p.PriceService.Value.ToString("C", MNPOST.Utils.Cultures.VietNam): "0",
+                TotalMoney = p.PaymentMethodID == "NGTT"? p.Amount.Value.ToString("C", MNPOST.Utils.Cultures.VietNam) : (p.Amount + p.COD).Value.ToString("C", MNPOST.Utils.Cultures.VietNam)
             }).ToList();
 
             Stream stream = REPORTUTILS.GetReportStream(ReportPath.RptPhieuGui, mailer);

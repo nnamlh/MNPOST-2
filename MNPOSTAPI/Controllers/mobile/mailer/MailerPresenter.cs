@@ -186,11 +186,12 @@ namespace MNPOSTAPI.Controllers.mobile.mailer
 
                     if (mailerInfo.IsReturn == true)
                     {
-                        findDetail.DeliveryNotes = "Đã hoàn";
-                        mailerInfo.DeliveryNotes = "Đã hoàn";
+                        findDetail.DeliveryNotes = "Đã hoàn - Người gửi thanh toán cước";
+                        mailerInfo.DeliveryNotes = "Đã hoàn - Người gửi thanh toán cước";
 
                         findDetail.DeliveryStatus = 11;
                         mailerInfo.CurrentStatusID = 11;
+                        mailerInfo.PaymentMethodID = "NGTT";
 
                         HandleHistory.AddTracking(11, info.MailerID, mailerInfo.CurrentPostOfficeID, "Ngày hoàn " + deliverDate.ToString("dd/MM/yyyy") + " lúc " + deliverDate.ToString("HH:mm") + ", người nhận: " + info.Reciever);
                     }

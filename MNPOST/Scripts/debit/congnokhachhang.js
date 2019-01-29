@@ -19,8 +19,29 @@ app.controller('myCtrl', function ($scope, $http) {
         "month": month,
         "year": year,
         "page": $scope.currentPage,
-        "customerId": ""
+        "cusId": ""
     };
+
+    $scope.findNgayChot = function (ngay) {
+        var ListNgayChot = [
+            { Ngay: 2, Ten: "Thứ 2" },
+            { Ngay: 3, Ten: "Thứ 3" },
+            { Ngay: 4, Ten: "Thứ 4" },
+            { Ngay: 5, Ten: "Thứ 5" },
+            { Ngay: 6, Ten: "Thứ 6" },
+            { Ngay: 7, Ten: "Thứ 7" },
+            { Ngay: 8, Ten: "Chủ nhật" },
+            { Ngay: 0, Ten: "Cuối tháng" }
+        ];
+
+        for (i = 0; i < ListNgayChot.length; i++) {
+            if (ListNgayChot[i].Ngay === ngay) {
+                return ListNgayChot[i].Ten;
+            }
+        }
+
+    };
+
     $scope.allChiTiet = [];
     $scope.cusNotPayList = [];
     $scope.reportDebit = function () {
@@ -35,7 +56,43 @@ app.controller('myCtrl', function ($scope, $http) {
         DethTime: curentDate,
         CusId : ''
     };
+    // xoa du lieu
+    $scope.sendDelete = function (index) {
+        var info = $scope.allDanhMuc[index];
 
+        var r = confirm("Bạn muốn xóa không ?");
+        if (r == true) {
+            showLoader(true);
+
+            $http({
+                method: "POST",
+                url: "/CustomerDebit/delete",
+                data: { documentid: info.DocumentID }
+            }).then(
+                function success(response) {
+
+                    var result = response.data;
+
+                    if (result.error == 0) {
+                      //  $scope.allDanhMuc.splice(index, 1);
+                        $scope.getData();
+                    } else {
+
+                        alert(result.msg);
+
+                    }
+
+                    showLoader(false);
+
+                },
+                function errror(response) {
+                    showLoader(false);
+                    showNotify("connect has disconnect");
+                }
+                );
+        } else {
+        }
+    };
 
     $scope.getData = function () {
        
@@ -108,7 +165,41 @@ app.controller('myCtrl', function ($scope, $http) {
             $scope.allMailerDebit[i].isCheck = $scope.isChkPaid;
         }
     };
+    $scope.findMailerPaid = function () {
 
+        for (var i = 0; i < $scope.allMailerDebit.length; i++) {
+
+            if ($scope.filerPaidList.MailerID === $scope.allMailerDebit[i].MailerID) {
+                if ($scope.autoChek) {
+                    $scope.allMailerDebit[i].isCheck = true;
+                }
+            }
+
+            if ($scope.allMailerDebit[i].isCheck) {
+                sumCod = sumCod + $scope.allMailerDebit[i].COD;
+                countMailer++;
+            }
+
+        }
+
+        $scope.createDocument.AllMoney = sumCod;
+        $scope.createDocument.AllMailer = countMailer;
+    };
+    $scope.checkPaidItem = function () {
+        var sumCod = 0;
+        var countMailer = 0;
+        for (var i = 0; i < $scope.allMailerDebit.length; i++) {
+
+            if ($scope.allMailerDebit[i].isCheck) {
+                sumCod = sumCod + $scope.allMailerDebit[i].Amount;
+                countMailer++;
+            }
+
+        }
+
+        $scope.createDocument.AllMoney = sumCod;
+        $scope.createDocument.AllMailer = countMailer;
+    };
     $scope.prepareCreate = function () {
         $scope.tabcreate = true;
         $scope.createDocument = {
@@ -139,9 +230,9 @@ app.controller('myCtrl', function ($scope, $http) {
             url: '/customerdebit/create',
             data: {
                 ListMailers: listSend,
-                CusId: createDocument.CusId,
-                DethTime: createDocument.DethTime,
-                Notes: createDocument.Notes
+                CusId: $scope.createDocument.CusId,
+                DethTime: $scope.createDocument.DethTime,
+                Notes: $scope.createDocument.Notes
             }
         }).then(function sucess(res) {
             showLoader(false); 
@@ -159,4 +250,10 @@ app.controller('myCtrl', function ($scope, $http) {
         console.log(JSON.stringify(listSend));
 
     };
+
+    $scope.showPDF = function (url) {
+
+        runShowPDF(url);
+    };
+
 });

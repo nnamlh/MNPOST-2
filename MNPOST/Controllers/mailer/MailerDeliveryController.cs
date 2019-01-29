@@ -713,11 +713,12 @@ namespace MNPOST.Controllers.mailer
                     mailerInfo.CurrentStatusID = 4;
                     if (mailerInfo.IsReturn == true)
                     {
-                        findDetail.DeliveryNotes = "Đã hoàn";
-                        mailerInfo.DeliveryNotes = "Đã hoàn";
+                        findDetail.DeliveryNotes = "Đã hoàn - Người gửi thanh toán cước";
+                        mailerInfo.DeliveryNotes = "Đã hoàn - Người gửi thanh toán cước";
 
                         findDetail.DeliveryStatus = 11;
                         mailerInfo.CurrentStatusID = 11;
+                        mailerInfo.PaymentMethodID = "NGTT";
 
                         HandleHistory.AddTracking(11, detail.MailerID, mailerInfo.CurrentPostOfficeID, "Ngày hoàn " + deliveryDate.ToString("dd/MM/yyyy") + " lúc " + deliveryDate.ToString("HH:mm") + ", người nhận: " + detail.DeliveryTo);
 

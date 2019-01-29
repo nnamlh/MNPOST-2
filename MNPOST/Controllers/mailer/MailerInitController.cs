@@ -90,7 +90,16 @@ namespace MNPOST.Controllers.mailer
             string path = "";
             try
             {
-                var findVSVX = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+               // var findVSVX = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+               var allService = db.BS_Services.Select(p => new ItemPriceCommon()
+               {
+                   code = p.ServiceID,
+                   name = p.ServiceName,
+                   price = p.Price,
+                   choose = false,
+                   percent = p.IsPercent
+
+               }).ToList();
                 // check sender
                 var checkSender = db.BS_Customers.Where(p => p.CustomerCode == senderID).FirstOrDefault();
 
@@ -293,18 +302,11 @@ namespace MNPOST.Controllers.mailer
                         var price = db.CalPrice(weight, senderID, checkProvince.ProvinceID, checkMailerType.ServiceID, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
                         var codPrice = 0;
 
-                        var services = new List<ItemPriceCommon>();
+                        var services = new List<ItemPriceCommon>(allService);
 
-                        if(vsvs == "Y")
+                        if (vsvs == "Y")
                         {
-                            services.Add(new ItemPriceCommon()
-                            {
-                                choose = true,
-                                code = findVSVX.ServiceID,
-                                name = findVSVX.ServiceName,
-                                percent = findVSVX.IsPercent,
-                                price = findVSVX.Price
-                            });
+                            services.Where(p => p.code == "VSVX").FirstOrDefault().choose = true;
                         }
 
                         mailers.Add(new MailerIdentity()
@@ -503,7 +505,7 @@ namespace MNPOST.Controllers.mailer
                     foreach (var service in item.Services)
                     {
                         var checkService = db.BS_Services.Where(p => p.ServiceID == service.code && p.IsActive == true).FirstOrDefault();
-                        if (checkService != null)
+                        if (checkService != null && service.choose == true)
                         {
                             var servicePrice = service.price;
 

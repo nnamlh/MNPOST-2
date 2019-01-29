@@ -45,7 +45,7 @@ namespace MNPOSTAPI.Controllers
                 if (findMailer == null)
                     throw new Exception("Sai mã order");
 
-                var date = DateTime.ParseExact(paser.DATA.ORDER_STATUSDATE, "dd/M/yyyy HH:mm", null);
+                var date = DateTime.ParseExact(paser.DATA.ORDER_STATUSDATE, "dd/M/yyyy HH:mm:ss", null);
 
                 var tracking = new MM_TrackingPartner()
                 {

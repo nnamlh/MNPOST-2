@@ -14,14 +14,21 @@
                 <form ng-submit="finishForm(insertbillform.$valid)" name="insertbillform">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Thêm mới vận đơn&nbsp;&nbsp;&nbsp;<a href="#" ng-click="createMailerDetail()"><i my-tool-tip="Thêm từ chi tiết" class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;<a href="#" ng-click="addByExcelFile()"><i my-tool-tip="Thêm từ excel" class="fa fa-file-excel-o"></i></a> &nbsp;&nbsp;&nbsp;<a href="#" ng-click="addNewMailer()"><i my-tool-tip="Thêm dòng mới" class="fa fa-plus"></i></a></h2>
+                            <h2>
+                                Bưu cục <strong>{{postchoose}}</strong>
+                                &nbsp;&nbsp;&nbsp;|<a href="#" ng-click="createMailerDetail()"><i my-tool-tip="Thêm từ chi tiết" class="fa fa-pencil"></i></a>
+                                &nbsp;&nbsp;&nbsp;<a href="#" ng-click="addByExcelFile()"><i my-tool-tip="Thêm từ excel" class="fa fa-file-excel-o"></i></a>
+                                &nbsp;&nbsp;&nbsp;<a href="#" ng-click="addNewMailer()"><i my-tool-tip="Thêm dòng mới" class="fa fa-plus"></i></a>
+                                &nbsp;&nbsp;&nbsp;<a class="btn btn-success btn-xs" href="/Report/Viewer/PrintMailer.aspx?post={{postchoose}}" target="_blank">In phiếu (in kim)</a>
+                            </h2>
+
                             <div class="nav navbar-right">
                                 <button type="submit" class="btn btn-primary">Hoàn thành</button>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <p>Bưu cục <strong>{{postchoose}}</strong></p>
+                          
                             <div class="table-responsive scrollmenu">
                                 <table class="table jambo_table bulk_action ">
                                     <thead>
@@ -39,21 +46,14 @@
                                             <th class="tableth">Đ/CHỈ (NHẬN)</th>
                                             <th class="tableth">T/THÀNH(NHẬN)</th>
                                             <th class="tableth">Q/HUYỆN(NHẬN)</th>
-                                            <th class="tableth">P/XÃ(NHẬN)</th>
                                             <th class="tableth">DỊCH VỤ</th>
                                             <th class="tableth">HÌNH THỨC</th>
                                             <th class="tableth">TL (Gram)</th>
                                             <th class="tableth">SL</th>
                                             <th class="tableth">COD</th>
-                                            <th class="tableth">Giá trị hàng</th>
                                             <th class="tableth">LH</th>
                                             <th class="tableth">MÔ TẢ</th>
-                                            <th class="tableth">GHI CHÚ</th>
-                                            <th class="tableth">PHỤ PHÍ</th>
-                                            <th class="tableth">CƯỚC</th>
-                                            <th class="tableth">CƯỚC COD</th>
-                                            <th class="tableth">TỔNG</th>
-                                            <th>#</th>
+                                            <th class="tableth">TỔNG CƯỚC</th>
                                         </tr>
                                     </thead>
 
@@ -86,20 +86,15 @@
                                             </td>
                                             <td class="warning"><input type="tel" ng-model="item.RecieverPhone" class="tableinput" required uib-typeahead="(phone.Phone+ '<br/>' + phone.Name + '<br/>' + phone.AddressInfo) for phone in getAddressInfoTemp($viewValue)" typeahead-on-select="showAddressTemp($item, $index)" /></td>
                                             <td class="warning"><input type="text" ng-model="item.RecieverName" required class="tableinput" /></td>
-                                            <td class="warning"><input type="text" ng-model="item.RecieverAddress" required class="tableinput" uib-typeahead="address for address in getLocation($viewValue)" /></td>
+                                            <td class="warning"><input type="text" ng-model="item.RecieverAddress" required class="tableinput"/></td>
                                             <td class="warning">
                                                 <select ui-select2="select2Options" class="tableinput" ng-model="item.RecieverProvinceID" required ng-change="provinceChange('district', 'recei', $index)">
                                                     <option ng-repeat="province in item.ListProvinceRecive" value="{{province.code}}">{{province.name}}</option>
                                                 </select>
                                             </td>
                                             <td class="warning">
-                                                <select ui-select2="select2Options" class="tableinput" ng-model="item.RecieverDistrictID" required ng-change="provinceChange('ward', 'recei', $index)">
+                                                <select ui-select2="select2Options" class="tableinput" ng-model="item.RecieverDistrictID" required ng-change="checkVSVX( $index)">
                                                     <option ng-repeat="district in item.ListDistrictRecive" value="{{district.code}}">{{district.name}}</option>
-                                                </select>
-                                            </td>
-                                            <td class="warning">
-                                                <select ui-select2="select2Options" class="tableinput" ng-model="item.RecieverWardID" required ng-change="provinceChange('ward', 'recei', $index)">
-                                                    <option ng-repeat="ward in item.ListWardRecive" value="{{ward.code}}">{{ward.name}}</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -118,38 +113,16 @@
                                                 <input type="number" ng-model="item.COD" class="tableinput" step="any" ng-change="setMerchandiseValue($index)" /><br />
                                                 {{item.COD | currency: 'VND ':0}}
                                             </td>
-                                            <td class="warning">
-                                                <input type="number" ng-model="item.MerchandiseValue" class="tableinput" step="any" /><br />
-                                                {{item.MerchandiseValue | currency: 'VND ':0}}
-                                            </td>
                                             <td>
                                                 <select ui-select2="select2Options" ng-model="item.MerchandiseID" class="tableinput" required>
                                                     <option ng-repeat="merchandise in merchandises" value="{{merchandise.code}}">{{merchandise.name}}</option>
                                                 </select>
                                             </td>
                                             <td class="warning"><input type="text" ng-model="item.MailerDescription" class="tableinput" /></td>
-                                            <td class="warning"><input type="text" ng-model="item.Notes" class="tableinput" /></td>
-                                            <td class="success">
-                                                <input type="number" ng-model="item.PriceService" class="tableinput" required step="any" ng-change="changePrice($index)" /><br />
-                                                {{item.PriceService | currency: 'VND ':0}}
-                                            </td>
-                                            <td class="success">
-                                                <input type="number" ng-model="item.PriceCoD" class="tableinput" required step="any" ng-change="changePrice($index)" /> <br />
-                                                {{item.PriceCoD | currency: 'VND ':0}}
-                                            </td>
-                                            <td class="success">
-                                                <input type="number" ng-model="item.PriceDefault" class="tableinput" required step="any" ng-change="changePrice($index)" /><br />
-                                                {{item.PriceDefault | currency: 'VND ':0}}
-                                            </td>
-                                            <td class="success">
-                                                <input type="number" ng-model="item.Amount" class="tableinput" required step="any" /> <br />
-                                                {{item.Amount | currency: 'VND ':0}}
-                                            </td>
-                                            <td><a class="btn btn-primary btn-xs" ng-click="calPrice($index)">Tính giá</a></td>
+                                            <td class="danger">{{item.Amount | currency: 'VND ':0}} <button type="button" class="btn btn-primary btn-xs" ng-click="calPrice($index)">tính cước</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
                     </div>
@@ -304,7 +277,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Quận huyện</label>
-                                        <select class="form-control" ng-model="mailer.SenderDistrictID" ng-change="provinceChange('ward', 'send')" required>
+                                        <select class="form-control" ng-model="mailer.SenderDistrictID" required>
                                             <option ng-repeat="item in mailer.ListDistrictSend" value="{{item.code}}">{{item.name}}</option>
                                         </select>
                                     </div>
@@ -333,14 +306,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Quận huyện nhận</label>
-                                        <select class="form-control" ng-model="mailer.RecieverDistrictID" ng-change="provinceChange('ward', 'recei')" required>
+                                        <select class="form-control" ng-model="mailer.RecieverDistrictID" required ng-change="checkVSVX()">
                                             <option ng-repeat="item in mailer.ListDistrictRecive" value="{{item.code}}">{{item.name}}</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Phường xã nhận</label>
-                                        <select class="form-control" ng-model="mailer.RecieverWardID" required>
-                                            <option ng-repeat="item in mailer.ListWardRecive" value="{{item.code}}">{{item.name}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -541,7 +508,7 @@
         }
 
         .nav-md {
-        overflow: hidden;
+            overflow: hidden;
         }
     </style>
 
@@ -549,8 +516,7 @@
 }
 
 @section scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMESJTjSQnZU8Q7J5AFDE2wP2wOm3hy1o&libraries=places&callback=init&language=vi"
-            async defer></script>
+
     <!-- jquery.inputmask -->
     <script src="~/Content/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
 
@@ -570,4 +536,7 @@
     </script>
 
     <script src="~/Scripts/order/orderinit.js"></script>
+    <!--
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMESJTjSQnZU8Q7J5AFDE2wP2wOm3hy1o&libraries=places&callback=init&language=vi"
+            async defer></script>-->
 }

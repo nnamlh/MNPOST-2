@@ -97,7 +97,9 @@
                                                 <tr ng-repeat="item in mailers">
                                                     <td><input type="checkbox" ng-model="item.isCheck" /></td>
                                                     <td>
-                                                        {{$index + 1}}
+                                                        {{$index + 1}} <br />
+                                                        <strong>COD: </strong> {{statuCoD[item.PaidCoD].name}}<br />
+                                                        <strong>Công nợ: </strong> {{statuDeth[mailer.IsPayment].name}}
                                                     </td>
                                                     <td>
                                                         <strong>Mã VĐ: </strong>{{item.MailerID}} <br />

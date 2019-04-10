@@ -307,14 +307,23 @@ namespace MNPOST.Controllers.mailer
         }
 
         [HttpPost]
-        public JsonResult CalBillPrice(float weight = 0, string customerId = "", string provinceId = "", string serviceTypeId = "", string postId = "", float cod = 0, float merchandiseValue = 0)
+        public JsonResult CalBillPrice(float weight = 0, string customerId = "", string provinceId = "", string serviceTypeId = "", string postId = "", float cod = 0, float merchandiseValue = 0, string districtId = "")
         {
 
             var findCus = db.BS_Customers.Where(p => p.CustomerCode == customerId).FirstOrDefault();
             decimal? price = 0;
             if (findCus != null)
             {
-                price = db.CalPrice(weight, findCus.CustomerID, provinceId, serviceTypeId, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                if(cod > 0)
+                {
+                    var findDitrict = db.BS_Districts.Where(p => p.DistrictID == districtId).FirstOrDefault();
+                    int? vsvx = findDitrict == null ? 1 : (findDitrict.VSVS == true ? 1 : 0);
+
+                    price = db.CalPriceCOD(weight, customerId, provinceId, "CD", postId, DateTime.Now.ToString("yyyy-MM-dd"), vsvx, serviceTypeId == "ST" ? "CODTK" : "CODN").FirstOrDefault();
+                } else
+                {
+                    price = db.CalPrice(weight, findCus.CustomerID, provinceId, serviceTypeId, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                }
             }
 
             return Json(new { price = price, codPrice = 0 }, JsonRequestBehavior.AllowGet);

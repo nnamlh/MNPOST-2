@@ -43,6 +43,35 @@ namespace MNPOSTAPI.Controllers.web
                 var price = db.CalPrice(paser.Weight, findCus.CustomerID, paser.RecieverProvinceID, paser.MailerTypeID, findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
                 var codPrice = 0;
 
+                //
+                var checkRece = db.BS_Districts.Where(p => p.DistrictID == paser.RecieverDistrictID).FirstOrDefault();
+                decimal? priceService = 0;
+                if(checkRece  != null)
+                {
+                    if(checkRece.VSVS == true)
+                    {
+                        var findService = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+                       
+                        if(findService.IsPercent == true)
+                        {
+                            priceService = (price * findService.Price) / 100;
+                        } else
+                        {
+                            priceService = findService.Price;
+                        }
+
+                        var mailerService = new MM_MailerServices()
+                        {
+                            MailerID = code,
+                            CreationDate = DateTime.Now,
+                            SellingPrice = (decimal)priceService,
+                            PriceDefault = (decimal) priceService,
+                            ServiceID = "VSVX"
+                        };
+                        db.MM_MailerServices.Add(mailerService);
+
+                    }
+                }
 
                 // theem
                 var mailerIns = new MM_Mailers()
@@ -67,8 +96,8 @@ namespace MNPOSTAPI.Controllers.web
                     MerchandiseID = paser.MerchandiseID,
                     PriceDefault = price,
                     Price = price,
-                    PriceService = paser.PriceService,
-                    Amount = price + codPrice,
+                    PriceService = priceService,
+                    Amount = price + codPrice + priceService,
                     PriceCoD = codPrice,
                     Notes = paser.Notes,
                     PaymentMethodID = paser.PaymentMethodID,
@@ -136,6 +165,35 @@ namespace MNPOSTAPI.Controllers.web
                     var code = mailerHandle.GeneralMailerCode(findCus.PostOfficeID);
                     var price = db.CalPrice(item.Weight, findCus.CustomerID, item.RecieverProvinceID, item.MailerTypeID, findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
                     var codPrice = 0;
+                    var checkRece = db.BS_Districts.Where(p => p.DistrictID == item.RecieverDistrictID).FirstOrDefault();
+                    decimal? priceService = 0;
+                    if (checkRece != null)
+                    {
+                        if (checkRece.VSVS == true)
+                        {
+                            var findService = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+
+                            if (findService.IsPercent == true)
+                            {
+                                priceService = (price * findService.Price) / 100;
+                            }
+                            else
+                            {
+                                priceService = findService.Price;
+                            }
+
+                            var mailerService = new MM_MailerServices()
+                            {
+                                MailerID = code,
+                                CreationDate = DateTime.Now,
+                                SellingPrice = (decimal)priceService,
+                                PriceDefault = (decimal)priceService,
+                                ServiceID = "VSVX"
+                            };
+                            db.MM_MailerServices.Add(mailerService);
+
+                        }
+                    }
 
 
                     // theem
@@ -161,8 +219,8 @@ namespace MNPOSTAPI.Controllers.web
                         MerchandiseID = item.MerchandiseID,
                         PriceDefault = price,
                         Price = price,
-                        PriceService = item.PriceService,
-                        Amount = price + codPrice,
+                        PriceService = priceService,
+                        Amount = price + codPrice + priceService,
                         PriceCoD = codPrice,
                         Notes = item.Notes,
                         PaymentMethodID = item.PaymentMethodID,
@@ -351,16 +409,21 @@ namespace MNPOSTAPI.Controllers.web
 
             var data = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.PaidCoD != 2 && p.COD > 0 && p.CurrentStatusID == 4).ToList();
 
-            var countMailer = data.Count();
-            var sumCoD = data.Sum(p => p.COD);
+         //   var countMailer = data.Count();
+            //var sumCoD = data.Sum(p => p.COD);
+
+            var sumCODDangPhat = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.COD > 0 && p.CurrentStatusID == 3).ToList();
+
+            var sumCODChuyenHoan = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.COD > 0 && p.CurrentStatusID != 11 && p.IsReturn == true).ToList();
 
             return new ResponseInfo()
             {
                 error = 0,
                 data = new
                 {
-                    countMailer = countMailer,
-                    sumCoD = sumCoD
+                    sumCoD = data.Count + " đơn/ " + data.Sum(p => p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam),
+                    sumCODDangPhat = sumCODDangPhat.Count + " đơn/ " + sumCODDangPhat.Sum(p=> p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam),
+                    sumCODChuyenHoan = sumCODChuyenHoan.Count + " đơn/ " + sumCODChuyenHoan.Sum(p => p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam)
                 }
             };
         }

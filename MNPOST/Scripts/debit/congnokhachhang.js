@@ -54,7 +54,7 @@ app.controller('myCtrl', function ($scope, $http) {
 
     $scope.createDocument = {
         DethTime: curentDate,
-        CusId : ''
+        CusId: ''
     };
     // xoa du lieu
     $scope.sendDelete = function (index) {
@@ -74,7 +74,7 @@ app.controller('myCtrl', function ($scope, $http) {
                     var result = response.data;
 
                     if (result.error == 0) {
-                      //  $scope.allDanhMuc.splice(index, 1);
+                        //  $scope.allDanhMuc.splice(index, 1);
                         $scope.getData();
                     } else {
 
@@ -95,10 +95,15 @@ app.controller('myCtrl', function ($scope, $http) {
     };
 
     $scope.getData = function () {
-       
-        showLoader(true);
-        $scope.reportDebit();
 
+
+        $scope.reportDebit();
+        $scope.getPayments();
+    };
+
+
+    $scope.getPayments = function () {
+        showLoader(true);
         $http({
             method: "POST",
             url: "/CustomerDebit/GetDebit",
@@ -109,7 +114,7 @@ app.controller('myCtrl', function ($scope, $http) {
             if (response.data.error === 0) {
 
                 $scope.allDanhMuc = response.data.data;
-   
+
             }
 
         }, function myError(response) {
@@ -117,7 +122,6 @@ app.controller('myCtrl', function ($scope, $http) {
             showNotify('Connect error');
         });
     };
-
 
     $scope.getData();
 
@@ -216,6 +220,31 @@ app.controller('myCtrl', function ($scope, $http) {
     };
 
 
+    $scope.sendThanhToan = function (documentId) {
+
+        showLoader(true);
+
+        $http({
+            method: 'POST',
+            url: '/customerdebit/thanhtoan',
+            data: {
+                documentid: documentId
+            }
+
+        }).then(function sucess(res) {
+            showLoader(false);
+            var result = res.data;
+            if (result.error === 1) {
+                alert('Không thể thanh toán');
+            } else {
+                $scope.getPayments();
+            }
+
+        });
+
+    };
+
+
     $scope.sendCreate = function () {
         showLoader(true);
         var listSend = [];
@@ -235,7 +264,7 @@ app.controller('myCtrl', function ($scope, $http) {
                 Notes: $scope.createDocument.Notes
             }
         }).then(function sucess(res) {
-            showLoader(false); 
+            showLoader(false);
             var rs = res.data;
 
             if (rs.error === 1) {

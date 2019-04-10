@@ -24,7 +24,7 @@ namespace MNPOST.Controllers.mailer
 
             // dịch vu
 
-            ViewBag.MailerTypes = db.BS_ServiceTypes.Select(p => new CommonData()
+            ViewBag.MailerTypes = db.BS_ServiceTypes.Where(p=> p.IsActive == true).Select(p => new CommonData()
             {
                 code = p.ServiceID,
                 name = p.ServiceName
@@ -298,15 +298,35 @@ namespace MNPOST.Controllers.mailer
 
                         //
                         string describe = desIdx == -1 ? "" : Convert.ToString(sheet.Cells[i, desIdx].Value);
-                        string vsvs = vsvxIdx == -1 ? "N" : Convert.ToString(sheet.Cells[i, desIdx].Value);
-                        var price = db.CalPrice(weight, senderID, checkProvince.ProvinceID, checkMailerType.ServiceID, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                        string vsvs = vsvxIdx == -1 ? "N" : Convert.ToString(sheet.Cells[i, vsvxIdx].Value);
+                        decimal? price = 0;
+
+                        if (cod > 0)
+                        {
+
+                            price = db.CalPriceCOD(weight, senderID, checkProvince.ProvinceID, "CD", postId, DateTime.Now.ToString("yyyy-MM-dd"), vsvs == "N"? 0:1, checkMailerType.ServiceID == "ST" ? "CODTK" : "CODN").FirstOrDefault();
+                        }
+                        else
+                        {
+                            price = db.CalPrice(weight, senderID, checkProvince.ProvinceID, checkMailerType.ServiceID, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                        }
+
                         var codPrice = 0;
 
                         var services = new List<ItemPriceCommon>(allService);
-
-                        if (vsvs == "Y")
+                        decimal? priceService = 0;
+                        if (vsvs == "Y" && cod == 0)
                         {
                             services.Where(p => p.code == "VSVX").FirstOrDefault().choose = true;
+                            var serviceVSVX = services.Where(p => p.code == "VSVX").FirstOrDefault();
+
+                            if (serviceVSVX.percent == true)
+                            {
+                                priceService = (price * serviceVSVX.price) / 100;
+                            } else
+                            {
+                                priceService = serviceVSVX.price;
+                            }
                         }
 
                         mailers.Add(new MailerIdentity()
@@ -323,8 +343,8 @@ namespace MNPOST.Controllers.mailer
                             Notes = notes,
                             PaymentMethodID = mailerPay,
                             PriceDefault = price,
-                            Amount = price + codPrice,
-                            PriceService = 0,
+                            Amount = price + codPrice + priceService,
+                            PriceService = priceService,
                             Quantity = quantity,
                             RecieverAddress = receiverAddress,
                             RecieverDistrictID = checkDistrict != null ? checkDistrict.DistrictID : "",
@@ -410,9 +430,18 @@ namespace MNPOST.Controllers.mailer
                     continue;
                 }
 
-                var price = db.CalPrice(item.Weight, checkSender.CustomerID, item.RecieverProvinceID, item.MailerTypeID, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                decimal? price = 0;
+                if (item.COD > 0)
+                {
+                    var findDitrict = db.BS_Districts.Where(p => p.DistrictID == item.RecieverDistrictID).FirstOrDefault();
+                    int? vsvx = findDitrict == null ? 1 : (findDitrict.VSVS == true ? 1 : 0);
+                    price = db.CalPriceCOD(item.Weight, checkSender.CustomerID, item.RecieverProvinceID, "CD", postId, DateTime.Now.ToString("yyyy-MM-dd"), vsvx, item.MailerTypeID == "ST" ? "CODTK" : "CODN").FirstOrDefault();
+                }
+                else
+                {
+                    price = db.CalPrice(item.Weight, checkSender.CustomerID, item.RecieverProvinceID, item.MailerTypeID, postId, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                }
 
-     
                 var codPrice = 0;
                 // theem
                 var mailerIns = new MM_Mailers()

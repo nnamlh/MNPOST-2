@@ -295,17 +295,12 @@
             };
 
             // action
-            $scope.finishForm = function (isValid) {
-                if (isValid) {
-                    if ($scope.IsAction === 'add') {
+            $scope.finishForm = function () {
+                  if ($scope.IsAction === 'add') {
                         $scope.sendCreate();
                     } else if ($scope.IsAction === 'edit') {
                         $scope.sendEdit();
                     }
-
-                } else {
-                    showNotify('our form is missing');
-                }
             }
 
             $scope.provinceSend = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.Provinces)));

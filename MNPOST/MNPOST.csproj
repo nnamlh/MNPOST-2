@@ -220,11 +220,14 @@
     <Compile Include="Controllers\mailer\MailerDeliveryController.cs" />
     <Compile Include="Controllers\mailer\MailerImportController.cs" />
     <Compile Include="Controllers\mailer\MailerInitController.cs" />
+    <Compile Include="Controllers\mailer\MailerPackingAcceptController.cs" />
+    <Compile Include="Controllers\mailer\MailerPackingController.cs" />
     <Compile Include="Controllers\mailer\MailerPartnerController.cs" />
     <Compile Include="Controllers\mailer\TrackingController.cs" />
     <Compile Include="Controllers\manage\AdminController.cs" />
     <Compile Include="Controllers\manage\ManageController.cs" />
     <Compile Include="Controllers\manage\MenuController.cs" />
+    <Compile Include="Controllers\mnpostinfo\BaseDataController.cs" />
     <Compile Include="Controllers\mnpostinfo\CountryController.cs" />
     <Compile Include="Controllers\mnpostinfo\DistrictController.cs" />
     <Compile Include="Controllers\mnpostinfo\PositionController.cs" />
@@ -238,6 +241,7 @@
     <Compile Include="Controllers\mnpostinfo\ZoneController.cs" />
     <Compile Include="Controllers\NoticeController.cs" />
     <Compile Include="Controllers\pricematrix\PriceMatrixController.cs" />
+    <Compile Include="Controllers\report\QuantityReportController.cs" />
     <Compile Include="Controllers\report\ReportController.cs" />
     <Compile Include="Controllers\troubleticket\TroubleController.cs" />
     <Compile Include="Filters\MyValidateAccess.cs" />
@@ -256,6 +260,12 @@
     <Compile Include="Models\IdentityRoute.cs" />
     <Compile Include="Models\IdentityRpt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\baocao\test.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>test.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Report\customer\AC_CustomerDebitDetails.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -275,6 +285,12 @@
       <DependentUpon>delivery.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Report\MailerPrint.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MailerPrint.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Report\MNPOSTReport.cs">
       <DependentUpon>MNPOSTReport.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -282,12 +298,26 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Report\ReportUtils.cs" />
+    <Compile Include="Report\ShowReport.aspx.cs">
+      <DependentUpon>ShowReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\ShowReport.aspx.designer.cs">
+      <DependentUpon>ShowReport.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Report\Viewer\MailerPrint.aspx.cs">
       <DependentUpon>MailerPrint.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Report\Viewer\MailerPrint.aspx.designer.cs">
       <DependentUpon>MailerPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Report\Viewer\PrintMailer.aspx.cs">
+      <DependentUpon>PrintMailer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Report\Viewer\PrintMailer.aspx.designer.cs">
+      <DependentUpon>PrintMailer.aspx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\Cultures.cs" />
@@ -1597,7 +1627,9 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Libs\EPPlus.dll" />
+    <Content Include="Report\ShowReport.aspx" />
     <Content Include="Report\Viewer\MailerPrint.aspx" />
+    <Content Include="Report\Viewer\PrintMailer.aspx" />
     <Content Include="Scripts\bootstrap-notify.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -1766,6 +1798,8 @@
     <Content Include="Scripts\myscripts.js" />
     <Content Include="Scripts\order\mailerdelivery.js" />
     <Content Include="Scripts\order\mailerimport.js" />
+    <Content Include="Scripts\order\mailerpacking.js" />
+    <Content Include="Scripts\order\mailerpackingaccept.js" />
     <Content Include="Scripts\order\mailerpartner.js" />
     <Content Include="Scripts\order\mailershow.js" />
     <Content Include="Scripts\order\orderinit.js" />
@@ -1847,6 +1881,10 @@
     <Content Include="Views\CustomerDebitNew\Show.cshtml" />
     <Content Include="Views\MailerPartner\GetTrackViettel.cshtml" />
     <Content Include="Views\MailerChangeInfo\Show.cshtml" />
+    <Content Include="Views\BaseData\ReasonReturn.cshtml" />
+    <Content Include="Views\MailerPacking\Index.cshtml" />
+    <Content Include="Views\MailerPackingAccept\Index.cshtml" />
+    <Content Include="Views\QuantityReport\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1870,6 +1908,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Report\baocao\test.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>test.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Report\customer\AC_CustomerDebitDetails.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>AC_CustomerDebitDetails.cs</LastGenOutput>
@@ -1881,6 +1923,10 @@
     <EmbeddedResource Include="Report\document\delivery.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>delivery.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\MailerPrint.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>MailerPrint.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\MNPOSTReport.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>

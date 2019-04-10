@@ -122,7 +122,7 @@
                                                         <td>{{item.ToTalAmount}}</td>
                                                         <td>{{item.CODTotal}}</td>
                                                         <td>{{item.Total}}</td>
-                                                        <td><a href="#" ng-class="{'fa fa-check' : item.StatusID == 1, 'fa fa-close' : item.StatusID == 0}" ng-click="thanhtoan($index)"></a></td>
+                                                        <td><a href="#" ng-class="{'fa fa-check' : item.StatusID == 1, 'fa fa-close' : item.StatusID == 2}" ng-click="sendThanhToan(item.DocumentID)"></a></td>
                                                         <td><a href="#" class="btn-xs btn-primary" ng-click="edit($index)">Xem</a></td>
                                                         <td><a href="#" class="btn-xs btn-danger" ng-click="sendDelete($index)">Xóa</a></td>
                                                         <td><a href="#" class="btn-xs btn-info" ng-click="showPDF('/customerdebit/ShowReport?docid=' + item.DocumentID)">Report</a></td>

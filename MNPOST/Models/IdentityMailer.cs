@@ -121,6 +121,17 @@ namespace MNPOST.Models
 
         public List<MailerIdentity> Mailers { get; set; }
     }
+
+    // packing
+    public class CreatePackingInfo
+    {
+        public string currentPost { get; set; }
+        public string postDes { get; set; }
+        public string transportType { get; set; }
+        public string tranpostName { get; set; }
+        public string notes { get; set; }
+        public string tripNumber { get; set; }
+    }
 }
  
  

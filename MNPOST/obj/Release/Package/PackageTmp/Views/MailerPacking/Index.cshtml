@@ -1,0 +1,359 @@
+﻿
+@{
+    ViewBag.Title = "Gửi nội bộ";
+}
+
+<div ng-app="myApp" class="row" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>CHUYỂN NỘI BỘ - {{postHandle}}</h2>
+                <div class="nav navbar-right">
+                    <button type="button" class="btn btn-primary" ng-click="preCreateDocument()">Tạo bảng kê</button>
+                    <button type="button" class="btn btn-success" ng-click="confirmSend()" ng-show="tabdetail && document.StatusID === 0">XÁC NHẬN CHUYỂN NỘI BỘ</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active" ng-click="tabdetail = false">
+                            <a href="#tab_bangke" role="tab" data-toggle="tab" aria-expanded="false">Bảng kê</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#tab_chitiet" role="tab" data-toggle="tab" aria-expanded="false" ng-click="tabdetail = true">Chi tiết</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active in" id="tab_bangke" aria-labelledby="home-tab">
+                            <div class="row">
+                                <form ng-submit="getData()">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Chọn bưu cục đến</label>
+                                            <select ui-select2="select2Options" class="form-control" ng-model="searchInfo.postAccept">
+                                                <option value="">Tất cả</option>
+                                                <option ng-repeat="item in posts" value="{{item.code}}">{{item.name}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Mã bảng kê</label>
+                                            <input type="text" class="form-control" ng-model="searchInfo.documentCode" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Thời gian</label>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.fromDate">
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.toDate">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-primary" type="submit">Xem thông tin</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Trạng thái</label>
+                                            <select ui-select2="select2Options" ng-model="searchInfo.status" class="form-control" convert-to-number>
+                                                <option ng-repeat="item in packingStatus" value="{{item.code}}">{{item.name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="col-md-12">
+                                    <!-- table data-->
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Mã bảng kê</th>
+                                                    <th>Thời gian</th>
+                                                    <th>Gửi tới</th>
+                                                    <th>Ghi chú nhận</th>
+                                                    <th>#</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in documents">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>
+                                                        {{item.DocumentCode}} <br />
+                                                        <a href="#" class="label label-info" ng-click="showDetail($index)">Chi tiết</a>
+                                                    </td>
+                                                    <td>
+                                                        Ngày: {{item.DocumentDate}} <br />
+                                                        Giờ: {{item.DocumentTime}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.PostOfficeIDAccept}}
+                                                    </td>
+                                                    <td>{{item.AcceptDescription}}</td>
+                                                    <td>
+                                                        Đã nhận: {{item.AllMailerAccept}}<br />
+                                                        Đã hủy: {{item.AllMailerCancel}} <br />
+                                                        Tổng gửi: {{item.AllMailer}} <br />
+                                                        <a href="#" class="label label-danger" ng-click="removeDocument(item.DocumentID)" ng-show="item.AllMailer === 0">Xóa bảng kê</a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="tab_chitiet">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Chọn bưu cục đến</label>
+                                        <select ui-select2="select2Options" class="form-control" ng-model="document.PostOfficeIDAccept" required ng-disabled="document.StatusID !== 0">
+                                            <option ng-repeat="item in posts" value="{{item.code}}">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Vận chuyển</label>
+                                        <select class="form-control" ng-model="document.TransportID" ng-change="changeTransport()" ng-disabled="document.StatusID !== 0">
+                                            <option value="TRUCK">ĐƯỜNG BỘ</option>
+                                            <option value="AIR">ĐƯỜNG HÀNG KHÔNG</option>
+                                        </select>
+                                        <br />
+                                        <select class="form-control" ng-model="document.TransportName" ng-disabled="document.StatusID !== 0">
+                                            <option ng-repeat="item in transports" value="{{item.TrasportName}}">{{item.TrasportName}}</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" ng-show="document.StatusID === 0" ng-click="updateDocument()">Chỉnh sửa</button>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group" ng-show="document.TransportID === 'AIR'">
+                                        <label>Số chuyến bay</label>
+                                        <input type="text" class="form-control" ng-model="document.TripNumber" ng-disabled="document.StatusID !== 0" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mã bảng kê</label>
+                                        <input type="text" class="form-control" value="{{document.DocumentCode + '----'+ packingStatus[document.StatusID].name}}" disabled />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nội dung gửi</label>
+                                        <textarea class="form-control" ng-model="document.SendDescription" ng-disabled="document.StatusID !== 0"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="x_title">
+                                        <h2><i class="fa fa-align-left"></i> Chi tiết</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <form ng-submit="addMailer()" ng-show="document.StatusID === 0">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" ng-model="mailerId" required />
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <button type="button" class="btn btn-success" ng-click="fillMailerForEmployee()">Lấy từ danh sách</button>
+                                            </div>
+                                        </div>
+                                       
+
+                                    </form>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>STT</th>
+                                                    <th>Vận đơn</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Khối lượng</th>
+                                                    <th>Dịch vụ</th>
+                                                    <th>Nơi đến</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in details">
+                                                    <td>{{$index + 1}}</td>
+                                                    <td>
+                                                        {{item.MailerID}} <br />
+                                                        <a href="#" class="label label-danger" ng-show="item.StatusID === 12" ng-click="removeMailer($index)">xóa</a>
+                                                    </td>
+                                                    <td><span class="label label-info">{{status[item.StatusID].name}}</span></td>
+                                                    <td>{{item.Weight}} GRAM</td>
+                                                    <td>{{item.MailerTypeID}}</td>
+                                                    <td>
+                                                        {{item.RecieverAddress}} <br />
+                                                        <span class="label label-info">{{item.RecieProvinceName}}</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- tao bang ke -->
+    <div id="createDocument" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <form ng-submit="sendCreate()">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Chọn bưu cục đến</label>
+                                    <select ui-select2="select2Options" class="form-control" ng-model="createDocument.postDes" required>
+                                        <option ng-repeat="item in posts" value="{{item.code}}">{{item.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vận chuyển</label>
+                                    <select class="form-control" ng-model="createDocument.transportType" ng-change="getTransport()">
+                                        <option value="TRUCK">ĐƯỜNG BỘ</option>
+                                        <option value="AIR">ĐƯỜNG HÀNG KHÔNG</option>
+                                    </select>
+                                    <br />
+                                    <select class="form-control" ng-model="createDocument.tranpostName" ui-select2="select2Options">
+                                        <option ng-repeat="item in transports" value="{{item.TrasportName}}">{{item.TrasportName}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" ng-show="createDocument.transportType === 'AIR'">
+                                    <label>Số chuyến bay</label>
+                                    <input type="text" class="form-control" ng-model="createDocument.tripNumber" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Nội dung gửi</label>
+                                    <textarea class="form-control" ng-model="createDocument.notes"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Tạo bảng kê</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    <!--Lay tuyen nhan vien -->
+    <div id="getmailerdelivery" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label>Tỉnh thành</label>
+                            <select class="form-control" ui-select2="select2Options" ng-model="provincesearch" ng-change="changeProvince()">
+                                <option value="">Tất cả</option>
+                                <option ng-repeat="item in provinces" value="{{item.code}}">{{item.name}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <label>Quận huyện</label>
+                            <select class="form-control" ui-select2="select2Options" ng-model="districtsearch">
+                                <option value="">Tất cả</option>
+                                <option ng-repeat="item in districts" value="{{item.code}}">{{item.name}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <br>
+                            <button class="btn btn-primary" ng-click="findAllMailerForEmployee()">XEM</button>
+                        </div>
+                        <div class="col-sm-12">
+                            <br />
+                            <div class="table-responsive scrollmenu">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr class="headings">
+                                            <th><input type="checkbox" ng-model="checkAllMailerForEmployee" ng-init="checkAllMailerForEmployee=false" ng-checked="checkAllMailerForEmployee" ng-change="checkAllMailerForEmployeeChange()" /></th>
+                                            <th>Vận đơn</th>
+                                            <th>Nơi đến</th>
+                                            <th>Tỉnh thành</th>
+                                            <th>Quận huyện</th>
+                                            <th>Người gửi</th>
+                                            <th>Trạng thái</th>
+                                            <th>Dịch vụ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="mailer in mailerEmployeeFinds">
+                                            <td><input type="checkbox" ng-model="mailer.IsCheck" ng-init="mailer.IsCheck=false" ng-checked="mailer.IsCheck" />{{$index + 1}}</td>
+                                            <td>{{mailer.MailerID}}</td>
+                                            <td>{{mailer.RecieverAddress}}</td>
+                                            <td>{{mailer.RecieverProvinceID}}</td>
+                                            <td>{{mailer.RecieverDistrictID}}</td>
+                                            <td>{{mailer.SenderName}}</td>
+                                            <td>{{status[mailer.CurrentStatusID].name}}</td>
+                                            <td>{{mailer.MailerTypeID}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br />
+                            <button type="button" class="btn btn-primary" ng-click="addMailerAutoFromRoutes()">Thêm vào danh sách</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Lay tuyen nhan vien -->
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+           var fromDate = '@DateTime.Now.AddDays(-1).ToString("dd/MM/yyyy")';
+        var toDate = '@DateTime.Now.AddDays(1).ToString("dd/MM/yyyy")';
+          // tao controller
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+
+    </script>
+    <script src="~/Scripts/order/mailerpacking.js"></script>
+}
+

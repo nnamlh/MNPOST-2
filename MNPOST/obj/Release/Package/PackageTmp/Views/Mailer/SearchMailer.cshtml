@@ -173,6 +173,10 @@
                                                 <label>Thanh toán CoD</label>
                                                 <p>{{statuCoD[mailer.PaidCoD].name}}</p>
                                             </div>
+                                            <div class="form-group" ng-show="mailer.COD > 0">
+                                                <label>Công nợ</label>
+                                                <p>{{statuDeth[mailer.IsPayment].name}}</p>
+                                            </div>
                                             <div class="form-group">
                                                 <label>Đổi tác</label>
                                                 <p>{{mailer.ThirdpartyCode}}</p>
@@ -255,6 +259,20 @@
                 {
                     "code": 2,
                     "name": "ĐÃ THANH TOÁN"
+                }
+            ];
+            $scope.statuDeth = [
+                {
+                    "code": 0,
+                    "name": "CHƯA THANH TOÁN"
+                },
+                {
+                    "code": 1,
+                    "name": "ĐÃ THANH TOÁN"
+                },
+                {
+                    "code": 2,
+                    "name": "ĐỢI THANH TOÁN"
                 }
             ];
             $scope.status = angular.copy(mailerStatusData);

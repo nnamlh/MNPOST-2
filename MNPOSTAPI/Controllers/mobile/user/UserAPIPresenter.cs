@@ -36,12 +36,45 @@ namespace MNPOSTAPI.Controllers.mobile.user
                 PostOfficeID = checkUser.PostOfficeID
             };
         }
+        public ResultInfo GetNotice(string user)
+        {
+            /*
+             var find = db.NoticeSaves.Where(p => p.MNUser == user).Select(p => new
+            {
+                id = p.Id,
+                time = p.CreateTime.Value.ToString("dd/MM/yyyy"),
+                title = p.Title,
+                messenger = p.Content,
+                content = p.Content,
+                isRead = p.IsRead
+            }).ToList();
+            */
 
+            var data = (from p in db.NoticeSaves
+                       where p.MNUser == user
+                       orderby p.CreateTime descending
+                       select new
+                       {
+                           id = p.Id,
+                           time = p.CreateTime.ToString(),
+                           title = p.Title,
+                           messenger = p.Content,
+                           content = p.Content,
+                           isRead = p.IsRead
+                       }).ToList();
+
+            return new NoticeResult()
+            {
+                error = 0,
+                msg = "",
+                data = data
+            };
+        }
         public void UpdateFirebaseID(string firebaseId, string user)
         {
             var find = db.FirebaseIDSaves.Where(p => p.UserID == user).FirstOrDefault();
 
-            if(find == null)
+            if (find == null)
             {
                 var ins = new FirebaseIDSave()
                 {
@@ -53,7 +86,8 @@ namespace MNPOSTAPI.Controllers.mobile.user
 
                 db.FirebaseIDSaves.Add(ins);
                 db.SaveChanges();
-            } else
+            }
+            else
             {
                 find.CreateTime = DateTime.Now;
                 find.FirebaseID = firebaseId;

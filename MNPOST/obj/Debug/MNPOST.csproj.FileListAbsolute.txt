@@ -462,6 +462,8 @@ D:\work\Project\007MNPost\MNPOST-2\MNPOST\bin\Microsoft.Owin.Security.OAuth.xml
 D:\work\Project\007MNPost\MNPOST-2\MNPOST\bin\Microsoft.Owin.Security.Google.xml
 D:\work\Project\007MNPost\MNPOST-2\MNPOST\bin\Microsoft.Owin.Security.Twitter.xml
 D:\work\Project\007MNPost\MNPOST-2\MNPOST\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
-D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.csprojResolveAssemblyReference.cache
 D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.dll
 D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.pdb
+D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.csprojAssemblyReference.cache
+D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.csproj.CoreCompileInputs.cache
+D:\work\Project\007MNPost\MNPOST-2\MNPOST\obj\Debug\MNPOST.csproj.CopyComplete

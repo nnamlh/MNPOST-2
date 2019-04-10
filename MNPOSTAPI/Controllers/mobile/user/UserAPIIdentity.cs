@@ -18,4 +18,10 @@ namespace MNPOSTAPI.Controllers.mobile.user
 
         public string PostOfficeID { get; set; }
     }
+
+
+    public class NoticeResult : ResultInfo
+    {
+        public Object data { get; set; }
+    }
 }

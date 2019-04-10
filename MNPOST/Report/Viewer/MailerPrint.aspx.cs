@@ -71,6 +71,7 @@ namespace MNPOST.Report.Viewer
 
 
             MailerRptViewer.ReportSource = rptH;
+            
         }
 
         protected void btnprint_Click(object sender, EventArgs e)

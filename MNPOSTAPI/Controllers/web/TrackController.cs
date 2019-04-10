@@ -26,6 +26,10 @@ namespace MNPOSTAPI.Controllers.web
                 sendTo = p.RecieProvinceName + ", " + p.ReceiDistrictName
             }).FirstOrDefault();
 
+            var images = db.MailerImages.Where(p => p.MailerID == mailerId).Select(p => new
+            {
+                url = p.PathImage
+            }).ToList();
 
             if (mailer == null)
             {
@@ -41,7 +45,8 @@ namespace MNPOSTAPI.Controllers.web
                     data = new
                     {
                         info = mailer,
-                        tracks = data
+                        tracks = data,
+                        images = images
                     },
                     error = 0
                 };

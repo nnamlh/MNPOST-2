@@ -27,6 +27,12 @@ namespace MNPOSTAPI.Controllers.mobile.user
             return result;
         }
 
+        [HttpGet]
+        public ResultInfo GetNotice()
+        {
+           return mPresenter.GetNotice(User.Identity.Name);
+        }
+
         /***
          * 
          * */

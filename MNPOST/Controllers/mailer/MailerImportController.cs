@@ -128,6 +128,8 @@ namespace MNPOST.Controllers.mailer
             }
 
 
+            MailerHandle.SendNotifi("Lấy hàng", "Lấy hàng tại " + findDocument.CustomerName, findEmployee.UserLogin);
+
             return Json(new ResultInfo()
             {
                 error = 0
@@ -392,7 +394,7 @@ namespace MNPOST.Controllers.mailer
 
             foreach(var item in details)
             {
-                var checkMailer = db.MM_Mailers.Find(item);
+                var checkMailer = db.MM_Mailers.Find(item.MailerID);
 
                 if (checkMailer == null)
                     continue;

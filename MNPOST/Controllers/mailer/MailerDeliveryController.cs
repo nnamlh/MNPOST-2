@@ -115,7 +115,7 @@ namespace MNPOST.Controllers.mailer
                 HandleHistory.AddTracking(3, mailerId, mailer.CurrentPostOfficeID, "Nhân viên " + employee.EmployeeName + "(" + employee.Phone + ") , đang đi phát hàng");
 
                 var data = db.MAILERDELIVERY_GETMAILER_BY_ID(insData.Id).FirstOrDefault();
-
+                MailerHandle.SendNotifi("Phát hàng", "Có 1 đơn phát hàng mới: " + mailer.MailerID, employee.UserLogin);
                 return Json(new ResultInfo()
                 {
                     error = 0,
@@ -186,7 +186,7 @@ namespace MNPOST.Controllers.mailer
                 HandleHistory.AddTracking(3, item, mailer.CurrentPostOfficeID, "Nhân viên " + employee.EmployeeName + "(" + employee.Phone + ") , đang đi phát hàng");
 
             }
-
+            MailerHandle.SendNotifi("Phát hàng", "Có đơn phát hàng mới: " + mailers.ToString(), employee.UserLogin);
             return Json(new ResultInfo()
             {
                 error = 0,
@@ -247,7 +247,7 @@ namespace MNPOST.Controllers.mailer
 
                 db.SaveChanges();
             }
-
+           
             return Json(new ResultInfo()
             {
                 error = 0,
@@ -533,7 +533,7 @@ namespace MNPOST.Controllers.mailer
         [HttpGet]
         public ActionResult GetMailerForEmployee(string postId, string province, string district)
         {
-            var mailers = db.MM_Mailers.Where(p => p.CurrentPostOfficeID == postId && (p.CurrentStatusID == 2 || p.CurrentStatusID == 6 || p.CurrentStatusID == 5) && p.RecieverProvinceID.Contains(province) && p.RecieverDistrictID.Contains(district)).ToList();
+            var mailers = db.MM_Mailers.Where(p => p.CurrentPostOfficeID == postId && (p.CurrentStatusID == 2 || p.CurrentStatusID == 6 || p.CurrentStatusID == 5) && (p.RecieverProvinceID.Contains(province) || p.RecieverDistrictID.Contains(district))).ToList();
             var data = new List<MailerIdentity>();
             foreach (var item in mailers)
             {
@@ -579,7 +579,7 @@ namespace MNPOST.Controllers.mailer
                 var documentCod = postId + date.ToString("ddMMyyyy");
                 //
                 var findDocument = db.MM_MailerDelivery.Where(p => p.DocumentCode == documentCod && p.EmployeeID == item.EmployeeID).FirstOrDefault();
-
+                var findEmployee = db.BS_Employees.Find(item.EmployeeID);
                 if (findDocument == null)
                 {
                     findDocument = new MM_MailerDelivery()
@@ -634,8 +634,12 @@ namespace MNPOST.Controllers.mailer
                         db.Entry(checkMailer).State = System.Data.Entity.EntityState.Modified;
 
                         db.SaveChanges();
+
+                        HandleHistory.AddTracking(3, checkMailer.MailerID, checkMailer.CurrentPostOfficeID, "Nhân viên " + findEmployee.EmployeeName + "(" + findEmployee.Phone + ") , đang đi phát hàng");
                     }
                 }
+
+                MailerHandle.SendNotifi("Phát hàng", "Có đơn phát mới phát", findEmployee.UserLogin);
 
             }
 
@@ -786,6 +790,8 @@ namespace MNPOST.Controllers.mailer
                 msg = "Sai thông tin"
             }, JsonRequestBehavior.AllowGet);
         }
+
+
 
       
 

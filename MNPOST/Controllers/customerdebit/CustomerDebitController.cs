@@ -229,7 +229,44 @@ namespace MNPOST.Controllers.customerdebit
             db.SaveChanges();
             return Json(new ResultInfo() { error = 0, msg = "", data = check }, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult ThanhToan(string documentid)
+        {
 
+            try
+            {
+                var check = db.AC_CustomerDebitVoucher.Where(p => p.DocumentID == documentid).FirstOrDefault();
+
+                if (check == null)
+                    return Json(new ResultInfo() { error = 0, msg = "" }, JsonRequestBehavior.AllowGet);
+
+                check.StatusID = 1; // da thanh toan
+
+                db.Entry(check).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+
+                var allDetail = db.AC_CustomerDebitVoucherDetail.Where(p => p.DocumentID == documentid).ToList();
+
+                foreach(var item in allDetail)
+                {
+                    var mailer = db.MM_Mailers.Find(item.MailerID);
+
+                    if(mailer != null)
+                    {
+                        mailer.IsPayment = 1;
+                        db.Entry(mailer).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+               
+            }
+            catch
+            {
+                return Json(new { error = 1, msg = "Lỗi xác nhận" }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { error = 0}, JsonRequestBehavior.AllowGet);
+
+        }
         [HttpPost]
         public ActionResult Create(string CusId, string DethTime, string Notes, List<string> ListMailers)
         {

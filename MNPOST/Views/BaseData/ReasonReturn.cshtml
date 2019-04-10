@@ -1,0 +1,147 @@
+﻿
+@{
+    ViewBag.Title = "Lý Do Trả Về";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Lý do chuyển hoàn <a class="label label-info" href="#" ng-click="addNew()">Thêm mới</a></h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <input type="text" ng-model="reason.name" class="form-control" ng-change="editChange()" />
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary" ng-click="send()">{{isEdit?'Sửa':'Thêm'}}</button>
+                    </div>
+
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="table-responsive">
+                            <table class="table table-striped jambo_table bulk_action">
+                                <thead>
+                                    <tr class="headings">
+                                        <th>STT</th>
+                                        <th>Tên lý do</th>
+                                        <th>#</th>
+                                        <th>#</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in allReasons">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td><a href="#" ng-click="edit($index)">Chi tiết</a></td>
+                                        <td><a href="#" ng-click="delete(item.code)">Xóa</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+
+
+
+            $scope.allReasons = [];
+
+            $scope.reason = { name: '', code: '' };
+
+            $scope.getData = function () {
+                $http.get('/basedata/GetAllReason').then(function (res) {
+
+                    var data = res.data;
+
+                    $scope.allReasons = data;
+
+                });
+
+            };
+            $scope.isEdit = false;
+
+            $scope.send = function () {
+
+                if ($scope.isEdit) {
+                    $http({
+                        method: 'POST',
+                        url: '/basedata/reasonedit',
+                        data: $scope.reason
+                    }).then(function (res) {
+                        $scope.getData();
+                        $scope.reason = { name: '', code: '' };
+                        $scope.isEdit = false;
+                    });
+                } else {
+                    $http({
+                        method: 'POST',
+                        url: '/basedata/reasonadd',
+                        data: {
+                            name: $scope.reason.name
+                        }
+                    }).then(function (res) {
+                        $scope.getData();
+                        $scope.reason = { name: '', code: '' };
+                        $scope.isEdit = false;
+                    });
+                }
+
+            };
+
+            $scope.delete = function (code) {
+                $http({
+                    method: 'POST',
+                    url: '/basedata/reasondelete',
+                    data: {
+                        code: code
+                    }
+                }).then(function (res) {
+                    $scope.getData();
+                    $scope.reason = { name: '', code: '' };
+                    $scope.isEdit = false;
+                });
+            }
+
+            $scope.edit = function (idx) {
+                $scope.isEdit = true;
+                $scope.reason = angular.copy($scope.allReasons[idx]);
+            };
+
+
+            $scope.getData();
+
+            $scope.addNew = function () {
+                $scope.isEdit = false;
+                $scope.reason = { name: '', code: '' };
+            };
+
+        });
+
+
+
+    </script>
+
+}
+

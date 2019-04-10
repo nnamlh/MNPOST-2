@@ -14,36 +14,39 @@ namespace MNPOSTAPI.Controllers.web
         MNPOSTEntities db = new MNPOSTEntities();
         // get province
         [HttpGet]
-        public List<ItemCommon> GetProvince()
+        public List<ItemCommonProvince> GetProvince()
         {
-            var data = db.BS_Provinces.Select(p => new ItemCommon
+            var data = db.BS_Provinces.Select(p => new ItemCommonProvince
             {
                 code = p.ProvinceID,
-                name = p.ProvinceName
+                name = p.ProvinceName,
+                vsvx = false
             }).ToList();
 
             return data;
         }
 
         [HttpGet]
-        public List<ItemCommon> GetDistrict(string provinceID)
+        public List<ItemCommonProvince> GetDistrict(string provinceID)
         {
-            var data = db.BS_Districts.Where(p => p.ProvinceID == provinceID).Select(p => new ItemCommon
+            var data = db.BS_Districts.Where(p => p.ProvinceID == provinceID).Select(p => new ItemCommonProvince
             {
                 code = p.DistrictID,
-                name = p.DistrictName
+                name = p.DistrictName,
+                vsvx = p.VSVS
             }).ToList();
 
             return data;
         }
 
         [HttpGet]
-        public List<ItemCommon> GetWard(string districtID)
+        public List<ItemCommonProvince> GetWard(string districtID)
         {
-            var data = db.BS_Wards.Where(p => p.DistrictID == districtID).Select(p => new ItemCommon
+            var data = db.BS_Wards.Where(p => p.DistrictID == districtID).Select(p => new ItemCommonProvince
             {
                 code = p.WardID,
-                name = p.WardName
+                name = p.WardName,
+                vsvx = false
             }).ToList();
 
             return data;
@@ -134,7 +137,7 @@ namespace MNPOSTAPI.Controllers.web
 
 
         [HttpGet]
-        public ResultInfo CalBillPrice(float weight = 0, string customerId = "", string provinceId = "", string serviceTypeId = "")
+        public ResultInfo CalBillPrice(float weight = 0, string customerId = "", string provinceId = "", string serviceTypeId = "", string districtId = "")
         {
             var findCus = db.BS_Customers.Where(p => p.CustomerCode == customerId).FirstOrDefault();
             decimal? price = 0;
@@ -143,7 +146,24 @@ namespace MNPOSTAPI.Controllers.web
                price = db.CalPrice(weight, findCus.CustomerID, provinceId, serviceTypeId, "BCQ3", DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
             }
 
-         
+            decimal? servicePrice = 0;
+
+            var checkDistrict = db.BS_Districts.Where(p => p.DistrictID == districtId).FirstOrDefault();
+            if(checkDistrict != null)
+            {
+                if(checkDistrict.VSVS == true)
+                {
+                    var findService = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+
+                    if(findService.IsPercent == true)
+                    {
+                        servicePrice = (price * findService.Price) / 100;
+                    } else
+                    {
+                        servicePrice = findService.Price;
+                    }
+                }
+            }
 
             return new ResponseInfo()
             {
@@ -151,7 +171,7 @@ namespace MNPOSTAPI.Controllers.web
                 data = new
                 {
                     price = price,
-                    codPrice = 0
+                    priceService = servicePrice
                 }
             };
         }

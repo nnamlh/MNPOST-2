@@ -24,7 +24,7 @@ namespace MNPOST.Controllers
         protected UserInfo EmployeeInfo;
         protected ReportUtils REPORTUTILS = new ReportUtils();
         protected MNPOSTEntities db = new MNPOSTEntities();
-
+        protected MailerHandleCommon MailerHandle;
         protected RoleManager<IdentityRole> RoleManager { get; private set; }
 
         protected UserManager<ApplicationUser> UserManager { get; private set; }
@@ -61,6 +61,7 @@ namespace MNPOST.Controllers
             RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(sdb));
             UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(sdb));
             conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+            MailerHandle = new MailerHandleCommon(new MNPOSTEntities());
         }
 
 

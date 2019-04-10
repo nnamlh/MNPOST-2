@@ -44,7 +44,34 @@ app.controller('myCtrl', function ($scope, $http, $rootScope) {
         "page": $scope.currentPage,
         "postId": ""
     };
-
+    $scope.statuCoD = [
+        {
+            "code": 0,
+            "name": "LẬP PHIẾU THANH TOÁN"
+        },
+        {
+            "code": 1,
+            "name": "LẬP PHIẾU THANH TOÁN"
+        },
+        {
+            "code": 2,
+            "name": "ĐÃ THANH TOÁN"
+        }
+    ];
+    $scope.statuDeth = [
+        {
+            "code": 0,
+            "name": "CHƯA THANH TOÁN"
+        },
+        {
+            "code": 1,
+            "name": "ĐÃ THANH TOÁN"
+        },
+        {
+            "code": 2,
+            "name": "ĐỢI THANH TOÁN"
+        }
+    ];
     $scope.mailers = [];
     $scope.GetData = function () {
         $scope.searchInfo.page = $scope.currentPage;
@@ -73,8 +100,8 @@ app.controller('myCtrl', function ($scope, $http, $rootScope) {
             showLoader(false);
             showNotify('Connect error');
         });
-    }
-    $scope.GetData();
+    };
+   // $scope.GetData();
     $scope.checkAll = function () {
         for (var i = 0; i < $scope.mailers.length; i++) {
             $scope.mailers[i].isCheck = $scope.checkMailers;
@@ -130,6 +157,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope) {
 
         if ($scope.postOffices.length === 1) {
             $scope.postHandle = $scope.postOffices[0];
+            $scope.GetData();
         } else {
             showModelFix('choosePostOfficeModal');
         }
@@ -141,7 +169,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope) {
         if ($scope.postHandle === '') {
             alert('Chọn bưu cục nếu không sẽ không thể thao tác');
         } else {
-            $scope.getCustomerData();
+            $scope.GetData();
             hideModel('choosePostOfficeModal');
         }
     };
@@ -339,7 +367,8 @@ app.controller('myCtrl', function ($scope, $http, $rootScope) {
                 'serviceTypeId': $scope.mailer.MailerTypeID,
                 'postId': $scope.mailer.PostOfficeAcceptID,
                 'cod': $scope.mailer.COD,
-                'merchandiseValue': $scope.mailer.MerchandiseValue
+                'merchandiseValue': $scope.mailer.MerchandiseValue,
+                'districtId': $scope.mailer.RecieverDistrictID
             }
         }).then(function mySuccess(response) {
             console.log(response.data);

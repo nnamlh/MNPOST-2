@@ -22,15 +22,6 @@ namespace MNPOST.Report.Viewer {
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
         
         /// <summary>
-        /// btnprint control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnprint;
-        
-        /// <summary>
         /// MailerRptViewer control.
         /// </summary>
         /// <remarks>

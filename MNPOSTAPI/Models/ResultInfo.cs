@@ -32,6 +32,12 @@ namespace MNPOSTAPI.Models
         public string code { get; set; }
 
         public string name { get; set; }
+
     }
 
+    public class ItemCommonProvince : ItemCommon
+    {
+        public bool? vsvx { get; set; }
+
+    }
 }

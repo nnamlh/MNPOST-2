@@ -169,7 +169,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, $interval) {
             }
 
         });
-    }
+    };
 
     $scope.cancelMailer = function () {
         showModel('cancelMailerModal');
@@ -183,7 +183,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, $interval) {
         }
 
         return false;
-    }
+    };
 
     $scope.finishCancalMailer = function () {
 

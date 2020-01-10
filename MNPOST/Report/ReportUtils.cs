@@ -2,6 +2,7 @@
 using CrystalDecisions.Shared;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -9,32 +10,62 @@ namespace MNPOST.Report
 {
     public class ReportUtils
     {
-        public Stream GetReportStreamWithParamter(string reportPath, Object data, Dictionary<string, string> paramaters)
+        public string GetContentType (string type = ".pdf")
+        {
+            switch(type)
+            {
+                case ".xlsx":
+                    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                case ".pdf":
+                    return "application/pdf";
+                default:
+                    return "application/octet-stream";
+            } 
+        }
+
+        public Stream GetReportStreamFromDatabase(string reportPath, Dictionary<string, string> paramaters, string type = ".pdf")
         {
             ReportDocument rptH = new ReportDocument();
 
             rptH.Load(HttpContext.Current.Server.MapPath(reportPath));
 
-            if (data != null)
-            {
-                rptH.SetDataSource(data);
-            }
+            string conn = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+
             ConnectionInfo crConnectionInfo = new ConnectionInfo();
-            crConnectionInfo.ServerName = "103.77.167.37";
-            crConnectionInfo.DatabaseName = "MNPOST";
-            crConnectionInfo.UserID = "sa";
-            crConnectionInfo.Password = "123qwe!@#mnpost123";
-     
-            rptH.DataSourceConnections[0].SetConnection("103.77.167.37", "MNPOST", "sa", "123qwe!@#mnpost123");
-            rptH.VerifyDatabase();
-            rptH.SetParameterValue(0, "BCQ3");
-            rptH.SetParameterValue(1, "");
-            Stream stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+            crConnectionInfo.ServerName = ConfigurationManager.AppSettings["ServerName"].ToString();
+            crConnectionInfo.DatabaseName = ConfigurationManager.AppSettings["DataBaseName"].ToString();
+            crConnectionInfo.UserID = ConfigurationManager.AppSettings["UserId"].ToString();
+            crConnectionInfo.Password = ConfigurationManager.AppSettings["Password"].ToString();
+
+            rptH.DataSourceConnections[0].SetConnection(crConnectionInfo.ServerName, crConnectionInfo.DatabaseName, crConnectionInfo.UserID, crConnectionInfo.Password);
+
+            foreach (KeyValuePair<string, string> item in paramaters)
+            {
+                rptH.SetParameterValue(item.Key, item.Value);
+            }
+
+            //   rptH.VerifyDatabase();
+            Stream stream = null;
+            switch (type)
+            {
+                case ".xlsx":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.ExcelWorkbook);
+                    break;
+                case ".pdf":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+                default:
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+            }
+
+            rptH.Dispose();
+            rptH.Close();
 
             return stream;
         }
 
-        public Stream GetReportStream(string reportPath, Object data)
+        public Stream GetReportStream(string reportPath, Object data, string type = ".pdf")
         {
             ReportDocument rptH = new ReportDocument();
 
@@ -45,11 +76,24 @@ namespace MNPOST.Report
                 rptH.SetDataSource(data);
             }
 
-            Stream stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
-
+            Stream stream = null;
+            switch (type)
+            {
+                case ".xlsx":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.ExcelWorkbook);
+                    break;
+                case ".pdf":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+                default:
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+            }
+            rptH.Dispose();
+            rptH.Close();
             return stream;
         }
-        public Stream GetReportDocStream(string reportPath, Object data)
+        public Stream GetReportDocStream(string reportPath, Object data, string type = ".pdf")
         {
             ReportDocument rptH = new ReportDocument();
 
@@ -60,12 +104,25 @@ namespace MNPOST.Report
                 rptH.SetDataSource(data);
             }
 
-            Stream stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.WordForWindows);
-
+            Stream stream = null;
+            switch (type)
+            {
+                case ".xlsx":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.ExcelWorkbook);
+                    break;
+                case ".pdf":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+                default:
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+            }
+            rptH.Dispose();
+            rptH.Close();
             return stream;
         }
 
-        public Stream GetReportStream(string reportPath, Object data, Dictionary<string, Dictionary<string, string>> values)
+        public Stream GetReportStream(string reportPath, Object data, Dictionary<string, Dictionary<string, string>> values, string type = ".pdf")
         {
             ReportDocument rptH = new ReportDocument();
 
@@ -88,8 +145,21 @@ namespace MNPOST.Report
                 rptH.SetDataSource(data);
             }
 
-            Stream stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
-
+            Stream stream = null;
+            switch (type)
+            {
+                case ".xlsx":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.ExcelWorkbook);
+                    break;
+                case ".pdf":
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+                default:
+                    stream = rptH.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                    break;
+            }
+            rptH.Dispose();
+            rptH.Close();
             return stream;
         }
     }

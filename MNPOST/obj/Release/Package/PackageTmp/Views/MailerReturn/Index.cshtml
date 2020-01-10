@@ -1,0 +1,223 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Danh sách đơn chưa phát được và chuyển hoàn</h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="searchInfo.MailerID" my-enter="GetData(1,searchText)" />
+                        </div>
+                    </div>
+                    <!-- search-->
+                </div>
+
+                <!-- table data-->
+                <div class="table-responsive scrollmenu">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <thead>
+                            <tr class="headings">
+                                <th>STT</th>
+                                <th>Mã vận đơn</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Mã người gửi</th>
+                                <th>Người gửi</th>
+                                <th>Điện thoại</th>
+                                <th>Địa chỉ gửi</th>
+                                <th>Tỉnh thành gửi</th>
+                                <th>Quận huyện gửi</th>
+                                <th>Người nhận</th>
+                                <th>Điện thoại</th>
+                                <th>Địa chỉ nhận</th>
+                                <th>Tỉnh thành nhận</th>
+                                <th>Quận huyện nhận</th>
+                                <th>Phường xã nhận</th>
+                                <th>Dịch vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in mailers  | filter : searchInfo.MailerID">
+                                <td><button type="button" class="btn btn-xs btn-primary" ng-click="sendUpdate(item.MailerID)">XÁC NHẬN</button></td>
+                                <td>{{$index + 1}}</td>
+                                <td>{{item.MailerID}}</td>
+                                <td><strong class="label label-success">{{status[item.CurrentStatusID].name}}</strong></td>
+                                <td>{{item.AcceptDate}}</td>
+                                <td>{{item.SenderID}}</td>
+                                <td>{{item.SenderName}}</td>
+                                <td>{{item.SenderPhone}}</td>
+                                <td>{{item.SenderAddress}}</td>
+                                <td>{{item.SendProvinceName}}</td>
+                                <td>{{item.SendDistrictName}}</td>
+                                <td>{{item.RecieverName}}</td>
+                                <td>{{item.RecieverPhone}}</td>
+                                <td>{{item.RecieverAddress}}</td>
+                                <td>{{item.RecieProvinceName}}</td>
+                                <td>{{item.ReceiDistrictName}}</td>
+                                <td>{{item.ReceiWardName}}</td>
+                                <td>{{item.MailerTypeID}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+
+    <!-- choose buu cuc-->
+    <div id="choosePostOfficeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chọn bưu cục xử lý</label>
+                        <select class="form-control" ng-model="postHandle">
+                            <option ng-repeat="item in postOffices" value="{{item}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="choosePostHandle()">Chọn</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- end chon buu cuc-->
+
+
+</div>
+
+
+@section scripts {
+    
+    <script type="text/javascript">
+        // tao controller
+          var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+        var app = angular.module('myApp', ['ui.bootstrap', 'myKeyPress', 'ui.select2']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.postHandle = '';
+            $scope.status = angular.copy(mailerStatusData);
+            $scope.mailers = [];
+            $scope.searchInfo = {
+                MailerID: ''
+            };
+            $scope.init = function () {
+                $scope.postOffices = postOfficeDatas;
+
+                if ($scope.postOffices.length === 1) {
+                    $scope.postHandle = $scope.postOffices[0];
+                    $scope.getData();
+                 //   $scope.sendGetEmployees();
+                } else {
+                    showModelFix('choosePostOfficeModal');
+                }
+
+            };
+
+            $scope.getData = function () {
+
+                showLoader(true);
+
+                $http({
+                    method: 'POST',
+                    url: '/mailerreturn/getdata',
+                    data: {
+                        postId: $scope.postHandle
+                    }
+                }).then(function sucess(res) {
+
+                    $scope.mailers = res.data;
+                    showLoader(false);
+                });
+
+            };
+            $scope.choosePostHandle = function () {
+                if ($scope.postHandle === '') {
+                    alert('Chọn bưu cục nếu không sẽ không thể thao tác');
+                } else {
+                    $scope.getData();
+                //    $scope.sendGetEmployees();
+                    hideModel('choosePostOfficeModal');
+                }
+            };
+
+            $scope.init();
+            $scope.sendUpdate = function (mailerId) {
+
+                showLoader(true);
+
+                $http({
+                    method: 'POST',
+                    url: '/mailerReturn/addMailers',
+                    data: {
+                        mailerId: mailerId,
+                        postId: $scope.postHandle
+                    }
+                }).then(function sucess(response) {
+                    showLoader(false);
+
+                    $scope.getData();
+                    showNotify("Đã nhập kho");
+                }, function error(response, error) {
+                    showNotify("connect has disconnect");
+                    showLoader(false);
+
+                });
+
+
+            };
+
+            $scope.sendGetEmployees = function () {
+
+                $http.get("/MailerImport/GetEmployee?postId=" + $scope.postHandle).then(function (response) {
+                    $scope.employees = response.data;
+                });
+
+            };
+            $scope.checkMailers = false;
+            $scope.checkAll = function () {
+                for (var i = 0; i < $scope.mailers.length; i++) {
+
+                    $scope.mailers[i].isCheck = $scope.checkMailers;
+
+                }
+            };
+
+            $scope.removeCheck = function () {
+                $scope.checkMailers = false;
+                for (var i = 0; i < $scope.mailers.length; i++) {
+
+                    $scope.mailers[i].isCheck = $scope.checkMailers;
+
+                }
+            };
+
+            function getSelectedIndex(mailerId) {
+                for (var i = 0; i < $scope.mailers.length; i++)
+                    if ($scope.mailers[i].MailerID === mailerId)
+                        return i;
+                return -1;
+            };
+
+
+        });
+    </script>
+
+}

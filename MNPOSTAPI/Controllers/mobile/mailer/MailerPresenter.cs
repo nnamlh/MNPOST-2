@@ -138,7 +138,7 @@ namespace MNPOSTAPI.Controllers.mobile.mailer
 
                 if (mailerInfo == null)
                     throw new Exception("Vận đơn sai");
-
+                mailerInfo.IsPostAccept = false;
                 findDetail.DeliveryStatus = info.StatusID;
                 mailerInfo.CurrentStatusID = info.StatusID;
 

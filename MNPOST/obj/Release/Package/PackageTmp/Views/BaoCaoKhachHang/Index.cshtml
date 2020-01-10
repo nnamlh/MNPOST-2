@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
+
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>DANH SÁCH BÁO CÁO</h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <table class="table table-bordered table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Báo cáo</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>DANH SÁCH ĐÃ PHÁT</td>
+                                    <td><button type="button" class="btn btn-success btn-xs" ng-click="printReport('bcphat')">XEM BÁO CÁO</button></td>
+                                </tr>
+                                <tr>
+                                    <td>DANH SÁCH ĐÃ HOÀN</td>
+                                    <td><button type="button" class="btn btn-success btn-xs" ng-click="printReport('bchoan')">XEM BÁO CÁO</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="x_title">
+                            <h2><i class="fa fa-align-left"></i> Lựa chọn xem</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Thời gian</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.fromDate">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.toDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Khách hàng</label>
+                        <select ui-select2="select2Options"  class="form-control" ng-model="searchInfo.groupId">
+                            <option value="">Chọn khách hàng</option>
+                            <option ng-repeat="x in groups" value="{{x.code}}">{{x.name + "-" + x.code}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+        // tao controller
+        var currentDate = '@DateTime.Now.ToString("dd/MM/yyyy")';
+        var fromDate = '@DateTime.Now.AddDays(-7).ToString("dd/MM/yyyy")';
+        var toDate = '@DateTime.Now.AddDays(1).ToString("dd/MM/yyyy")';
+       var groups = angular.fromJson('@Html.Raw(Json.Encode(ViewBag.CustomerGroup))');
+
+    </script>
+    <script type="text/javascript">
+
+        var app = angular.module('myApp', ['ui.bootstrap', 'myDirective', 'myKeyPress', 'ui.select2', 'ui.mask']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.select2Options = {
+                width: '100%'
+            };
+            $scope.groups = groups;
+
+            $scope.searchInfo = {
+                "reportId": "",
+                "fromDate": fromDate,
+                "toDate": toDate,
+                "groupId": ""
+            };
+
+            $scope.reportUrl = '#';
+            $scope.printReport = function (report) {
+                $scope.searchInfo.reportId = report;
+                if ($scope.searchInfo.reportId === 'bcphat' || $scope.searchInfo.reportId === 'bchoan' ) {
+                    var url = '/baocaokhachhang/BaoCao?fromDate=' + $scope.searchInfo.fromDate + '&toDate=' + $scope.searchInfo.toDate + '&groupId=' + $scope.searchInfo.groupId + '&reportId=' + $scope.searchInfo.reportId ;
+                    var excelUrl = url + '&type=.xlsx';
+                    runShowPDF(url, excelUrl);
+                }
+
+            };
+
+
+        });
+
+
+    </script>
+
+}
+
+

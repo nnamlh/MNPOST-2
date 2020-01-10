@@ -12,9 +12,11 @@
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+
+    <link rel="stylesheet" href="~/Content/bootstrap/css/bootstrap.css" />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
 
     <!-- Select2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -80,6 +82,7 @@
             height: 600px;
             border: 1px solid green;
         }
+
         #the-canvas {
             padding-left: 0;
             padding-right: 0;
@@ -122,7 +125,7 @@
                         <div class="nav toggle">
                             <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                         </div>
-                       
+
                         <ul class="nav navbar-nav navbar-right">
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -170,7 +173,7 @@
                 }
             }
             <footer>
-      
+
                 <div class="clearfix"></div>
             </footer>
 
@@ -180,7 +183,7 @@
     <div id="loader"></div>
 
     <div id="showreport" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" style="width: 90%">
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -189,7 +192,9 @@
                     &nbsp; &nbsp;
                     <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
                     &nbsp; &nbsp;
-                    <button id="printpdf">Print</button>
+                    <button id="printpdf" style="background-color:brown">Print PDF</button>
+                    &nbsp; &nbsp;
+                    <button id="printexcel" style="background-color:aquamarine">Print EXCEL</button>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -202,9 +207,9 @@
     <!-- jQuery -->
     <script src="~/Content/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
 
-  
+    <script src="~/Content/bootstrap/js/bootstrap.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="~/Content/build/js/custom.js"></script>
     <script src="~/Scripts/bootstrap-notify.min.js"></script>
@@ -227,7 +232,7 @@
 
     <script src="~/Scripts/myscripts.js"></script>
     <script src="~/Scripts/showpdf.js"></script>
-   
+
     <script type="text/javascript">
         $(document).ready(function () {
             $('[data-toggle="popover"]').popover();

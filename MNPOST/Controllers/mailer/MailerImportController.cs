@@ -186,6 +186,7 @@ namespace MNPOST.Controllers.mailer
                 if (find != null && (find.CurrentStatusID == 0 || find.CurrentStatusID == 8))
                 {
                     find.CurrentStatusID = 2; // nhap kho
+                    find.IsPostAccept = true;
                     find.LastUpdateDate = DateTime.Now;
                     db.Entry(find).State = System.Data.Entity.EntityState.Modified;
                     db.SaveChanges();

@@ -40,22 +40,35 @@ namespace MNPOSTAPI.Controllers.web
 
                 MailerHandleCommon mailerHandle = new MailerHandleCommon(db);
                 var code = mailerHandle.GeneralMailerCode(findCus.PostOfficeID);
-                var price = db.CalPrice(paser.Weight, findCus.CustomerID, paser.RecieverProvinceID, paser.MailerTypeID, findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                //  var price = db.CalPrice(paser.Weight, findCus.CustomerID, paser.RecieverProvinceID, paser.MailerTypeID, findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
                 var codPrice = 0;
+
+                decimal? price = 0;
+                if (paser.COD > 0)
+                {
+                    var findDitrict = db.BS_Districts.Where(p => p.DistrictID == paser.RecieverDistrictID).FirstOrDefault();
+                    int? vsvx = findDitrict == null ? 1 : (findDitrict.VSVS == true ? 1 : 0);
+                    price = db.CalPriceCOD(paser.Weight, findCus.CustomerID, paser.RecieverProvinceID, "CD", findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd"), vsvx, paser.MailerTypeID == "ST" ? "CODTK" : "CODN").FirstOrDefault();
+                }
+                else
+                {
+                    price = db.CalPrice(paser.Weight, findCus.CustomerID, paser.RecieverProvinceID, paser.MailerTypeID, findCus.PostOfficeID, DateTime.Now.ToString("yyyy-MM-dd")).FirstOrDefault();
+                }
 
                 //
                 var checkRece = db.BS_Districts.Where(p => p.DistrictID == paser.RecieverDistrictID).FirstOrDefault();
                 decimal? priceService = 0;
-                if(checkRece  != null)
+                if (checkRece != null)
                 {
-                    if(checkRece.VSVS == true)
+                    if (checkRece.VSVS == true)
                     {
                         var findService = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
-                       
-                        if(findService.IsPercent == true)
+
+                        if (findService.IsPercent == true)
                         {
                             priceService = (price * findService.Price) / 100;
-                        } else
+                        }
+                        else
                         {
                             priceService = findService.Price;
                         }
@@ -65,7 +78,7 @@ namespace MNPOSTAPI.Controllers.web
                             MailerID = code,
                             CreationDate = DateTime.Now,
                             SellingPrice = (decimal)priceService,
-                            PriceDefault = (decimal) priceService,
+                            PriceDefault = (decimal)priceService,
                             ServiceID = "VSVX"
                         };
                         db.MM_MailerServices.Add(mailerService);
@@ -392,6 +405,58 @@ namespace MNPOSTAPI.Controllers.web
 
         }
 
+        [HttpGet]
+        public ResultInfo GetMailersByStatus(string cusId, int? type)
+        {
+            // type = 1: get COD
+            // type = 2 get dang phat
+            // type = 3 get chuyen hoan
+
+            var findCus = db.BS_Customers.Where(p => p.CustomerCode == cusId).FirstOrDefault();
+
+            if (findCus == null)
+                return new ResultInfo()
+                {
+                    error = 1,
+                    msg = "Không có chơi phá"
+                };
+            var findAllCus = db.BS_Customers.Where(p => p.CustomerGroupID == findCus.CustomerGroupID).Select(p => p.CustomerCode).ToList();
+
+
+
+            switch (type)
+            {
+                case 1:
+                    var data = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.PaidCoD != 2 && p.COD > 0 && p.CurrentStatusID != 0).ToList();
+                    return new ResponseInfo()
+                    {
+                        error = 0,
+                        data = data
+                    };
+                case 2:
+                    var sumCODDangPhat = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.COD > 0 && p.CurrentStatusID == 3).ToList();
+                    return new ResponseInfo()
+                    {
+                        error = 0,
+                        data = sumCODDangPhat
+                    };
+                case 3:
+                    var sumCODChuyenHoan = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.COD > 0 && p.CurrentStatusID != 11 && p.IsReturn == true).ToList();
+                    return new ResponseInfo()
+                    {
+                        error = 0,
+                        data = sumCODChuyenHoan
+                    };
+
+            }
+
+            return new ResultInfo()
+            {
+                error = 1,
+                msg = "Không có chơi phá"
+            };
+        }
+
 
         [HttpGet]
         public ResultInfo ReportCusCoD(string cusId)
@@ -407,9 +472,10 @@ namespace MNPOSTAPI.Controllers.web
 
             var findAllCus = db.BS_Customers.Where(p => p.CustomerGroupID == findCus.CustomerGroupID).Select(p => p.CustomerCode).ToList();
 
-            var data = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.PaidCoD != 2 && p.COD > 0 && p.CurrentStatusID == 4).ToList();
+            // var data = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.PaidCoD != 2 && p.COD > 0 && p.CurrentStatusID == 4).ToList();
+            var data = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.PaidCoD != 2 && p.COD > 0 && p.CurrentStatusID != 0).ToList();
 
-         //   var countMailer = data.Count();
+            //   var countMailer = data.Count();
             //var sumCoD = data.Sum(p => p.COD);
 
             var sumCODDangPhat = db.MM_Mailers.Where(p => findAllCus.Contains(p.SenderID) && p.COD > 0 && p.CurrentStatusID == 3).ToList();
@@ -422,7 +488,7 @@ namespace MNPOSTAPI.Controllers.web
                 data = new
                 {
                     sumCoD = data.Count + " đơn/ " + data.Sum(p => p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam),
-                    sumCODDangPhat = sumCODDangPhat.Count + " đơn/ " + sumCODDangPhat.Sum(p=> p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam),
+                    sumCODDangPhat = sumCODDangPhat.Count + " đơn/ " + sumCODDangPhat.Sum(p => p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam),
                     sumCODChuyenHoan = sumCODChuyenHoan.Count + " đơn/ " + sumCODChuyenHoan.Sum(p => p.COD).Value.ToString("C", MNPOSTAPI.Utils.Cultures.VietNam)
                 }
             };
@@ -510,7 +576,7 @@ namespace MNPOSTAPI.Controllers.web
 
         // cong no
         [HttpGet]
-        public ResultInfo CustomerDebitNoPaid (string cusId)
+        public ResultInfo CustomerDebitNoPaid(string cusId)
         {
             // danh sách các thang chưa thanh tonas
             var findCus = db.BS_Customers.Where(p => p.CustomerCode == cusId).FirstOrDefault();

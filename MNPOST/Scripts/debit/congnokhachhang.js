@@ -61,7 +61,7 @@ app.controller('myCtrl', function ($scope, $http) {
         var info = $scope.allDanhMuc[index];
 
         var r = confirm("Bạn muốn xóa không ?");
-        if (r == true) {
+        if (r === true) {
             showLoader(true);
 
             $http({
@@ -73,7 +73,7 @@ app.controller('myCtrl', function ($scope, $http) {
 
                     var result = response.data;
 
-                    if (result.error == 0) {
+                    if (result.error === 0) {
                         //  $scope.allDanhMuc.splice(index, 1);
                         $scope.getData();
                     } else {
@@ -89,8 +89,7 @@ app.controller('myCtrl', function ($scope, $http) {
                     showLoader(false);
                     showNotify("connect has disconnect");
                 }
-                );
-        } else {
+            );
         }
     };
 
@@ -165,11 +164,27 @@ app.controller('myCtrl', function ($scope, $http) {
     };
 
     $scope.chkAllPaid = function () {
-        for (i = 0; i < $scope.allMailerDebit.length; i++) {
+
+        var sumCod = 0;
+        var countMailer = 0;
+        for (var i = 0; i < $scope.allMailerDebit.length; i++) {
             $scope.allMailerDebit[i].isCheck = $scope.isChkPaid;
+
+            if ($scope.allMailerDebit[i].isCheck) {
+                sumCod = sumCod + $scope.allMailerDebit[i].COD;
+                countMailer++;
+            }
+
         }
+
+        $scope.createDocument.AllMoney = sumCod;
+        $scope.createDocument.AllMailer = countMailer;
+
     };
     $scope.findMailerPaid = function () {
+
+        var sumCod = 0;
+        var countMailer = 0;
 
         for (var i = 0; i < $scope.allMailerDebit.length; i++) {
 
@@ -282,7 +297,8 @@ app.controller('myCtrl', function ($scope, $http) {
 
     $scope.showPDF = function (url) {
 
-        runShowPDF(url);
+        var excelUrl = url + '&type=.xlsx';
+        runShowPDF(url, excelUrl);
     };
 
 });

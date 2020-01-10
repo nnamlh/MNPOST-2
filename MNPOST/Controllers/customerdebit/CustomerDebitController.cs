@@ -37,7 +37,7 @@ namespace MNPOST.Controllers.customerdebit
         }
 
         [HttpGet]
-        public ActionResult ShowReport(string docid)
+        public ActionResult ShowReport(string docid, string type = ".pdf")
         {
             // lam như phân lấy dữ liệu thư viện
             Dictionary<string, string> textValues = new Dictionary<string, string>();
@@ -83,24 +83,26 @@ namespace MNPOST.Controllers.customerdebit
                            join p in db.BS_Provinces
                            on mm.RecieverProvinceID equals p.ProvinceID
                            where d.DocumentID == docid
-                           select new
+                           select new CustomerDebitDetail
                            {
                                SoPhieu = mm.MailerID,
-                               NgayGui = mm.AcceptDate,
                                NoiDen = p.ProvinceCode,
                                DichVu = mm.MailerTypeID,
-                               SoLuong = mm.Quantity,
-                               TrongLuong = mm.Weight,
+                               SoLuong = mm.Quantity == null ? 0:mm.Quantity.Value,
+                               TrongLuong = mm.Weight == null? 0:mm.Weight.Value,
                                CuocPhi = d.Price,
                                PhuPhi = d.PriceService,
-                               ThanhTien = d.BfVATamount
+                               ThanhTien = d.BfVATamount,
+                               Group = 1
                            }).ToList();
 
 
 
-            Stream stream = REPORTUTILS.GetReportStream(ReportPath.RptAC_CustomerDebitDetails, results);
+            Stream stream = REPORTUTILS.GetReportStream(ReportPath.RptAC_CustomerDebitDetails, results, values, type);
+         
 
-            return File(stream, "application/pdf");
+            return File(stream, REPORTUTILS.GetContentType(type), "report_phat_hang" + type);
+ 
         }
 
         [HttpPost]
@@ -153,18 +155,18 @@ namespace MNPOST.Controllers.customerdebit
             return Json(results, JsonRequestBehavior.AllowGet);
         }
 
-        public string getMaxid()
+        public string getMaxid(String postId)
         {
             //lay ra gia tri maxid
-            var maxid = db.AC_CustomerDebitVoucher.Where(p => p.PostOfficeID == "BCQ3").OrderByDescending(x => x.DocumentID).FirstOrDefault();
+            var maxid = db.AC_CustomerDebitVoucher.Where(p => p.PostOfficeID == postId).OrderByDescending(x => x.DocumentID).FirstOrDefault();
             string maxndg = string.Empty;
             if (maxid != null)
             {
-                maxndg = string.Format("BCQ3" + "{0}", (Convert.ToUInt32(maxid.DocumentID.Substring(6)) + 1).ToString("D6"));
+                maxndg = string.Format(postId + "{0}", (Convert.ToUInt32(maxid.DocumentID.Substring(6)) + 1).ToString("D6"));
             }
             else
             {
-                maxndg = "BCQ3" + "000001";
+                maxndg = postId + "000001";
             }
             ResultInfo result = new ResultInfo()
             {
@@ -298,7 +300,7 @@ namespace MNPOST.Controllers.customerdebit
                     throw new Exception("Sai thông tin");
                 double totalamount = 0;
                 double totalcod = 0;
-                string maxid = getMaxid();
+                string maxid = getMaxid(EmployeeInfo.currentPost);
 
                 AC_CustomerDebitVoucher mt = new AC_CustomerDebitVoucher();
                 mt.DocumentID = maxid;
@@ -335,6 +337,7 @@ namespace MNPOST.Controllers.customerdebit
                         {
                             returncost = findMailer.Price / 2; //nếu có chuyển hoàn.
                                                           //thêm vào bảng dịch vụ cộng thêm
+                            /*
                             MM_MailerServices ms = new MM_MailerServices();
                             ms.MailerID = findMailer.MailerID;
                             
@@ -348,37 +351,50 @@ namespace MNPOST.Controllers.customerdebit
                             ms.LastEditDate = DateTime.Now;
                             ms.CreationDate = DateTime.Now;
                             db.MM_MailerServices.Add(ms);
+                            */
                             //update thu khac vào bảng mm_mailers
                         }
 
                     }
+                    if (returncost == null)
+                    {
+                        returncost = 0;
+                    }
+                    try
+                    {
 
-                    findMailer.PriceService = findMailer.PriceService + decimal.Parse(returncost.ToString());
-                    findMailer.IsPayment = 2;
-                    db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
+                        findMailer.PriceService = findMailer.PriceService + decimal.Parse(returncost.ToString());
+                        findMailer.IsPayment = 2;
+                        db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
 
-                    db.SaveChanges();
+                        db.SaveChanges();
 
-                    string tttt = findMailer.MailerID;
-                    AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
-                    ct.DocumentID = maxid;
-                    ct.MailerID = findMailer.MailerID;
-                    ct.Amount = double.Parse((findMailer.Amount ?? 0).ToString());
-                    ct.Price = decimal.Parse((double.Parse((findMailer.Price ?? 0).ToString()) / 1.1).ToString());
-                    ct.PriceService = decimal.Parse((findMailer.PriceService ?? 0).ToString()) + decimal.Parse(returncost.ToString());
-                    ct.DiscountPercent = decimal.Parse((findMailer.DiscountPercent ?? 0).ToString());
-                    ct.Discount = decimal.Parse((findMailer.Discount ?? 0).ToString());
-                    ct.VATpercent = decimal.Parse((findMailer.VATPercent ?? 0).ToString());
-                    // ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
-                    ct.BfVATamount = decimal.Round(decimal.Parse((findMailer.BefVATAmount ?? 0).ToString()));
-                    ct.VATamount = decimal.Round(decimal.Parse((findMailer.VATAmount ?? 0).ToString()));
-                    ct.AcceptDate = DateTime.Parse(findMailer.AcceptDate.ToString());
-                    ct.Quantity = int.Parse(findMailer.Quantity.ToString());
-                    ct.Weight = decimal.Parse(findMailer.Weight.ToString());
-                    db.AC_CustomerDebitVoucherDetail.Add(ct);
-                    totalamount += double.Parse((findMailer.Amount ?? 0).ToString());
-                    totalcod += double.Parse((findMailer.COD ?? 0).ToString());
-                    db.SaveChanges();
+                        string tttt = findMailer.MailerID;
+
+                        AC_CustomerDebitVoucherDetail ct = new AC_CustomerDebitVoucherDetail();
+                        ct.DocumentID = maxid;
+                        ct.MailerID = findMailer.MailerID;
+                        ct.Amount = (double)(findMailer.Amount != null ? findMailer.Amount : 0);
+                        ct.Price = (decimal)( (findMailer.Price != null ? findMailer.Price: 0) / 1.1m);
+                        ct.PriceService = (decimal)((findMailer.PriceService != null ? findMailer.PriceService : 0) + returncost);
+                        ct.DiscountPercent = (decimal)findMailer.DiscountPercent;
+                        ct.Discount = (decimal)findMailer.Discount;
+                        ct.VATpercent = (decimal)findMailer.VATPercent;
+                        // ct.BfVATamount = decimal.Parse((item1.BfVATAmount ?? 0).ToString());
+                        ct.BfVATamount = (decimal)findMailer.BefVATAmount;
+                        ct.VATamount = (decimal)findMailer.VATAmount;
+                        ct.AcceptDate = findMailer.AcceptDate;
+                        ct.Quantity = (int)findMailer.Quantity;
+                        ct.Weight = (decimal)findMailer.Weight;
+                        db.AC_CustomerDebitVoucherDetail.Add(ct);
+                        totalamount += (double)(findMailer.Amount != null ? findMailer.Amount : 0);
+                        totalcod += (double)(findMailer.COD != null ? findMailer.COD:0);
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("error : " + e.Message);
+                    }
 
                 }
 

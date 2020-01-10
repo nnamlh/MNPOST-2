@@ -202,7 +202,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
         var mailer = $scope.mailers[idx];
 
         var cus = mailerService.findCustomer(mailer.SenderID);
-      
+
 
         if (cus.code.indexOf('KHACHLE') === -1) {
             showNotify("Đang chọn: " + cus.name);
@@ -217,8 +217,8 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
             $scope.mailers[idx].SenderPhone = cus.phone;
             $scope.mailers[idx].SenderProvinceID = cus.provinceId;
             $scope.mailers[idx].SenderAddress = cus.address;
-           
-           $scope.mailers[idx].SenderWardID = cus.wardId;
+
+            $scope.mailers[idx].SenderWardID = cus.wardId;
 
             $scope.provinceChange('district', 'send', idx, function (district) {
                 $scope.mailers[idx].SenderDistrictID = cus.districtId;
@@ -298,10 +298,10 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
         $scope.mailers[idx].RecieverAddress = phone.AddressInfo;
         $scope.mailers[idx].RecieverProvinceID = phone.ProvinceId;
         $scope.mailers[idx].RecieverDistrictID = phone.DistrictId;
-       // $scope.mailers[idx].RecieverWardID = phone.WardId;
+        // $scope.mailers[idx].RecieverWardID = phone.WardId;
         $scope.provinceChange('district', 'recie', idx);
 
-      //  $scope.provinceChange('ward', 'recie', idx);
+        //  $scope.provinceChange('ward', 'recie', idx);
     };
 
     $scope.getMailerCode = function (idx) {
@@ -335,7 +335,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                 $scope.mailers[i].ListDistrictSend = [];
                 $scope.mailers[i].ListProvinceRecive = [];
                 $scope.mailers[i].ListDistrictRecive = [];
-             //   $scope.mailers[i].ListWardRecive = [];
+                //   $scope.mailers[i].ListWardRecive = [];
             }
 
             $http({
@@ -381,7 +381,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
     $scope.senderExcelInfo = {};
     $scope.provinceSend = provinceSendGet;
     $scope.districtSend = [];
-  //  $scope.wardSend = [];
+    //  $scope.wardSend = [];
     $scope.addByExcelFile = function () {
         showModel('insertbyexcel');
     };
@@ -405,7 +405,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
             if (pType === "district") {
                 url = url + "parentId=" + $scope.mailers[idx].RecieverProvinceID + "&type=district";
             }
-           
+
         }
 
 
@@ -429,7 +429,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                 if (pType === "ward") {
                     $scope.mailers[idx].ListWardRecive = angular.copy(response.data);
                 }*/
-            } 
+            }
             /*
             if (typeof (callback) === typeof (Function)) {
                 callback();
@@ -473,7 +473,7 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
             $scope.senderExcelInfo.senderProvince = cus.provinceId;
             $scope.senderExcelInfo.senderAddress = cus.address;
             $scope.senderExcelInfo.senderDistrict = cus.districtId;
-         //   $scope.senderExcelInfo.senderWard = cus.wardId;
+            //   $scope.senderExcelInfo.senderWard = cus.wardId;
             $scope.senderExcelInfo.postId = mailerService.getPost();
 
             $scope.provinceExcelChange("district");
@@ -547,7 +547,9 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                     if (result.error === 1) {
                         alert(result.msg);
                     } else {
-                       
+
+
+                        /*
                         for (var i = 0; i < result.data.length; i++) {
 
                             var item = result.data[i];
@@ -555,9 +557,10 @@ app.controller('myCtrl', function ($scope, $http, $rootScope, mailerService, uiU
                             item.ListProvinceRecive = provinceSendGet;
                            // item.Services = [];
                             mailerService.addMailer(item);
-                        }
+                        }*/
                         hideModel('insertbyexcel');
                         $scope.$apply();
+                        alert('Đã thêm dữ liệu từ file Excel');
                     }
                 }
             });
@@ -573,7 +576,7 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
 
     $scope.select2Options = {
         width: '100%'
-        
+
     };
 
     $scope.customers = mailerService.getCustomers();
@@ -598,7 +601,7 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
         for (var i = 0; i < $scope.mailer.Services.length; i++) {
             if ($scope.mailer.Services[i].choose) {
                 if ($scope.mailer.Services[i].percent) {
-                    total = total + ($scope.mailer.Services[i].price * $scope.mailer.PriceDefault)/100;
+                    total = total + ($scope.mailer.Services[i].price * $scope.mailer.PriceDefault) / 100;
                 } else {
                     total = total + $scope.mailer.Services[i].price;
                 }
@@ -617,12 +620,12 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
                 $scope.mailer.SenderAddress = address;
                 $scope.mailer.SenderProvinceID = response.data.provinceId;
                 $scope.mailer.SenderDistrictID = response.data.districtId;
-               // $scope.mailer.SenderWardID = response.data.wardId;
+                // $scope.mailer.SenderWardID = response.data.wardId;
             } else {
                 $scope.mailer.RecieverAddress = address;
                 $scope.mailer.RecieverProvinceID = response.data.provinceId;
                 $scope.mailer.RecieverDistrictID = response.data.districtId;
-              //  $scope.mailer.RecieverWardID = response.data.wardId;
+                //  $scope.mailer.RecieverWardID = response.data.wardId;
             }
 
             $scope.getDistrictAndWard(type);
@@ -723,10 +726,10 @@ app.controller('ctrlAddDetail', function ($scope, $rootScope, $http, mailerServi
 
             if (type === 'send') {
                 $scope.mailer.ListDistrictSend = angular.copy(response.data);
- 
+
             } else {
                 $scope.mailer.ListDistrictRecive = angular.copy(response.data);
-  
+
             }
 
         });

@@ -3,5 +3,125 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<div class="row" ng-app="myApp" ng-controller="myCtrl">
 
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>DANH SÁCH BÁO CÁO</h2>
+                <div class="clearfix"></div>
+            </div>
+            <!-- end x_title-->
+            <div class="x_content">
+                <div class="row">
+                    <!-- search-->
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <select class="form-control" ng-model="searchInfo.reportId">
+                                <option value="reportphatchitiet">BÁO CÁO PHÁT CHI TIẾT</option>
+                                <option value="reportphatvanhan">BÁO CÁO SẢN LƯỢNG PHÁT VÀ NHẬN NHÂN VIÊN</option>
+                                <option value="reportbcphatvanhan">BÁO CÁO SẢN LƯỢNG PHÁT VÀ NHẬN BƯU CỤC</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <button type="button" class="btn btn-success" ng-click="printReport()">XEM BÁO CÁO</button>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="x_title">
+                            <h2><i class="fa fa-align-left"></i> Lựa chọn xem</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Thời gian</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.fromDate">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" required class="form-control" ui-mask="99/99/9999" model-view-value="true" ui-mask-placeholder ui-mask-placeholder-char="" ng-model="searchInfo.toDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Bưu cục</label>
+                        <select class="form-control" ng-model="searchInfo.postId" ng-change="changePost()">
+                            <option value="">chọn bưu cục</option>
+                            <option ng-repeat="x in postOffices" value="{{x}}">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Nhân viên</label>
+                        <select class="form-control" ng-model="searchInfo.employeeId">
+                            <option value="">Tất cả</option>
+                            <option ng-repeat="x in employees" value="{{x.code}}">{{x.name + "-" + x.code}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- end x_content-->
+        </div>
+        <!-- end x_pannel-->
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+        // tao controller
+        var currentDate = '@DateTime.Now.ToString("dd/MM/yyyy")';
+        var fromDate = '@DateTime.Now.AddDays(-7).ToString("dd/MM/yyyy")';
+        var toDate = '@DateTime.Now.AddDays(1).ToString("dd/MM/yyyy")';
+        var postOfficeDatas = angular.fromJson(@Html.Raw(Json.Encode(ViewBag.PostOffices)));
+
+    </script>
+    <script type="text/javascript">
+
+        var app = angular.module('myApp', ['ui.bootstrap', 'myDirective', 'myKeyPress', 'ui.select2', 'ui.mask']);
+
+        app.controller('myCtrl', function ($scope, $http) {
+
+            $scope.postOffices = postOfficeDatas;
+
+            $scope.searchInfo = {
+                "reportId": "",
+                "fromDate": fromDate,
+                "toDate": toDate,
+                "postId": "",
+                "employeeId": ""
+            };
+
+            $scope.employees = [];
+
+            $scope.changePost = function () {
+
+                $http.get('/quantityreport/GetEmployee?postId=' + $scope.searchInfo.postId).then(function (res) {
+
+                    $scope.employees = res.data;
+                });
+
+            };
+
+            $scope.reportUrl = '#';
+            $scope.printReport = function () {
+
+                if ($scope.searchInfo.reportId === 'reportphatchitiet' || $scope.searchInfo.reportId === 'reportphatvanhan' || $scope.searchInfo.reportId === 'reportbcphatvanhan' ) {
+                    var url = '/QuantityReport/PhatHang?fromDate=' + $scope.searchInfo.fromDate + '&toDate=' + $scope.searchInfo.toDate + '&postId=' + $scope.searchInfo.postId + '&reportId=' + $scope.searchInfo.reportId + '&employeeId=' + $scope.searchInfo.employeeId;
+                    var excelUrl = url + '&type=.xlsx';
+                    runShowPDF(url, excelUrl);
+                }
+
+            };
+
+
+        });
+
+
+    </script>
+
+}

@@ -16,6 +16,7 @@ namespace MNPOST.Controllers.report
     {
 
         [HttpGet]
+
         public ActionResult GetTest()
         {
             /*

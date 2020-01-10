@@ -19,12 +19,9 @@ namespace MNPOST.Controllers.mailer
         [HttpGet]
         public ActionResult Init()
         {
-
-
-
             // dịch vu
 
-            ViewBag.MailerTypes = db.BS_ServiceTypes.Where(p=> p.IsActive == true).Select(p => new CommonData()
+            ViewBag.MailerTypes = db.BS_ServiceTypes.Where(p => p.IsActive == true).Select(p => new CommonData()
             {
                 code = p.ServiceID,
                 name = p.ServiceName
@@ -80,26 +77,25 @@ namespace MNPOST.Controllers.mailer
         public ActionResult InsertByExcel(HttpPostedFileBase files, string senderID, string senderAddress, string senderName, string senderPhone, string senderProvince, string senderDistrict, string postId)
         {
             MailerHandleCommon mailerHandle = new MailerHandleCommon(db);
-            List<MailerIdentity> mailers = new List<MailerIdentity>();
+            //  List<MailerIdentity> mailers = new List<MailerIdentity>();
             var result = new ResultInfo()
             {
                 error = 0,
-                msg = "Đã tải",
-                data = mailers
+                msg = "Đã tải"
             };
             string path = "";
             try
             {
-               // var findVSVX = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
-               var allService = db.BS_Services.Select(p => new ItemPriceCommon()
-               {
-                   code = p.ServiceID,
-                   name = p.ServiceName,
-                   price = p.Price,
-                   choose = false,
-                   percent = p.IsPercent
+                // var findVSVX = db.BS_Services.Where(p => p.ServiceID == "VSVX").FirstOrDefault();
+                var allService = db.BS_Services.Select(p => new ItemPriceCommon()
+                {
+                    code = p.ServiceID,
+                    name = p.ServiceName,
+                    price = p.Price,
+                    choose = false,
+                    percent = p.IsPercent
 
-               }).ToList();
+                }).ToList();
                 // check sender
                 var checkSender = db.BS_Customers.Where(p => p.CustomerCode == senderID).FirstOrDefault();
 
@@ -222,8 +218,7 @@ namespace MNPOST.Controllers.mailer
                     // check cac gia tri can
                     if (receiverIdx == -1 || receiAddressIdx == -1 || receiPhoneIdx == -1 || receiProvinceIdx == -1 || weigthIdx == -1)
                         throw new Exception("Thiếu các cột cần thiết");
-                    //
-                
+
                     for (int i = 2; i <= totalRows; i++)
                     {
                         string mailerId = mailerCodeIdx == -1 ? mailerHandle.GeneralMailerCode(postId) : Convert.ToString(sheet.Cells[i, mailerCodeIdx].Value);
@@ -248,7 +243,7 @@ namespace MNPOST.Controllers.mailer
 
 
                         //
-                        string receiverDistrict = receiDistrictIdx == -1 ? "": Convert.ToString(sheet.Cells[i, receiDistrictIdx].Value);
+                        string receiverDistrict = receiDistrictIdx == -1 ? "" : Convert.ToString(sheet.Cells[i, receiDistrictIdx].Value);
                         var receiverDistrictSplit = receiverDistrict.Split('-');
                         var checkDistrict = db.BS_Districts.Find(receiverDistrictSplit[0]);
 
@@ -304,7 +299,7 @@ namespace MNPOST.Controllers.mailer
                         if (cod > 0)
                         {
 
-                            price = db.CalPriceCOD(weight, senderID, checkProvince.ProvinceID, "CD", postId, DateTime.Now.ToString("yyyy-MM-dd"), vsvs == "N"? 0:1, checkMailerType.ServiceID == "ST" ? "CODTK" : "CODN").FirstOrDefault();
+                            price = db.CalPriceCOD(weight, senderID, checkProvince.ProvinceID, "CD", postId, DateTime.Now.ToString("yyyy-MM-dd"), vsvs == "N" ? 0 : 1, checkMailerType.ServiceID == "ST" ? "CODTK" : "CODN").FirstOrDefault();
                         }
                         else
                         {
@@ -313,54 +308,104 @@ namespace MNPOST.Controllers.mailer
 
                         var codPrice = 0;
 
-                        var services = new List<ItemPriceCommon>(allService);
                         decimal? priceService = 0;
-                        if (vsvs == "Y" && cod == 0)
-                        {
-                            services.Where(p => p.code == "VSVX").FirstOrDefault().choose = true;
-                            var serviceVSVX = services.Where(p => p.code == "VSVX").FirstOrDefault();
 
-                            if (serviceVSVX.percent == true)
-                            {
-                                priceService = (price * serviceVSVX.price) / 100;
-                            } else
-                            {
-                                priceService = serviceVSVX.price;
-                            }
-                        }
 
-                        mailers.Add(new MailerIdentity()
+                        // theem
+                        var mailerIns = new MM_Mailers()
                         {
                             MailerID = mailerId,
+                            AcceptTime = DateTime.Now,
+                            AcceptDate = DateTime.Now,
                             COD = cod,
-                            PriceCoD = codPrice,
+                            CreationDate = DateTime.Now,
+                            CurrentStatusID = 0,
                             HeightSize = 0,
+                            Weight = weight,
                             LengthSize = 0,
+                            WidthSize = 0,
+                            Quantity = quantity,
+                            PostOfficeAcceptID = postId,
+                            CurrentPostOfficeID = postId,
+                            EmployeeAcceptID = EmployeeInfo.employeeId,
                             MailerDescription = describe,
                             MailerTypeID = checkMailerType != null ? checkMailerType.ServiceID : "",
-                            MerchandiseID = merchandisType,
                             MerchandiseValue = cod,
+                            MerchandiseID = merchandisType,
+                            PriceDefault = price,
+                            Price = price,
+                            PriceService = priceService,
+                            Amount = price + codPrice + priceService,
+                            PriceCoD = codPrice,
                             Notes = notes,
                             PaymentMethodID = mailerPay,
-                            PriceDefault = price,
-                            Amount = price + codPrice + priceService,
-                            PriceService = priceService,
-                            Quantity = quantity,
                             RecieverAddress = receiverAddress,
-                            RecieverDistrictID = checkDistrict != null ? checkDistrict.DistrictID : "",
                             RecieverName = receiver,
                             RecieverPhone = receiverPhone,
+                            RecieverDistrictID = checkDistrict != null ? checkDistrict.DistrictID : "",
+                            RecieverWardID = "",
                             RecieverProvinceID = checkProvince != null ? checkProvince.ProvinceID : "",
-                            Weight = weight,
-                            WidthSize = 0,
                             SenderID = senderID,
                             SenderAddress = senderAddress,
                             SenderDistrictID = senderDistrict,
                             SenderName = senderName,
                             SenderPhone = senderPhone,
                             SenderProvinceID = senderProvince,
-                            Services = services
-                        });
+                            SenderWardID = "",
+                            PaidCoD = 0,
+                            CreateType = 0,
+                            VATPercent = 10,
+                            IsReturn = false,
+                            IsPayment = 0,
+                            IsPostAccept = false
+                        };
+
+                        try
+                        {
+                            // 
+                            db.MM_Mailers.Add(mailerIns);
+                            db.SaveChanges();
+
+                            if (vsvs == "Y" && cod == 0)
+                            {
+                                // services.Where(p => p.code == "VSVX").FirstOrDefault().choose = true;
+                                var serviceVSVX = allService.Where(p => p.code == "VSVX").FirstOrDefault();
+
+                                if (serviceVSVX.percent == true)
+                                {
+                                    priceService = (price * serviceVSVX.price) / 100;
+                                }
+                                else
+                                {
+                                    priceService = serviceVSVX.price;
+                                }
+
+                                var mailerService = new MM_MailerServices()
+                                {
+                                    MailerID = mailerId,
+                                    CreationDate = DateTime.Now,
+                                    SellingPrice = (decimal)priceService,
+                                    PriceDefault = (decimal)serviceVSVX.price,
+                                    ServiceID = serviceVSVX.code
+                                };
+                                db.MM_MailerServices.Add(mailerService);
+
+                                db.SaveChanges();
+
+                                mailerIns.PriceService = priceService;
+                                mailerIns.Amount = mailerIns.Price + mailerIns.PriceCoD + mailerIns.PriceService;
+
+                                db.Entry(mailerIns).State = System.Data.Entity.EntityState.Modified;
+                                db.SaveChanges();
+                            }
+
+                            // luu tracking
+                            HandleHistory.AddTracking(0, mailerId, postId, "Nhận thông tin đơn hàng");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
 
                     }
                     // xoa file temp
@@ -372,7 +417,7 @@ namespace MNPOST.Controllers.mailer
 
                 }
 
-                result.data = mailers;
+                //    result.data = mailers;
             }
             catch (Exception e)
             {
@@ -396,8 +441,8 @@ namespace MNPOST.Controllers.mailer
             if (mailers == null)
                 return Json(new { error = 1, msg = "Hoàn thành" }, JsonRequestBehavior.AllowGet);
 
-            if (mailers.Count() > 100)
-                return Json(new { error = 1, msg = "Để đảm bảo hệ thống chỉ update 100/1 lần" }, JsonRequestBehavior.AllowGet);
+            if (mailers.Count() > 300)
+                return Json(new { error = 1, msg = "Để đảm bảo hệ thống chỉ update 300/1 lần" }, JsonRequestBehavior.AllowGet);
 
             var checkPost = db.BS_PostOffices.Find(postId);
 
@@ -488,85 +533,94 @@ namespace MNPOST.Controllers.mailer
                     CreateType = 0,
                     VATPercent = 10,
                     IsReturn = false,
-                    IsPayment = 0
+                    IsPayment = 0,
+                    IsPostAccept = false
                 };
 
-                // 
-                db.MM_Mailers.Add(mailerIns);
-                db.SaveChanges();
-
-                // add addressTemp
-                var findAddressTemp = db.AddressTemps.Where(p => p.Phone == mailerIns.RecieverPhone).FirstOrDefault();
-
-                if (findAddressTemp != null)
+                try
                 {
-                    findAddressTemp.AddressInfo = mailerIns.RecieverAddress;
-                    findAddressTemp.DistrictId = mailerIns.RecieverDistrictID;
-                    findAddressTemp.ProvinceId = mailerIns.RecieverProvinceID;
-                    findAddressTemp.WardId = mailerIns.RecieverWardID;
-                    findAddressTemp.Name = mailerIns.RecieverName;
-
-                    db.Entry(findAddressTemp).State = System.Data.Entity.EntityState.Modified;
+                    // 
+                    db.MM_Mailers.Add(mailerIns);
                     db.SaveChanges();
-                }
-                else
-                {
-                    var insAddressInfo = new AddressTemp()
+
+                    // add addressTemp
+                    var findAddressTemp = db.AddressTemps.Where(p => p.Phone == mailerIns.RecieverPhone).FirstOrDefault();
+
+                    if (findAddressTemp != null)
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = mailerIns.RecieverName,
-                        Phone = mailerIns.RecieverPhone,
-                        AddressInfo = mailerIns.RecieverAddress,
-                        DistrictId = mailerIns.RecieverDistrictID,
-                        ProvinceId = mailerIns.RecieverProvinceID,
-                        WardId = mailerIns.RecieverWardID
-                    };
+                        findAddressTemp.AddressInfo = mailerIns.RecieverAddress;
+                        findAddressTemp.DistrictId = mailerIns.RecieverDistrictID;
+                        findAddressTemp.ProvinceId = mailerIns.RecieverProvinceID;
+                        findAddressTemp.WardId = mailerIns.RecieverWardID;
+                        findAddressTemp.Name = mailerIns.RecieverName;
 
-                    db.AddressTemps.Add(insAddressInfo);
-                    db.SaveChanges();
-                }
-
-                // save service
-                if (item.Services != null)
-                {
-
-                    decimal? totalPriceService = 0;
-                    foreach (var service in item.Services)
+                        db.Entry(findAddressTemp).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    else
                     {
-                        var checkService = db.BS_Services.Where(p => p.ServiceID == service.code && p.IsActive == true).FirstOrDefault();
-                        if (checkService != null && service.choose == true)
+                        var insAddressInfo = new AddressTemp()
                         {
-                            var servicePrice = service.price;
+                            Id = Guid.NewGuid().ToString(),
+                            Name = mailerIns.RecieverName,
+                            Phone = mailerIns.RecieverPhone,
+                            AddressInfo = mailerIns.RecieverAddress,
+                            DistrictId = mailerIns.RecieverDistrictID,
+                            ProvinceId = mailerIns.RecieverProvinceID,
+                            WardId = mailerIns.RecieverWardID
+                        };
 
-                            if(service.percent == true)
-                            {
-                                servicePrice = (servicePrice * mailerIns.Price) / 100;
-                            }
-                            totalPriceService = totalPriceService + servicePrice;
-                            var mailerService = new MM_MailerServices()
-                            {
-                                MailerID = item.MailerID,
-                                CreationDate = DateTime.Now,
-                                SellingPrice = (decimal)servicePrice,
-                                PriceDefault = (decimal)checkService.Price,
-                                ServiceID = service.code
-                            };
-                            db.MM_MailerServices.Add(mailerService);
-                        }
+                        db.AddressTemps.Add(insAddressInfo);
+                        db.SaveChanges();
                     }
 
-                    db.SaveChanges();
+                    // save service
+                    if (item.Services != null)
+                    {
 
-                    mailerIns.PriceService = totalPriceService;
-                    mailerIns.Amount = mailerIns.Price + mailerIns.PriceCoD + mailerIns.PriceService;
+                        decimal? totalPriceService = 0;
+                        foreach (var service in item.Services)
+                        {
+                            var checkService = db.BS_Services.Where(p => p.ServiceID == service.code && p.IsActive == true).FirstOrDefault();
+                            if (checkService != null && service.choose == true)
+                            {
+                                var servicePrice = service.price;
 
-                    db.Entry(mailerIns).State = System.Data.Entity.EntityState.Modified;
-                    db.SaveChanges();
+                                if (service.percent == true)
+                                {
+                                    servicePrice = (servicePrice * mailerIns.Price) / 100;
+                                }
+                                totalPriceService = totalPriceService + servicePrice;
+                                var mailerService = new MM_MailerServices()
+                                {
+                                    MailerID = item.MailerID,
+                                    CreationDate = DateTime.Now,
+                                    SellingPrice = (decimal)servicePrice,
+                                    PriceDefault = (decimal)checkService.Price,
+                                    ServiceID = service.code
+                                };
+                                db.MM_MailerServices.Add(mailerService);
+                            }
+                        }
+
+                        db.SaveChanges();
+
+                        mailerIns.PriceService = totalPriceService;
+                        mailerIns.Amount = mailerIns.Price + mailerIns.PriceCoD + mailerIns.PriceService;
+
+                        db.Entry(mailerIns).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+                    }
+
+
+                    // luu tracking
+                    HandleHistory.AddTracking(0, item.MailerID, postId, "Nhận thông tin đơn hàng");
                 }
-
-
-                // luu tracking
-                HandleHistory.AddTracking(0, item.MailerID, postId, "Nhận thông tin đơn hàng");
+                catch
+                {
+                    insertFail.Add(item);
+                    continue;
+                }
             }
 
 

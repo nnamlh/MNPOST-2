@@ -63,8 +63,10 @@ namespace MNPOST.Controllers.mailer
             return View();
         }
 
+
+
         [HttpPost]
-        public JsonResult GetMailers(int? page, string search, string fromDate, string toDate, int status, string postId, string customerId)
+        public ActionResult GetMailers(int? page, string search, string fromDate, string toDate, int status, string postId, string customerId)
         {
             int pageSize = 50;
 
@@ -104,6 +106,8 @@ namespace MNPOST.Controllers.mailer
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+
 
         public ActionResult CancelReturn(string mailerId)
         {

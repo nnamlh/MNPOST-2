@@ -37,14 +37,15 @@ namespace MNPOSTAPI.Controllers
 
                 var findMailer = db.MM_Mailers.Where(p => p.ThirdpartyDocID == thirtCode).FirstOrDefault();
 
-                if(findMailer == null)
+                if (findMailer == null)
                 {
                     findMailer = db.MM_Mailers.Where(p => p.MailerID == order).FirstOrDefault();
                 }
 
+                /*
                 if (findMailer == null)
                     throw new Exception("Sai mã order");
-
+                    */
                 var date = DateTime.ParseExact(paser.DATA.ORDER_STATUSDATE, "dd/M/yyyy HH:mm:ss", null);
 
                 var tracking = new MM_TrackingPartner()
@@ -52,9 +53,9 @@ namespace MNPOSTAPI.Controllers
                     Id = Guid.NewGuid().ToString(),
                     CreateTime = date,
                     Describe = paser.DATA.NOTE,
-                    MailerID = findMailer.MailerID,
+                    MailerID = findMailer != null ? findMailer.MailerID : order,
                     OrderReferece = paser.DATA.ORDER_NUMBER,
-                    LocationCurrent = findMailer.CurrentPostOfficeID,
+                    LocationCurrent = findMailer != null ? findMailer.CurrentPostOfficeID : "",
                     StatusID = Convert.ToString(paser.DATA.ORDER_STATUS),
                     StatusName = paser.DATA.STATUS_NAME
                 };
@@ -63,18 +64,22 @@ namespace MNPOSTAPI.Controllers
                 db.SaveChanges();
 
 
-                if(tracking.StatusID == "501")
+                if (tracking.StatusID == "501")
                 {
-                    findMailer.DeliveryTo = paser.DATA.NOTE;
-                    findMailer.DeliveryDate = date;
-                    findMailer.DeliveryNotes = "Đã phát";
-                    findMailer.CurrentStatusID = 4;
+                    if (findMailer != null)
+                    {
+                        findMailer.DeliveryTo = paser.DATA.NOTE;
+                        findMailer.DeliveryDate = date;
+                        findMailer.DeliveryNotes = "Đã phát";
+                        findMailer.CurrentStatusID = 4;
 
-                    db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
-                    db.SaveChanges();
+                        db.Entry(findMailer).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+                    }
                 }
 
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 logger.Error(e.Message);
             }

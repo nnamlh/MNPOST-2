@@ -3,7 +3,7 @@ var pdfDoc = null,
     pageNum = 1,
     pageRendering = false,
     pageNumPending = null,
-    scale = 0.95,
+    scale = 1.2,
     canvas = document.getElementById('the-canvas'),
     ctx = canvas.getContext('2d');
 
@@ -78,9 +78,10 @@ function onNextPage() {
 document.getElementById('next').addEventListener('click', onNextPage);
 
 var pdfURL = '';
-
-function runShowPDF(url) {
+var excelUrl = '';
+function runShowPDF(url, urlExcel) {
     pdfURL = url;
+    excelUrl = urlExcel;
     showLoader(true);
     var pdfjsLib = window['pdfjs-dist/build/pdf'];
     // The workerSrc property shall be specified.
@@ -95,12 +96,16 @@ function runShowPDF(url) {
         renderPage(pageNum);
     }, function (reason) {
         showLoader(false);
-        console.error(reason)
+        console.error(reason);
     });
 }
 
 function printPDF () {
     window.open(pdfURL, '_blank');
 }
-
+function printExcel() {
+    window.open(excelUrl, '_blank');
+}
 document.getElementById('printpdf').addEventListener('click', printPDF);
+
+document.getElementById('printexcel').addEventListener('click', printExcel);

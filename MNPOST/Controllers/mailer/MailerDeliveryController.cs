@@ -66,11 +66,26 @@ namespace MNPOST.Controllers.mailer
 
             if (mailer.CurrentStatusID != 2 && mailer.CurrentStatusID != 6 && mailer.CurrentStatusID != 5)
             {
+
                 return Json(new ResultInfo()
                 {
                     error = 1,
                     msg = "Mã hàng không thể phân phát"
                 }, JsonRequestBehavior.AllowGet);
+            }
+
+
+
+            if (mailer.CurrentStatusID == 6 || mailer.CurrentStatusID == 5)
+            {
+                if (mailer.IsPostAccept == false)
+                {
+                    return Json(new ResultInfo()
+                    {
+                        error = 1,
+                        msg = "Mã hàng không thể phân phát vì bưu cục chưa xác nhận nhận hàng"
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
 
             var delivery = db.MM_MailerDelivery.Find(documentId);
@@ -106,6 +121,7 @@ namespace MNPOST.Controllers.mailer
                 db.SaveChanges();
 
                 mailer.CurrentStatusID = 3;
+                mailer.IsPostAccept = false;
                 mailer.LastUpdateDate = DateTime.Now;
                 db.Entry(mailer).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();
@@ -156,6 +172,18 @@ namespace MNPOST.Controllers.mailer
                 if (mailer.CurrentStatusID != 2 && mailer.CurrentStatusID != 6 && mailer.CurrentStatusID != 5)
                     continue;
 
+                if (mailer.CurrentStatusID == 6 || mailer.CurrentStatusID == 5)
+                {
+                    if (mailer.IsPostAccept == false)
+                    {
+                        return Json(new ResultInfo()
+                        {
+                            error = 1,
+                            msg = "Mã hàng không thể phân phát vì bưu cục chưa xác nhận nhận hàng"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+
                 // dang phat
                 var check = db.MM_MailerDeliveryDetail.Where(p => p.MailerID == item && p.DocumentID == documentId && p.DeliveryStatus == 3).FirstOrDefault();
 
@@ -178,6 +206,7 @@ namespace MNPOST.Controllers.mailer
 
                 mailer.CurrentStatusID = 3;
                 mailer.LastUpdateDate = DateTime.Now;
+                mailer.IsPostAccept = false;
                 db.Entry(mailer).State = System.Data.Entity.EntityState.Modified;
 
                 db.SaveChanges();
@@ -242,7 +271,7 @@ namespace MNPOST.Controllers.mailer
 
                 mailer.CurrentStatusID = lastTracking.StatusID;
                 mailer.LastUpdateDate = DateTime.Now;
-
+                mailer.IsPostAccept = true;
                 db.Entry(mailer).State = System.Data.Entity.EntityState.Modified;
 
                 db.SaveChanges();
@@ -416,6 +445,7 @@ namespace MNPOST.Controllers.mailer
 
                 foreach (var mailer in listMailer)
                 {
+
                     if (mailer.IsDetail == true)
                     {
                         // check phuong
@@ -537,7 +567,15 @@ namespace MNPOST.Controllers.mailer
             var data = new List<MailerIdentity>();
             foreach (var item in mailers)
             {
+
+                if (item.CurrentStatusID == 5 || item.CurrentStatusID == 6)
+                {
+                    if(item.IsPostAccept == false)
+                        continue;
+                }
+
                 var mailer = db.MAILER_GETINFO_BYID(item.MailerID).FirstOrDefault();
+
 
                 data.Add(new MailerIdentity()
                 {
@@ -612,6 +650,14 @@ namespace MNPOST.Controllers.mailer
                     if (checkMailer != null)
                     {
 
+                        if (checkMailer.CurrentStatusID == 6 || checkMailer.CurrentStatusID == 5)
+                        {
+                            if (checkMailer.IsPostAccept == false)
+                            {
+                                continue;
+                            }
+                        }
+
                         // dang phat
                         var check = db.MM_MailerDeliveryDetail.Where(p => p.MailerID == mailer.MailerID && p.DocumentID == findDocument.DocumentID && p.DeliveryStatus == 3).FirstOrDefault();
 
@@ -631,6 +677,7 @@ namespace MNPOST.Controllers.mailer
 
                         checkMailer.CurrentStatusID = 3;
                         checkMailer.LastUpdateDate = DateTime.Now;
+                        checkMailer.IsPostAccept = false;
                         db.Entry(checkMailer).State = System.Data.Entity.EntityState.Modified;
 
                         db.SaveChanges();
@@ -656,7 +703,7 @@ namespace MNPOST.Controllers.mailer
             if (findDetail != null)
             {
                 var mailerInfo = db.MM_Mailers.Find(findDetail.MailerID);
-
+                
                 var findDocument = db.MM_MailerDelivery.Where(p => p.DocumentID == detail.DocumentID).FirstOrDefault();
 
                 if (findDocument == null)
@@ -772,7 +819,7 @@ namespace MNPOST.Controllers.mailer
 
                    
                 }
-
+                mailerInfo.IsPostAccept = false;
                 db.Entry(mailerInfo).State = System.Data.Entity.EntityState.Modified;
                 db.Entry(findDetail).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();

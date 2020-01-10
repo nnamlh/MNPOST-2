@@ -223,6 +223,7 @@
     <Compile Include="Controllers\mailer\MailerPackingAcceptController.cs" />
     <Compile Include="Controllers\mailer\MailerPackingController.cs" />
     <Compile Include="Controllers\mailer\MailerPartnerController.cs" />
+    <Compile Include="Controllers\mailer\MailerReturnController.cs" />
     <Compile Include="Controllers\mailer\TrackingController.cs" />
     <Compile Include="Controllers\manage\AdminController.cs" />
     <Compile Include="Controllers\manage\ManageController.cs" />
@@ -241,6 +242,7 @@
     <Compile Include="Controllers\mnpostinfo\ZoneController.cs" />
     <Compile Include="Controllers\NoticeController.cs" />
     <Compile Include="Controllers\pricematrix\PriceMatrixController.cs" />
+    <Compile Include="Controllers\report\BaoCaoKhachHangController.cs" />
     <Compile Include="Controllers\report\QuantityReportController.cs" />
     <Compile Include="Controllers\report\ReportController.cs" />
     <Compile Include="Controllers\troubleticket\TroubleController.cs" />
@@ -260,6 +262,36 @@
     <Compile Include="Models\IdentityRoute.cs" />
     <Compile Include="Models\IdentityRpt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\baocao\cus_baocaohoan.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cus_baocaohoan.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Report\baocao\cus_baocaophat.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cus_baocaophat.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Report\baocao\rpt_baocaosanluongbuucuc.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rpt_baocaosanluongbuucuc.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Report\baocao\rpt_phathang_nhanvien_chitiet.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rpt_phathang_nhanvien_chitiet.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Report\baocao\rpt_sanluongphatvalayhang.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rpt_sanluongphatvalayhang.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Report\baocao\test.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1457,6 +1489,13 @@
     <Content Include="aspnet_client\system_web\4_0_30319\crystalreportviewers13\prompting\js\promptengine_strings_zh_TW.js" />
     <Content Include="aspnet_client\system_web\4_0_30319\crystalreportviewers13\urlreporting\activexviewer.js" />
     <Content Include="aspnet_client\system_web\4_0_30319\crystalreportviewers13\urlreporting\appletviewer.js" />
+    <Content Include="Content\bootstrap\css\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap\css\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap\css\bootstrap.css" />
+    <Content Include="Content\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Content\bootstrap\js\bootstrap.js" />
+    <Content Include="Content\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Content\bootstrap\js\npm.js" />
     <Content Include="Content\build\css\custom.css" />
     <Content Include="Content\build\css\custom.min.css" />
     <Content Include="Content\build\js\custom.js" />
@@ -1778,6 +1817,15 @@
     <Content Include="Content\vendors\font-awesome\scss\_variables.scss" />
     <Content Include="Content\vendors\jquery.inputmask\.bower.json" />
     <Content Include="Content\vendors\jquery.inputmask\bower.json" />
+    <Content Include="Content\bootstrap\css\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap\css\bootstrap-theme.min.css.map" />
+    <Content Include="Content\bootstrap\css\bootstrap.css.map" />
+    <Content Include="Content\bootstrap\css\bootstrap.min.css.map" />
+    <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\bootstrap\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\mnpost.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\debit\congnokhachhang.js" />
@@ -1885,6 +1933,8 @@
     <Content Include="Views\MailerPacking\Index.cshtml" />
     <Content Include="Views\MailerPackingAccept\Index.cshtml" />
     <Content Include="Views\QuantityReport\Index.cshtml" />
+    <Content Include="Views\MailerReturn\Index.cshtml" />
+    <Content Include="Views\BaoCaoKhachHang\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1908,6 +1958,26 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Report\baocao\cus_baocaohoan.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cus_baocaohoan.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\baocao\cus_baocaophat.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cus_baocaophat.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\baocao\rpt_baocaosanluongbuucuc.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rpt_baocaosanluongbuucuc.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\baocao\rpt_phathang_nhanvien_chitiet.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rpt_phathang_nhanvien_chitiet.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report\baocao\rpt_sanluongphatvalayhang.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rpt_sanluongphatvalayhang.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Report\baocao\test.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>test.cs</LastGenOutput>
